@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <integer name="SelectorCal"> 0x00</integer>
+    <integer name="SelectorFrd"> 0x01</integer>
+    <integer name="SelectorCir"> 0x02</integer>
+    <integer name="SelectorMe"> 0x03</integer>
+</resources>

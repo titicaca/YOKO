@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:clickable="false">
+
+    <RadioButton
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/string_register"
+        android:id="@+id/register_rbtn"
+        android:layout_alignParentTop="false"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentStart="false"
+        android:checked="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp" />
+
+    <EditText
+        android:id="@+id/register_input_username_et"
+        android:layout_width="280dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="107dp"
+        android:ems="10"
+        android:hint="@string/hint_username"
+        android:inputType="text" />
+
+    <EditText
+        android:id="@+id/register_input_code_et"
+        android:layout_width="280dp"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/register_input_username_et"
+        android:hint="@string/hint_password"
+        android:inputType="textPassword"
+        android:singleLine="false"
+        android:layout_below="@+id/register_input_username_et">
+    </EditText>
+
+    <EditText
+        android:id="@+id/register_reinput_code_et"
+        android:layout_width="280dp"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/register_input_code_et"
+        android:hint="@string/hint_reinput_password"
+        android:inputType="textPassword"
+        android:singleLine="false"
+        android:layout_below="@+id/register_input_code_et">
+    </EditText>
+
+    <Button
+        android:layout_width="280dp"
+        android:layout_height="wrap_content"
+        android:text="@string/string_finish"
+        android:id="@+id/finish_btn"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentStart="false"
+        android:layout_alignParentLeft="false"
+        android:layout_marginTop="10dp"
+        android:clickable="true"
+        android:enabled="true"
+        android:layout_below="@+id/register_reinput_code_et" />
+
+</RelativeLayout>

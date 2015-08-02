@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="string_finish">完成</string>
+    <string name="error_invalid_username">This username is invalid</string>
+    <string name="error_inconsistent_register_passwords">The two passwords you typed do not match.</string>
+</resources>

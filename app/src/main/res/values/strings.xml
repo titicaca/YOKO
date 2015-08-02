@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">YoKo</string>
+    <string name="string_login">登录</string>
+    <string name="string_register">注册</string>
+    <string name="string_change_password">修改密码</string>
+    <string name="hint_username">用户名</string>
+    <string name="hint_phone">手机号码</string>
+    <string name="hint_password">密码</string>
+    <string name="hint_new_password">新密码</string>
+    <string name="hint_reinput_password">再次输入密码</string>
+</resources>
