@@ -9,23 +9,24 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.fifteentec.Fragment.CalViewFragment;
+import com.fifteentec.Fragment.FriendsFragment;
 import com.fifteentec.Fragment.TabButtonFragment;
 
-public class TabActivity extends Activity implements TabButtonFragment.Ibutton{
+public class TabActivity extends Activity implements TabButtonFragment.Ibutton {
     private FragmentManager mFragmentManager;
-    private final int EnterPage= 0;
+    private final int EnterPage = 0;
     private TabButtonFragment mbuttonfg;
     private CalViewFragment mCalViewFragment;
+    private FriendsFragment friendsFragment;
 
 
     @SuppressLint("NewApi")
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mFragmentManager= this.getFragmentManager();
+        mFragmentManager = this.getFragmentManager();
         setContentView(R.layout.activity_tab_main_layout);
-        mbuttonfg=(TabButtonFragment)mFragmentManager.findFragmentById(R.id.tab_main_botton);
+        mbuttonfg = (TabButtonFragment) mFragmentManager.findFragmentById(R.id.tab_main_botton);
         mbuttonfg.setButton(this);
         TabSelector(R.integer.SelectorCal);
 
@@ -36,8 +37,7 @@ public class TabActivity extends Activity implements TabButtonFragment.Ibutton{
     public void TabSelector(int id) {
         FragmentTransaction mFmTrans = mFragmentManager.beginTransaction();
         HideAllView(mFmTrans);
-        switch (id)
-        {
+        switch (id) {
             case R.integer.SelectorCal:
                 Toast d = Toast.makeText(this, "Calendar",
                         Toast.LENGTH_SHORT);
@@ -58,10 +58,24 @@ public class TabActivity extends Activity implements TabButtonFragment.Ibutton{
                 a.show();
                 break;
             case R.integer.SelectorCir:
-                Toast b =Toast.makeText(this, "Friend",
+                Toast b = Toast.makeText(this, "Friend",
                         Toast.LENGTH_SHORT);
                 b.setDuration(Toast.LENGTH_SHORT);
                 b.show();
+                if (null == friendsFragment) {
+                    friendsFragment = new FriendsFragment();
+                    mFmTrans.add(R.id.id_content, friendsFragment, "frd");
+                } else {
+                    mFmTrans.show(friendsFragment);
+                }
+
+//                if (friendsFragment == null) {
+//                    friendsFragment = new FriendsFragment();
+//                    mFmTrans.add(R.id.id_content, friendsFragment, "cal");
+//                } else {
+//                    mFmTrans.show(friendsFragment);
+//                }
+
 
                 break;
 
@@ -80,7 +94,7 @@ public class TabActivity extends Activity implements TabButtonFragment.Ibutton{
     }
 
     private void HideAllView(FragmentTransaction mFmTrans) {
-        if(mCalViewFragment != null){
+        if (mCalViewFragment != null) {
             mFmTrans.hide(mCalViewFragment);
         }
 

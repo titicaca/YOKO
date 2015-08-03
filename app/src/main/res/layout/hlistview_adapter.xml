@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <RelativeLayout
+        android:id="@+id/hlist_rl_title"
+        android:layout_width="fill_parent"
+        android:layout_height="40dp"
+        android:padding="5dp" >
+
+        <ImageView
+            android:id="@+id/hlist_iv_back"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_centerVertical="true"
+            android:background="@drawable/ic_launcher" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/hlist_iv_back"
+            android:text="好友" />
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/hlist_iv_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/hlist_rl_title"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/ic_launcher" />
+
+    <TextView
+        android:id="@+id/hlist_tv_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/hlist_rl_title"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:background="#f00"
+        android:text="标签"
+        android:textSize="30sp" />
+
+    <RelativeLayout
+        android:id="@+id/hlist_rL_information"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/hlist_iv_icon"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp" >
+
+        <TextView
+            android:id="@+id/hlist_rL_information_tv_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="姓名" />
+
+        <View
+            android:id="@+id/hlist_rL_information_view1"
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_below="@id/hlist_rL_information_tv_name"
+            android:background="#000" />
+
+        <ImageView
+            android:id="@+id/hlist_rL_information_iv_address"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_below="@id/hlist_rL_information_view1"
+            android:background="@drawable/ic_launcher" />
+
+        <TextView
+            android:id="@+id/hlist_rL_information_tv_address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/hlist_rL_information_view1"
+            android:layout_toRightOf="@id/hlist_rL_information_iv_address"
+            android:text="所在地" />
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/hlist_iv_xx1"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_below="@id/hlist_rL_information"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/ic_launcher" />
+
+    <ImageView
+        android:id="@+id/hlist_iv_xx2"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_below="@id/hlist_rL_information"
+        android:layout_marginTop="10dp"
+        android:layout_toRightOf="@id/hlist_iv_xx1"
+        android:background="@drawable/ic_launcher" />
+
+    <TextView
+        android:id="@+id/hlist_tv_descriptions"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/hlist_iv_xx1"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:text="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
+
+    <TextView
+        android:id="@+id/hlist_tv_like"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/hlist_tv_label"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:text="34喜欢" />
+
+    <TextView
+        android:id="@+id/hlist_tv_arrive"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/hlist_tv_like"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="40dp"
+        android:text="23到过" />
+
+    <TextView
+        android:id="@+id/hlist_tv_friends"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/hlist_tv_arrive"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="40dp"
+        android:text="34好友" />
+
+    <View
+        android:id="@+id/hlist__view"
+        android:layout_width="fill_parent"
+        android:layout_height="0.1dp"
+        android:layout_below="@id/hlist_tv_descriptions"
+        android:layout_marginTop="5dp"
+        android:background="#000" />
+
+    <GridView
+        android:id="@+id/hlist_gv_images"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/hlist__view"
+        android:numColumns="4" >
+    </GridView>
+
+</RelativeLayout>

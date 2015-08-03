@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/YOKO.iml" filepath="$PROJECT_DIR$/YOKO.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/volley/volley.iml" filepath="$PROJECT_DIR$/volley/volley.iml" />
+      <module fileurl="file://$PROJECT_DIR$/yoko.iml" filepath="$PROJECT_DIR$/yoko.iml" />
     </modules>
   </component>
 </project>
