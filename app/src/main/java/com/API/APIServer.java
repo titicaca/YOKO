@@ -54,9 +54,7 @@ public class APIServer {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.v("VolleyError", error.toString());
-                        Log.v("VolleyError", "Status Code: " + error.networkResponse.statusCode);
-                        error.printStackTrace();
+                        Log.v("VolleyEroor", new String(error.networkResponse.data));
 
                         callbackResponse.setResponse(null);
                         callbackResponse.run();
@@ -92,9 +90,7 @@ public class APIServer {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.v("VolleyError", error.toString());
-                        Log.v("VolleyError", "Status Code: " + error.networkResponse.statusCode);
-                        error.printStackTrace();
+                        Log.v("VolleyEroor", new String(error.networkResponse.data));
 
                         callbackResponse.setResponse(null);
                         callbackResponse.run();
@@ -156,9 +152,7 @@ public class APIServer {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.v("VolleyError", error.toString());
-                        Log.v("VolleyError", "Status Code: " + error.networkResponse.statusCode);
-                        error.printStackTrace();
+                        Log.v("VolleyEroor", new String(error.networkResponse.data));
 
                         callbackResponse.setResponse(null);
                         callbackResponse.run();
@@ -194,9 +188,7 @@ public class APIServer {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.v("VolleyError", error.toString());
-                        Log.v("VolleyError", "Status Code: " + error.networkResponse.statusCode);
-                        error.printStackTrace();
+                        Log.v("VolleyEroor", new String(error.networkResponse.data));
 
                         callbackResponse.setResponse(null);
                         callbackResponse.run();
@@ -263,9 +255,7 @@ public class APIServer {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.v("VolleyError", error.toString());
-                        Log.v("VolleyError", "Status Code: " + error.networkResponse.statusCode);
-                        error.printStackTrace();
+                        Log.v("VolleyEroor", new String(error.networkResponse.data));
 
                         callbackResponse.setResponse(null);
                         callbackResponse.run();
