@@ -34,7 +34,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 "(_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "uid CHAR(20), " +
                 "fuid CHAR(20), " +
-                "tagId CHAR(20)" +
+                "tagId CHAR(20)," +
                 "tagName CHAR(255)" +
                 ")");
     }

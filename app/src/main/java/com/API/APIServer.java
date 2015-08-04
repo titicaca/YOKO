@@ -38,7 +38,7 @@ public class APIServer {
      * @param tag 请求的Tag标签
      */
     public void sendJsonArrayPost(String url, JSONArray params,
-                                  final APIJsonArrayCallbackResponse callbackResponse,
+                                  final APICallbackResponse callbackResponse,
                                   RequestQueue queue, final Object tag) {
         JsonArrayRequest request = new JsonArrayRequest(
                 Method.GET,
@@ -54,15 +54,9 @@ public class APIServer {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.v("VolleyError", error.toString());
-                        error.printStackTrace();
-                        JSONArray error_response = null;
-                        try {
-                            error_response = new JSONArray("[{status:error}]");
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        callbackResponse.setResponse(error_response);
+                        Log.v("VolleyEroor", new String(error.networkResponse.data));
+
+                        callbackResponse.setResponse(null);
                         callbackResponse.run();
                     }
                 }
@@ -81,7 +75,7 @@ public class APIServer {
      * @param tag 请求的Tag标签
      */
     public void sendJsonPost(String url, JSONObject params,
-                             final APIJsonCallbackResponse callbackResponse,
+                             final APICallbackResponse callbackResponse,
                              RequestQueue queue, final Object tag) {
         JsonObjectRequest request = new JsonObjectRequest(
                 url,
@@ -96,15 +90,9 @@ public class APIServer {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.v("VolleyError", error.toString());
-                        error.printStackTrace();
-                        JSONObject error_response = new JSONObject();
-                        try {
-                            error_response.put(APIKey.KEY_STATUS, VALUE_NETWORK_CONNECTION_ERROR);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        callbackResponse.setResponse(error_response);
+                        Log.v("VolleyEroor", new String(error.networkResponse.data));
+
+                        callbackResponse.setResponse(null);
                         callbackResponse.run();
                     }
                 }
@@ -123,7 +111,7 @@ public class APIServer {
      * @param tag 请求的Tag标签
      */
     public void sendJsonGet(String url, JSONObject params,
-                            final APIJsonCallbackResponse callbackResponse,
+                            final APICallbackResponse callbackResponse,
                             RequestQueue queue, final Object tag) {
         if (params != null) {
             Iterator<String> keys = params.keys();
@@ -164,15 +152,9 @@ public class APIServer {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.v("VolleyError", error.toString());
-                        error.printStackTrace();
-                        JSONObject error_response = new JSONObject();
-                        try {
-                            error_response.put(APIKey.KEY_STATUS, VALUE_NETWORK_CONNECTION_ERROR);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        callbackResponse.setResponse(error_response);
+                        Log.v("VolleyEroor", new String(error.networkResponse.data));
+
+                        callbackResponse.setResponse(null);
                         callbackResponse.run();
                     }
                 }
@@ -191,7 +173,7 @@ public class APIServer {
      * @param tag 请求的Tag标签
      */
     public void sendStringPost(String url, final Map<String, String> params,
-                              final APIStringCallbackResponse callbackResponse,
+                              final APICallbackResponse callbackResponse,
                               RequestQueue queue, final Object tag) {
         StringRequest request = new StringRequest(
                 Request.Method.POST,
@@ -206,10 +188,9 @@ public class APIServer {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.v("VolleyError", error.toString());
-                        error.printStackTrace();
-                        String error_response = new String("success:failed");
-                        callbackResponse.setResponse(error_response);
+                        Log.v("VolleyEroor", new String(error.networkResponse.data));
+
+                        callbackResponse.setResponse(null);
                         callbackResponse.run();
                     }
                 }
@@ -233,7 +214,7 @@ public class APIServer {
      * @param tag 请求的Tag标签
      */
     public void sendStringGet(String url, final Map<String, String> params,
-                              final APIStringCallbackResponse callbackResponse,
+                              final APICallbackResponse callbackResponse,
                               RequestQueue queue, final Object tag) {
         if (params != null) {
             Iterator<String> keys = params.keySet().iterator();
@@ -274,10 +255,9 @@ public class APIServer {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.v("VolleyError", error.toString());
-                        error.printStackTrace();
-                        String error_response = new String("success:failed");
-                        callbackResponse.setResponse(error_response);
+                        Log.v("VolleyEroor", new String(error.networkResponse.data));
+
+                        callbackResponse.setResponse(null);
                         callbackResponse.run();
                     }
                 }
