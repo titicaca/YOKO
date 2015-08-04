@@ -133,8 +133,8 @@ public class NewFriendActivity extends Activity implements OnClickListener {
                             // new_friends_lv.setVisibility(View.VISIBLE);
                             // list = new ArrayList<JsonParsing>();
                             JsonParsing jp = new JsonParsing();
-                            jp.name = number[i];
-                            jp.id = i + "";
+//                            jp.name = number[i];
+//                            jp.id = i + "";
                             list.add(jp);
                             break;
                         }

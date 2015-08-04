@@ -1,7 +1,6 @@
 package com.fifteentec.yoko;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
@@ -12,7 +11,7 @@ import com.fifteentec.Fragment.CalViewFragment;
 import com.fifteentec.Fragment.FriendsFragment;
 import com.fifteentec.Fragment.TabButtonFragment;
 
-public class TabActivity extends Activity implements TabButtonFragment.Ibutton {
+public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutton {
     private FragmentManager mFragmentManager;
     private final int EnterPage = 0;
     private TabButtonFragment mbuttonfg;

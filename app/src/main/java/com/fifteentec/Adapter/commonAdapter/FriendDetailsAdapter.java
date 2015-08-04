@@ -92,7 +92,7 @@ public class FriendDetailsAdapter extends PagerAdapter {
         // 填充数据
         // viewHolder.tvName.setText(position + 1 + "");
         viewHolder.hlist_rL_information_tv_name
-                .setText(jsonData.get(position).name);
+                .setText(jsonData.get(position).nickname);
         fdgvadapter = new FriendDetailsGridViewAdapter(context);
         viewHolder.gv.setAdapter(fdgvadapter);
         ((ViewPager) view).addView(userLayout, 0);

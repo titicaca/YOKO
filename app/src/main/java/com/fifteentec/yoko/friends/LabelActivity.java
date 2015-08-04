@@ -29,6 +29,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -59,6 +60,7 @@ public class LabelActivity extends Activity implements OnItemLongClickListener,
         lv.setOnItemLongClickListener(this);
         lv.setOnItemClickListener(this);
         label_create.setOnClickListener(this);
+
 
     }
 
@@ -100,7 +102,7 @@ public class LabelActivity extends Activity implements OnItemLongClickListener,
     }
 
     public void addlist() {
-
+        label = new ArrayList<String>();
         try {
             json = readSDFile(NewLabelActivity.labelstr);
         } catch (IOException e) {
@@ -133,6 +135,7 @@ public class LabelActivity extends Activity implements OnItemLongClickListener,
                 }
 
                 labellist.put(jsonObjs.optString("label"), listNameid);
+                listNameid = new ArrayList<JsonParsing>();
 
             }
         } catch (JSONException e) {
@@ -156,7 +159,8 @@ public class LabelActivity extends Activity implements OnItemLongClickListener,
                 in.putExtra("flag", "0");
                 // startActivity(in);
                 in.putExtra("isLabelTrans", "labalnews");
-                in.putExtra("labelindex", 0);
+                in.putExtra("labelindex", -1);
+                in.putExtra("personlist", (Serializable) new ArrayList<JsonParsing>());
                 startActivityForResult(in, LABEL_REQUEST);
 
                 break;
@@ -170,9 +174,10 @@ public class LabelActivity extends Activity implements OnItemLongClickListener,
     public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
         Intent in = new Intent();
         in.setClass(LabelActivity.this, NewLabelActivity.class);
-        in.putExtra("flag", "0");
+        in.putExtra("flag", "3");
         in.putExtra("labelindex", arg2);
         // startActivity(in);
+        in.putExtra("personlist", (Serializable) labellist.get(label.get(arg2)));
         in.putExtra("isLabelTrans", "labaltrans");
         startActivityForResult(in, LABEL_REQUEST);
     }
@@ -197,4 +202,14 @@ public class LabelActivity extends Activity implements OnItemLongClickListener,
         return res;
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        addlist();
+        liadapter = new LabelItemAdapter(this, label);
+        lv.setAdapter(liadapter);
+
+
+    }
 }

@@ -4,9 +4,6 @@ package com.fifteentec.Adapter.commonAdapter;
  * Created by Administrator on 2015/8/3.
  */
 
-import java.util.ArrayList;
-
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +15,9 @@ import android.widget.TextView;
 
 import com.fifteentec.yoko.R;
 import com.fifteentec.yoko.friends.JsonParsing;
+import com.nostra13.universalimageloader.core.ImageLoader;
+
+import java.util.ArrayList;
 
 public class FriendsAdapter extends BaseAdapter {
 
@@ -61,6 +61,7 @@ public class FriendsAdapter extends BaseAdapter {
                     .findViewById(R.id.friends_adapter_tv_name);
             viewHolder.friends_adapter_tv_add = (TextView) convertView
                     .findViewById(R.id.friends_adapter_tv_add);
+            viewHolder.iv = (ImageView) convertView.findViewById(R.id.friends_adapter_iv);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -68,7 +69,10 @@ public class FriendsAdapter extends BaseAdapter {
         if (flag.equals("1")) {
             viewHolder.friends_adapter_tv_add.setVisibility(View.VISIBLE);
         }
-        viewHolder.friends_adapter_tv_name.setText(list.get(arg0).name);
+        viewHolder.friends_adapter_tv_name.setText(list.get(arg0).nickname);
+
+        ImageLoader.getInstance().displayImage(list.get(arg0).picturelink, viewHolder.iv);
+
         viewHolder.friends_adapter_tv_add
                 .setOnClickListener(new OnClickListener() {
 

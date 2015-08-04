@@ -57,7 +57,7 @@ public class NewLabelActivity extends Activity implements OnItemClickListener,
     public static String labelstr = Environment.getExternalStorageDirectory()
             + File.separator + "label" + File.separator + "json.txt";
     private String labaltrans;
-    private Integer labelindex = 0;
+    private Integer labelindex = -1;
 
     @SuppressWarnings("unchecked")
     @Override
@@ -68,20 +68,17 @@ public class NewLabelActivity extends Activity implements OnItemClickListener,
         search = (EditText) findViewById(R.id.new_label_et_search);
         new_label_gv = (GridView) findViewById(R.id.new_label_gv);
         new_label_tv = (TextView) findViewById(R.id.new_label_tv);
-        // 假数据
-        // initdatas();
 
         Intent intent = getIntent();
         String flag = intent.getStringExtra("flag");
-        labelindex = intent.getIntExtra("labelindex", 0);
+        labelindex = intent.getIntExtra("labelindex", -1);
         labaltrans = intent.getStringExtra("isLabelTrans");
-
+        jsonData = (ArrayList<JsonParsing>) intent.getSerializableExtra("personlist");
         if (flag.equals("0")) {
             nlgvadapter = new NewLabelGvAdapter(this, jsonData, "0");
             new_label_gv.setAdapter(nlgvadapter);
         } else {
-            jsonTrans = (ArrayList<JsonParsing>) intent
-                    .getSerializableExtra("jsonTrans");
+            jsonTrans = jsonData;
             nlgvadapter = new NewLabelGvAdapter(this, jsonTrans, "0");
             new_label_gv.setAdapter(nlgvadapter);
         }
@@ -373,7 +370,7 @@ public class NewLabelActivity extends Activity implements OnItemClickListener,
                                     // temp.put("labelName",
                                     // search.getText().toString()); //
                                     // JSONObject是按照key:value形式保存
-                                    temp.put("name", jsonTrans.get(x).name);
+//                                    temp.put("name", jsonTrans.get(x).name);
                                     temp.put("id", jsonTrans.get(x).id);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
@@ -455,8 +452,8 @@ public class NewLabelActivity extends Activity implements OnItemClickListener,
                             if (jsonTrans.size() == 0) {
                                 listNameid = new ArrayList<JsonParsing>();
                                 JsonParsing jps = new JsonParsing();
-                                jps.id = "";
-                                jps.name = "";
+//                                jps.id = "";
+//                                jps.name = "";
                                 listNameid.add(jps);
                                 label.add(search.getText().toString());
 
@@ -468,7 +465,7 @@ public class NewLabelActivity extends Activity implements OnItemClickListener,
                                 for (int i = 0; i < jsonTrans.size(); i++) {
                                     JsonParsing jps = new JsonParsing();
                                     jps.id = jsonTrans.get(i).id;
-                                    jps.name = jsonTrans.get(i).name;
+//                                    jps.name = jsonTrans.get(i).name;
                                     listNameid.add(jps);
                                 }
                                 Log.e("123", listNameid + "");
@@ -494,8 +491,8 @@ public class NewLabelActivity extends Activity implements OnItemClickListener,
                                             // search.getText().toString()); //
                                             // JSONObject是按照key:value形式保存
 
-                                            temp.put("name",
-                                                    jsonLabelListData.get(x).name);
+//                                            temp.put("name",
+//                                                    jsonLabelListData.get(x).name);
                                             temp.put("id",
                                                     jsonLabelListData.get(x).id);
                                         } catch (JSONException e) {
@@ -571,6 +568,15 @@ public class NewLabelActivity extends Activity implements OnItemClickListener,
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
+//                            Set keyset = labellist.keySet();
+//                            for (Object labename : keyset) {
+//                                if (label.get(labelindex).equals(labename)) {
+//                                    Toast.makeText(NewLabelActivity.this,"123",Toast.LENGTH_SHORT).show();
+//
+//                                }
+//                            }
+
+
 //                            for (int i = 0; i < listNameid.size(); i++) {
 //                                if (label.get(labelindex).equals(labellist.get(labelname).get(i).name)) {
 //

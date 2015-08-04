@@ -2,34 +2,6 @@
 <items version="2" >
 
     <item
-        jar="E:\Git\code\yoko\app\build\intermediates\exploded-aar\yoko\SMSSDK\unspecified\jars\libs\SMSSDK-1.2.2.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="fdbdc82cc81d5d26e2ef56ab5f4ffb0fc04b4b00">
-        <dex dex="E:\Git\code\yoko\app\build\intermediates\pre-dexed\debug\SMSSDK-1.2.2-769cd164e5a4833a08272037cb4750d340a2784b.jar" />
-    </item>
-    <item
-        jar="E:\Git\code\yoko\app\src\main\java\libs\android-support-v4.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="4a6be13368bb64c5a0b0460632d228a1a915f58f">
-        <dex dex="E:\Git\code\yoko\app\build\intermediates\pre-dexed\debug\android-support-v4-56b013a2e96ab9ee5db91df1112c4de0a0610a9f.jar" />
-    </item>
-    <item
-        jar="E:\Git\code\yoko\app\build\intermediates\exploded-aar\yoko\SMSSDK\unspecified\jars\libs\MobTools.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="c41aaf9ac27d8a39338463e980799f855ee3d432">
-        <dex dex="E:\Git\code\yoko\app\build\intermediates\pre-dexed\debug\MobTools-aba8c0fe385ab9e5d679be0eb72f747c31504e7e.jar" />
-    </item>
-    <item
-        jar="E:\Git\code\yoko\app\libs\universal-image-loader-1.9.4.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="dd9eeb557650c4ad7394df23f0f5cf27a7cfc697">
-        <dex dex="E:\Git\code\yoko\app\build\intermediates\pre-dexed\debug\universal-image-loader-1.9.4-1ba88d03c2583ff3d909791d54316835709df411.jar" />
-    </item>
-    <item
         jar="E:\Git\code\yoko\app\build\intermediates\exploded-aar\yoko\volley\unspecified\jars\classes.jar"
         jumboMode="false"
         revision="22.0.1"
@@ -51,11 +23,88 @@
         <dex dex="E:\Git\code\yoko\app\build\intermediates\pre-dexed\debug\okhttp-2.4.0-4f9f5639380640e8df06325f316b5baa920686b5.jar" />
     </item>
     <item
+        jar="E:\Git\code\yoko\app\build\intermediates\exploded-aar\yoko\SMSSDK\unspecified\jars\libs\SMSSDK-1.2.2.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="fdbdc82cc81d5d26e2ef56ab5f4ffb0fc04b4b00">
+        <dex dex="E:\Git\code\yoko\app\build\intermediates\pre-dexed\debug\SMSSDK-1.2.2-769cd164e5a4833a08272037cb4750d340a2784b.jar" />
+    </item>
+    <item
+        jar="E:\Git\code\yoko\app\build\intermediates\exploded-aar\yoko\SMSSDK\unspecified\jars\libs\MobTools.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="c41aaf9ac27d8a39338463e980799f855ee3d432">
+        <dex dex="E:\Git\code\yoko\app\build\intermediates\pre-dexed\debug\MobTools-aba8c0fe385ab9e5d679be0eb72f747c31504e7e.jar" />
+    </item>
+    <item
+        jar="E:\Git\code\0804\yoko\app\libs\universal-image-loader-1.9.4.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="dd9eeb557650c4ad7394df23f0f5cf27a7cfc697">
+        <dex dex="E:\Git\code\0804\yoko\app\build\intermediates\pre-dexed\debug\universal-image-loader-1.9.4-ebf315f14d3e3fd453391503902a29f29bb69c06.jar" />
+    </item>
+    <item
+        jar="E:\Git\code\0804\yoko\app\build\intermediates\exploded-aar\yoko\SMSSDK\unspecified\jars\libs\MobTools.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="c41aaf9ac27d8a39338463e980799f855ee3d432">
+        <dex dex="E:\Git\code\0804\yoko\app\build\intermediates\pre-dexed\debug\MobTools-34e409c33b1050ee422478584cbac018fba13c61.jar" />
+    </item>
+    <item
+        jar="E:\Git\code\0804\yoko\app\build\intermediates\exploded-aar\yoko\SMSSDK\unspecified\jars\libs\SMSSDK-1.2.2.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="fdbdc82cc81d5d26e2ef56ab5f4ffb0fc04b4b00">
+        <dex dex="E:\Git\code\0804\yoko\app\build\intermediates\pre-dexed\debug\SMSSDK-1.2.2-dc8724d91da5951af7bc42ca25a60b87ad80e86a.jar" />
+    </item>
+    <item
         jar="E:\Git\code\yoko\app\libs\okio-1.4.0.jar"
         jumboMode="false"
         revision="22.0.1"
         sha1="5b72bf48563ea8410e650de14aa33ff69a3e8c35">
         <dex dex="E:\Git\code\yoko\app\build\intermediates\pre-dexed\debug\okio-1.4.0-fc369c208ee0475562d9c01f95e924159a8e9b95.jar" />
+    </item>
+    <item
+        jar="E:\Git\code\yoko\app\libs\universal-image-loader-1.9.4.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="dd9eeb557650c4ad7394df23f0f5cf27a7cfc697">
+        <dex dex="E:\Git\code\yoko\app\build\intermediates\pre-dexed\debug\universal-image-loader-1.9.4-1ba88d03c2583ff3d909791d54316835709df411.jar" />
+    </item>
+    <item
+        jar="E:\Git\code\0804\yoko\app\libs\okio-1.4.0.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="5b72bf48563ea8410e650de14aa33ff69a3e8c35">
+        <dex dex="E:\Git\code\0804\yoko\app\build\intermediates\pre-dexed\debug\okio-1.4.0-3bef012636da1331813eea830b9925aa8e8300f4.jar" />
+    </item>
+    <item
+        jar="E:\Git\code\0804\yoko\app\build\intermediates\exploded-aar\yoko\SMSSDK\unspecified\jars\classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="a34e5e259a4dd255a04fc914ee2b7c3d292fad5b">
+        <dex dex="E:\Git\code\0804\yoko\app\build\intermediates\pre-dexed\debug\classes-025abb59f06f23d1c8b1482507a0e889b10e04db.jar" />
+    </item>
+    <item
+        jar="E:\Git\code\0804\yoko\app\src\main\java\libs\android-support-v4.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="4a6be13368bb64c5a0b0460632d228a1a915f58f">
+        <dex dex="E:\Git\code\0804\yoko\app\build\intermediates\pre-dexed\debug\android-support-v4-1a42c804736382b7c384d0617045ef02fe7bc91d.jar" />
+    </item>
+    <item
+        jar="E:\Git\code\0804\yoko\app\build\intermediates\exploded-aar\yoko\volley\unspecified\jars\classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="c93de974c86e1ba54404ddfcb8848857faef0973">
+        <dex dex="E:\Git\code\0804\yoko\app\build\intermediates\pre-dexed\debug\classes-1c802f7df273c6ff5128f5057f78e39cc0a54e9c.jar" />
+    </item>
+    <item
+        jar="E:\Git\code\0804\yoko\app\libs\okhttp-2.4.0.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="40340c0748190fe897baf7bffbc1b282734294e5">
+        <dex dex="E:\Git\code\0804\yoko\app\build\intermediates\pre-dexed\debug\okhttp-2.4.0-efb444e151caba98cb33c4704ce84c0b45689ced.jar" />
     </item>
 
 </items>

@@ -4,18 +4,6 @@ package com.fifteentec.yoko.friends;
  * Created by Administrator on 2015/8/3.
  */
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-
-import org.apache.http.util.EncodingUtils;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -23,8 +11,8 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.view.View.OnFocusChangeListener;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -33,6 +21,17 @@ import android.widget.TextView;
 import com.fifteentec.Adapter.commonAdapter.NewLabelGvAddAdapter;
 import com.fifteentec.Component.calendar.KeyboardLayout;
 import com.fifteentec.yoko.R;
+
+import org.apache.http.util.EncodingUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
 
 public class NewLabelGvAddActivity extends Activity implements OnClickListener {
 

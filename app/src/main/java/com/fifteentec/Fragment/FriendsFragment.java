@@ -25,9 +25,13 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.API.APIJsonCallbackResponse;
+import com.API.APIServer;
+import com.API.APIUrl;
 import com.fifteentec.Adapter.commonAdapter.FriendsAdapter;
 import com.fifteentec.Adapter.commonAdapter.FriendsTwoAdapter;
 import com.fifteentec.Component.calendar.KeyboardLayout;
+import com.fifteentec.yoko.BaseActivity;
 import com.fifteentec.yoko.R;
 import com.fifteentec.yoko.friends.FriendDetailsActivity;
 import com.fifteentec.yoko.friends.JsonParsing;
@@ -59,6 +63,9 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
     private View v;
     private TextView friends_tv_addfriends;
     private FriendsAdapter fAdapter;
+    private BaseActivity activity;
+    private ArrayList<JsonParsing> list = new ArrayList<JsonParsing>();
+    private JsonParsing jp;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -69,6 +76,11 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
         search = (EditText) view.findViewById(R.id.friends_search_et);
         friends_tv_addfriends = (TextView) view
                 .findViewById(R.id.friends_tv_addfriends);
+
+        this.activity = (BaseActivity) this.getActivity();
+        jp = new JsonParsing();
+
+
         // 判断软键盘弹出收起
         // friends_search_ll.getViewTreeObserver().addOnGlobalLayoutListener(
         // new OnGlobalLayoutListener() {
@@ -80,7 +92,7 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
         //
         // }
         // });
-        initDatas();
+//        initDatas();
         mainView = (KeyboardLayout) view.findViewById(R.id.keyboardLayout1);
         mainView.setOnkbdStateListener(new KeyboardLayout.onKybdsChangeListener() {
 
@@ -116,18 +128,18 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
         // 好友标签适配器
         FriendsTwoAdapter ftapterAdapter = new FriendsTwoAdapter(getActivity());
         lv1.setAdapter(ftapterAdapter);
-        // 好友列表适配器
-        fAdapter = new FriendsAdapter(getActivity(), jsonData, "0", v);
-        lv2.setAdapter(fAdapter);
+
         // 设置listview定高
         setListViewHeightBasedOnChildren(lv1);
-        setListViewHeightBasedOnChildren(lv2);
+
         friends_tv_addfriends.setOnClickListener(this);
         search.setOnFocusChangeListener(onFocusAutoClearHintListener);
         // lv1.setOnItemClickListener(this);
         lv2.setOnItemClickListener(this);
         lv1.setOnItemClickListener(this);
         lv2.setOnItemLongClickListener(this);
+        //加载好友列表
+        LoadFriendsList();
         // lv2.setOnItemClickListener(new OnItemClickListener() {
         //
         // @Override
@@ -314,7 +326,7 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
                 intent.setClass(getActivity(), FriendDetailsActivity.class);
                 intent.putExtra("position", arg2);
                 // 传递集合数据时，需要将bean文件实现Serializable接口才能正常传递
-                intent.putExtra("json", (Serializable) jsonData);
+                intent.putExtra("json", (Serializable) list);
                 startActivity(intent);
                 break;
             default:
@@ -354,7 +366,7 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 // showClickMessage("确定");
-                                jsonData.remove(position);
+                                list.remove(position);
                                 fAdapter.notifyDataSetChanged();
                                 // 因为之前listview已经固定高度，所以删除后，需重新定高
                                 setListViewHeightBasedOnChildren(lv2);
@@ -376,5 +388,31 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
         return false;
     }
 
+    private void LoadFriendsList() {
+        APIServer api = APIServer.getInstance();
+        api.sendJsonGet(
+                APIUrl.URL_FRIENDLIST,
+                null,
+                new APIJsonCallbackResponse() {
+
+                    @Override
+                    public void run() {
+                        JSONObject response = this.getResponse();
+
+                        try {
+                            jp.parsingJson(response);
+                            // 好友列表适配器
+                            list = jp.list;
+                            fAdapter = new FriendsAdapter(getActivity(), list, "0", v);
+                            lv2.setAdapter(fAdapter);
+                            setListViewHeightBasedOnChildren(lv2);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                activity.getRequestQueue(),
+                null);
+    }
 }
 

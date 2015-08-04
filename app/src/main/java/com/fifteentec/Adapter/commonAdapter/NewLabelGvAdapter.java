@@ -4,9 +4,6 @@ package com.fifteentec.Adapter.commonAdapter;
  * Created by Administrator on 2015/8/3.
  */
 
-import java.util.ArrayList;
-
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +15,8 @@ import android.widget.TextView;
 
 import com.fifteentec.yoko.R;
 import com.fifteentec.yoko.friends.JsonParsing;
+
+import java.util.ArrayList;
 
 public class NewLabelGvAdapter extends BaseAdapter {
 
@@ -79,7 +78,7 @@ public class NewLabelGvAdapter extends BaseAdapter {
         }
 
         if (arg0 < list.size()) {
-            viewHolder.new_label_gv_tv.setText(list.get(arg0).name);
+            viewHolder.new_label_gv_tv.setText(list.get(arg0).nickname);
             // viewHolder.new_label_gv_tv.setVisibility(View.VISIBLE);
         } else if (arg0 == list.size()) {
             viewHolder.iv.setImageResource(R.drawable.face_05);

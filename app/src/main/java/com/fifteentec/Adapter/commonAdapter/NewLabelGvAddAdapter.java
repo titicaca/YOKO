@@ -4,12 +4,6 @@ package com.fifteentec.Adapter.commonAdapter;
  * Created by Administrator on 2015/8/3.
  */
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -21,6 +15,10 @@ import android.widget.TextView;
 
 import com.fifteentec.yoko.R;
 import com.fifteentec.yoko.friends.JsonParsing;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 
 public class NewLabelGvAddAdapter extends BaseAdapter {
 
@@ -53,11 +51,11 @@ public class NewLabelGvAddAdapter extends BaseAdapter {
 
             for (int i = 0; i < jsonTransModified.size(); i++) {
                 for (int j = 0; j < jsonData.size(); j++) {
-                    if (jsonTransModified.get(i).id.equals(jsonData.get(j).id)) {
-                        isSelected.put(j, true);
-                        setIsSelected(isSelected);
-                        break;
-                    }
+//                    if (jsonTransModified.get(i).id.equals(jsonData.get(j).id)) {
+//                        isSelected.put(j, true);
+//                        setIsSelected(isSelected);
+//                        break;
+//                    }
                 }
 
             }
@@ -127,9 +125,9 @@ public class NewLabelGvAddAdapter extends BaseAdapter {
                     Iterator it = jsonTrans.iterator();
                     while (it.hasNext()) {
                         JsonParsing jp = (JsonParsing) it.next();
-                        if (jp.name.equals(jsonData.get(position).name)) {
-                            it.remove();
-                        }
+//                        if (jp.name.equals(jsonData.get(position).name)) {
+//                            it.remove();
+//                        }
                     }
 
                     // jsonTrans.removeAll(jp);
@@ -140,7 +138,7 @@ public class NewLabelGvAddAdapter extends BaseAdapter {
                     setIsSelected(isSelected);
 
                     JsonParsing jp = new JsonParsing();
-                    jp.name = jsonData.get(position).name;
+//                    jp.name = jsonData.get(position).name;
                     jp.id = jsonData.get(position).id;
 
                     jsonTrans.add(jp);
@@ -152,7 +150,7 @@ public class NewLabelGvAddAdapter extends BaseAdapter {
 
         // 根据isSelected来设置checkbox的选中状况
         viewHolder.cb.setChecked(getIsSelected().get(position));
-        viewHolder.new_label_gvadd_item_tv.setText(jsonData.get(position).name);
+//        viewHolder.new_label_gvadd_item_tv.setText(jsonData.get(position).name);
         // viewHolder.cb.setOnCheckedChangeListener(new
         // OnCheckedChangeListener() {
         //
