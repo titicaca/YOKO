@@ -10,9 +10,7 @@ import android.widget.LinearLayout;
 
 import com.fifteentec.yoko.R;
 
-/**
- * Created by Administrator on 2015/7/31 0031.
- */
+
 public class TabButtonFragment extends Fragment implements View.OnClickListener{
 
     private final int SelectCalendar = 0x00;

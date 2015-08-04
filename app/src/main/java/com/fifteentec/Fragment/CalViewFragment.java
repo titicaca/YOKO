@@ -2,6 +2,7 @@ package com.fifteentec.Fragment;
 
 import android.os.Bundle;
 import android.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,44 +36,24 @@ public class CalViewFragment extends Fragment {
 
     }
 
-    /*public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            Bundle mbundle = getArguments();
-
-            if(mbundle !=null)
-            {
-                ArrayList<Integer> mDateArray;
-                mDateArray = mbundle.getIntegerArrayList("Date");
-                myear = mDateArray.get(0);
-                mmonth = mDateArray.get(1);
-                mdayofweek = mDateArray.get(3);
-                mdayofmonth = mDateArray.get(2);
-                mCurDate = new GregorianCalendar(myear,mmonth,mdayofmonth);
-            }
-        }
-
-        public static CalViewFragment newInstance(ArrayList<Integer> date)
-        {
-            Bundle mbundle = new Bundle();
-            mbundle.putIntegerArrayList("Date", date);
-            CalViewFragment mCalViewFragment = new CalViewFragment();
-            mCalViewFragment.setArguments(mbundle);
-            return mCalViewFragment;
-        }
-    */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.d("Test","in0");
         View view = inflater.inflate(R.layout.fragment_calendar_main_layout,container,false);
+        Log.d("Test","in1");
         mCalView =  (CalView) view.findViewById(R.id.id_cal_view);
+        Log.d("Test","in2");
         mCalView.init(mDate.getNowCalendar());
+        Log.d("Test", "in3");
         mMonthText = (TextView) view.findViewById(R.id.id_cal_view_month);
+        Log.d("Test","in4");
         mMonthText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mCalView.SwitchMode();
             }
         });
-
+        Log.d("Test", "in5");
         return view;
     }
 }

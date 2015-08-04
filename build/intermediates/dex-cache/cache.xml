@@ -2,102 +2,53 @@
 <items version="2" >
 
     <item
-        jar="/Users/benbush/Documents/workspace/yoko/app/build/intermediates/exploded-aar/yoko/volley/unspecified/jars/classes.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="ce9740dd837d220e09deb68e2784f2580e575bcc">
-        <dex dex="/Users/benbush/Documents/workspace/yoko/app/build/intermediates/pre-dexed/debug/classes-5418cf22133b95ba2a8ed0adcfae9f7214de8fcc.jar" />
-    </item>
-    <item
-        jar="/Users/benbush/Documents/workspace/yoko/app/libs/okhttp-2.4.0.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="40340c0748190fe897baf7bffbc1b282734294e5">
-        <dex dex="/Users/benbush/Documents/workspace/yoko/app/build/intermediates/pre-dexed/debug/okhttp-2.4.0-a9c1ecb4a732f6c62cdf3e12163045ad134440df.jar" />
-    </item>
-    <item
-        jar="/Users/benbush/GitHub/YOKO/app/build/intermediates/exploded-aar/yoko/SMSSDK/unspecified/jars/classes.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="525188f7d233e127e41306b8cdab6126de3d653c">
-        <dex dex="/Users/benbush/GitHub/YOKO/app/build/intermediates/pre-dexed/debug/classes-187aa640b01c08cf03dd409b2d16053d5272dbba.jar" />
-    </item>
-    <item
-        jar="/Users/benbush/Documents/workspace/yoko/app/build/intermediates/exploded-aar/yoko/SMSSDK/unspecified/jars/libs/SMSSDK-1.2.2.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="fdbdc82cc81d5d26e2ef56ab5f4ffb0fc04b4b00">
-        <dex dex="/Users/benbush/Documents/workspace/yoko/app/build/intermediates/pre-dexed/debug/SMSSDK-1.2.2-2714aa84b2a91823a68abf2872b6b5e30587f7f8.jar" />
-    </item>
-    <item
-        jar="/Users/benbush/Documents/workspace/yoko/app/libs/okio-1.4.0.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="5b72bf48563ea8410e650de14aa33ff69a3e8c35">
-        <dex dex="/Users/benbush/Documents/workspace/yoko/app/build/intermediates/pre-dexed/debug/okio-1.4.0-bf40aadef217eb8e93940e5505856f34957c76c9.jar" />
-    </item>
-    <item
-        jar="/Users/benbush/GitHub/YOKO/app/build/intermediates/exploded-aar/yoko/SMSSDK/unspecified/jars/libs/SMSSDK-1.2.2.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="fdbdc82cc81d5d26e2ef56ab5f4ffb0fc04b4b00">
-        <dex dex="/Users/benbush/GitHub/YOKO/app/build/intermediates/pre-dexed/debug/SMSSDK-1.2.2-e9de069be088548e3acfb18fb47864b00ace7791.jar" />
-    </item>
-    <item
-        jar="/Users/benbush/GitHub/YOKO/app/build/intermediates/exploded-aar/yoko/SMSSDK/unspecified/jars/libs/MobTools.jar"
+        jar="/Users/kylin/AndroidStudioProjects/yoko/app/build/intermediates/exploded-aar/yoko/SMSSDK/unspecified/jars/libs/MobTools.jar"
         jumboMode="false"
         revision="22.0.1"
         sha1="c41aaf9ac27d8a39338463e980799f855ee3d432">
-        <dex dex="/Users/benbush/GitHub/YOKO/app/build/intermediates/pre-dexed/debug/MobTools-1509a3f8266c09460503c52bee0cdc8131689604.jar" />
+        <dex dex="/Users/kylin/AndroidStudioProjects/yoko/app/build/intermediates/pre-dexed/debug/MobTools-e7b26ea80499caa56f30f78b0841720ecadf1cee.jar" />
     </item>
     <item
-        jar="/Users/benbush/GitHub/YOKO/app/libs/okio-1.4.0.jar"
+        jar="/Users/kylin/AndroidStudioProjects/yoko/app/build/intermediates/exploded-aar/yoko/volley/unspecified/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="05c1074f4849319f92d5c311ee83b4b9ab4448df">
+        <dex dex="/Users/kylin/AndroidStudioProjects/yoko/app/build/intermediates/pre-dexed/debug/classes-c3a109b0e07393d984e14a8748542d8354584316.jar" />
+    </item>
+    <item
+        jar="/Users/kylin/AndroidStudioProjects/yoko/app/libs/okio-1.4.0.jar"
         jumboMode="false"
         revision="22.0.1"
         sha1="5b72bf48563ea8410e650de14aa33ff69a3e8c35">
-        <dex dex="/Users/benbush/GitHub/YOKO/app/build/intermediates/pre-dexed/debug/okio-1.4.0-057a49e2af5b54496ff810667c0106310f7cfe7a.jar" />
+        <dex dex="/Users/kylin/AndroidStudioProjects/yoko/app/build/intermediates/pre-dexed/debug/okio-1.4.0-76d68e5f39b92afc6239097fa450633e5326845a.jar" />
     </item>
     <item
-        jar="/Users/benbush/GitHub/YOKO/app/libs/okhttp-2.4.0.jar"
+        jar="/Users/kylin/AndroidStudioProjects/yoko/app/build/intermediates/exploded-aar/yoko/SMSSDK/unspecified/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="d42594cf8b1f33f4e4696250545e2473ff59c5d8">
+        <dex dex="/Users/kylin/AndroidStudioProjects/yoko/app/build/intermediates/pre-dexed/debug/classes-7ca12e4bfd3a1f15eb979c9d7021210deda9ed80.jar" />
+    </item>
+    <item
+        jar="/Users/kylin/AndroidStudioProjects/yoko/app/build/intermediates/exploded-aar/yoko/SMSSDK/unspecified/jars/libs/SMSSDK-1.2.2.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="fdbdc82cc81d5d26e2ef56ab5f4ffb0fc04b4b00">
+        <dex dex="/Users/kylin/AndroidStudioProjects/yoko/app/build/intermediates/pre-dexed/debug/SMSSDK-1.2.2-86c309a14f4c74e5bd1676351459dbc28794e084.jar" />
+    </item>
+    <item
+        jar="/Users/kylin/AndroidStudioProjects/yoko/app/libs/universal-image-loader-1.9.4.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="dd9eeb557650c4ad7394df23f0f5cf27a7cfc697">
+        <dex dex="/Users/kylin/AndroidStudioProjects/yoko/app/build/intermediates/pre-dexed/debug/universal-image-loader-1.9.4-57d514026ecd1405a01c51ae355a85ef1a86b733.jar" />
+    </item>
+    <item
+        jar="/Users/kylin/AndroidStudioProjects/yoko/app/libs/okhttp-2.4.0.jar"
         jumboMode="false"
         revision="22.0.1"
         sha1="40340c0748190fe897baf7bffbc1b282734294e5">
-        <dex dex="/Users/benbush/GitHub/YOKO/app/build/intermediates/pre-dexed/debug/okhttp-2.4.0-dbc90f08fb6b63df978f47eecd78af6ce8b58111.jar" />
-    </item>
-    <item
-        jar="/Users/benbush/GitHub/YOKO/app/libs/universal-image-loader-1.9.4.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="dd9eeb557650c4ad7394df23f0f5cf27a7cfc697">
-        <dex dex="/Users/benbush/GitHub/YOKO/app/build/intermediates/pre-dexed/debug/universal-image-loader-1.9.4-a7f0725cafeac27786b84254711e309065e337e4.jar" />
-    </item>
-    <item
-        jar="/Users/benbush/Documents/workspace/yoko/app/build/intermediates/exploded-aar/yoko/SMSSDK/unspecified/jars/libs/MobTools.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="c41aaf9ac27d8a39338463e980799f855ee3d432">
-        <dex dex="/Users/benbush/Documents/workspace/yoko/app/build/intermediates/pre-dexed/debug/MobTools-b2d264a1c366d48c0c99e9d6043443fe4011b0de.jar" />
-    </item>
-    <item
-        jar="/Users/benbush/Documents/workspace/yoko/app/libs/universal-image-loader-1.9.4.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="dd9eeb557650c4ad7394df23f0f5cf27a7cfc697">
-        <dex dex="/Users/benbush/Documents/workspace/yoko/app/build/intermediates/pre-dexed/debug/universal-image-loader-1.9.4-25b62b84a25fbc91e79c7339bd165784bad1a3d1.jar" />
-    </item>
-    <item
-        jar="/Users/benbush/Documents/workspace/yoko/app/build/intermediates/exploded-aar/yoko/SMSSDK/unspecified/jars/classes.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="0906fd5b2dd372fe91f671dfd2bda967c83251d7">
-        <dex dex="/Users/benbush/Documents/workspace/yoko/app/build/intermediates/pre-dexed/debug/classes-bd1875653a350b733ff15dde2a31b20d4c459737.jar" />
-    </item>
-    <item
-        jar="/Users/benbush/GitHub/YOKO/app/build/intermediates/exploded-aar/yoko/volley/unspecified/jars/classes.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="ca6433158a9f4ea7c0456c50a5a729bc3971073e">
-        <dex dex="/Users/benbush/GitHub/YOKO/app/build/intermediates/pre-dexed/debug/classes-9938a683295fd1e8f7a13ab57154ab2d9684582b.jar" />
+        <dex dex="/Users/kylin/AndroidStudioProjects/yoko/app/build/intermediates/pre-dexed/debug/okhttp-2.4.0-d126d128b4a369a04d2ba49da445d099416f0ee9.jar" />
     </item>
 
 </items>

@@ -39,17 +39,13 @@ public class TabActivity extends Activity implements TabButtonFragment.Ibutton{
         switch (id)
         {
             case R.integer.SelectorCal:
-                Toast d = Toast.makeText(this, "Calendar",
-                        Toast.LENGTH_SHORT);
-                d.setDuration(Toast.LENGTH_SHORT);
-                d.show();
-                /*if(mCalViewFragment ==null){
+                if(mCalViewFragment ==null){
                     mCalViewFragment = new CalViewFragment();
                     mFmTrans.add(R.id.id_content,mCalViewFragment,"cal");
                 }
                 else{
                     mFmTrans.show(mCalViewFragment);
-                }*/
+                }
                 break;
             case R.integer.SelectorFrd:
                 Toast a = Toast.makeText(this, "Found",

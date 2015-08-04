@@ -11,6 +11,9 @@ public class CalUtil {
 
     public static final List<Integer> LENTH_OF_MONTH = new ArrayList<>(Arrays.asList(31,28,31,30,31,30,31,31,30,31,30,31));
 
+    public static final int LENTH_OF_YEAR =12;
+    public static final int NON_LEAKYEAR = 365;
+
     public static boolean isLeapYear (int year){
         GregorianCalendar temp = new GregorianCalendar(year,1,1);
 

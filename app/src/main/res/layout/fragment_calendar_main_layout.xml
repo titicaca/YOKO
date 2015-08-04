@@ -34,7 +34,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <com.fifteentec.yoko.android.calendar.CalView
+    <com.fifteentec.Component.calendar.CalView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:id="@+id/id_cal_view"
