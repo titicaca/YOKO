@@ -25,15 +25,28 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.API.APIJsonCallbackResponse;
+import com.API.APIKey;
+import com.API.APIServer;
+import com.API.APIUrl;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
  * A login screen that offers login via phone/password.
  */
-public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
+public class LoginActivity extends LoaderActivity {
 
     /**
      * A dummy authentication store containing known user names and passwords.
@@ -58,8 +71,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
         // Set up the login form.
         mPhoneView = (AutoCompleteTextView) findViewById(R.id.phone_actv);
-        populateAutoComplete();
-
         mPasswordView = (EditText) findViewById(R.id.password_et);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -92,11 +103,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         mProgressView = findViewById(R.id.login_progress);
     }
 
-    private void populateAutoComplete() {
-        getLoaderManager().initLoader(0, null, this);
-    }
-
-
     /**
      * Attempts to sign in or register the account specified by the login form.
      * If there are form errors (invalid phone, missing fields, etc.), the
@@ -112,7 +118,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
-        String phone = mPhoneView.getText().toString();
+        String phone = mPhoneView.getText().toString().replaceAll("[\\s\\-]+", "");
         String password = mPasswordView.getText().toString();
 
         boolean cancel = false;
@@ -207,55 +213,9 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return new CursorLoader(this,
-                // Retrieve data rows for the device user's 'profile' contact.
-                Uri.withAppendedPath(ContactsContract.Profile.CONTENT_URI,
-                        ContactsContract.Contacts.Data.CONTENT_DIRECTORY), ProfileQuery.PROJECTION,
-
-                ContactsContract.Contacts.Data.MIMETYPE +
-                        " = ?", new String[]{ContactsContract.CommonDataKinds.Phone
-                .CONTENT_ITEM_TYPE},
-
-                ContactsContract.Contacts.Data.IS_PRIMARY + " DESC");
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        List<String> phones = new ArrayList<String>();
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            phones.add(cursor.getString(ProfileQuery.PHONE));
-            cursor.moveToNext();
-        }
-
-        addPhonesToAutoComplete(phones);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> cursorLoader) {
-
-    }
-
-    private void addPhonesToAutoComplete(List<String> phoneCollection) {
-        //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
-        ArrayAdapter<String> adapter =
-                new ArrayAdapter<String>(this,
-                        android.R.layout.simple_dropdown_item_1line, phoneCollection);
-
+    protected void setAdapter(ArrayAdapter<String> adapter) {
         mPhoneView.setAdapter(adapter);
     }
-
-    private interface ProfileQuery {
-        String[] PROJECTION = {
-                ContactsContract.CommonDataKinds.Phone.NUMBER,
-                ContactsContract.CommonDataKinds.Phone.IS_PRIMARY,
-        };
-
-        int PHONE = 0;
-        int IS_PRIMARY = 1;
-    }
-
 
     /**
      * Represents an asynchronous login/registration task used to authenticate
@@ -290,7 +250,27 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                 }
             }
 
-            // TODO: login the account here.
+            JSONObject loginParams = new JSONObject();
+            Map<String, String> loginHeaders = new HashMap<String, String>();
+            try {
+                loginParams.put(APIKey.KEY_USERNAME, "0_" + mPhone);
+                loginParams.put(APIKey.KEY_PASSWORD, mPassword);
+                loginParams.put(APIKey.KEY_GRANT_TYPE, "password");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            loginHeaders.put(APIKey.KEY_HEADER_AUTH, APIKey.KEY_HEADER_AUTH_VALUE);
+
+            APIServer.getInstance()._sendJsonPost(APIUrl.URL_LOGIN,
+                    loginParams, loginHeaders, new APIJsonCallbackResponse() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), "登录成功！\n" + this.getResponse().toString(),
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    }, getRequestQueue(), null);
+
             return true;
         }
 
@@ -312,6 +292,5 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             mAuthTask = null;
             showProgress(false);
         }
-
     }
 }
