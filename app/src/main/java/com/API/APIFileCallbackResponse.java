@@ -6,7 +6,7 @@ import java.io.InputStream;
  * Created by benbush on 15/7/6.
  * 用于接收InputStream格式的Response
  */
-public abstract class APIFileCallbackResponse implements Runnable{
+public abstract class APIFileCallbackResponse implements APICallbackResponse{
     private InputStream response;
 
     public InputStream getResponse() {
