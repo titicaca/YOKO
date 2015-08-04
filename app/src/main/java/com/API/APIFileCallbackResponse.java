@@ -3,10 +3,9 @@ package com.API;
 import java.io.InputStream;
 
 /**
- * Created by benbush on 15/7/6.
  * 用于接收InputStream格式的Response
  */
-public abstract class APIFileCallbackResponse implements APICallbackResponse{
+public abstract class APIFileCallbackResponse implements APICallbackResponse<InputStream>{
     private InputStream response;
 
     public InputStream getResponse() {

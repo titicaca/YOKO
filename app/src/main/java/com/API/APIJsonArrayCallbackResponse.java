@@ -3,10 +3,9 @@ package com.API;
 import org.json.JSONArray;
 
 /**
- * Created by benbush on 15/7/10.
  * 用于接收JsonArray格式的Response
  */
-public abstract class APIJsonArrayCallbackResponse implements APICallbackResponse{
+public abstract class APIJsonArrayCallbackResponse implements APICallbackResponse<JSONArray>{
     private JSONArray response;
 
     public JSONArray getResponse() {

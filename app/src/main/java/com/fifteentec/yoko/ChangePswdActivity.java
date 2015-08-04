@@ -1,16 +1,48 @@
 package com.fifteentec.yoko;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.LoaderManager.LoaderCallbacks;
+import android.content.ContentResolver;
+import android.content.CursorLoader;
+import android.content.Loader;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.EditorInfo;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
-public class ChangePswdActivity extends Activity {
+import com.API.APIJsonCallbackResponse;
+import com.API.APIKey;
+import com.API.APIServer;
+import com.API.APIUrl;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
+
+public class ChangePswdActivity extends BaseActivity {
+    private String mPhone;
     private EditText mPasswordEt;
     private EditText mPassword2Et;
     private Button mConfirmBtn;
@@ -20,6 +52,13 @@ public class ChangePswdActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_password);
+
+        String message = getIntent().getStringExtra("FROM_WHERE");
+        if(message != null && message.equals("VALIDATE_ACTIVITY")) {
+            mPhone = "0_" + getIntent().getStringExtra("PHONE");
+        } else {
+            mPhone = "";
+        }
 
         mPasswordEt = (EditText)findViewById(R.id.changepswd_input_code_et);
         mPassword2Et = (EditText)findViewById(R.id.changepswd_reinput_code_et);
@@ -116,7 +155,22 @@ public class ChangePswdActivity extends Activity {
                 return false;
             }
 
-            // TODO: register the new account here.
+            JSONObject changePswdParams = new JSONObject();
+            try {
+                changePswdParams.put(APIKey.KEY_USERNAME, mPhone);
+                changePswdParams.put(APIKey.KEY_PASSWORD, mNewPassword);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            APIServer.getInstance().sendJsonPut(APIUrl.URL_CHANGE_PASSWORD,
+                    changePswdParams, null, new APIJsonCallbackResponse() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), "恭喜你！修改密码成功！\n" + this.getResponse().toString(),
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    }, getRequestQueue(), null);
+
             return true;
         }
 

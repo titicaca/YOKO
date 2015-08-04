@@ -1,10 +1,9 @@
 package com.API;
 
 /**
- * Created by benbush on 15/6/24.
  * 用于接收String格式的Response
  */
-public abstract class APIStringCallbackResponse implements APICallbackResponse {
+public abstract class APIStringCallbackResponse implements APICallbackResponse<String> {
     private String response;
 
     public String getResponse() {

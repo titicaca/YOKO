@@ -2,6 +2,8 @@ package com.fifteentec.yoko;
 
 import android.text.TextUtils;
 
+import org.w3c.dom.Text;
+
 public class InfoValidate {
 
     /**
@@ -46,7 +48,7 @@ public class InfoValidate {
 
     public static boolean isPasswordValid(String password) {
         //String pswRegex = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[~!@#$%^&*()_+`\\-={}:\";'<>?,.\\\\/]).{4,16}$";
-        String pswRegex = "^(?=.*[a-zA-Z])(?=.*\\d).{4,16}$";
+        String pswRegex = "^(?=.*[a-zA-Z])(?=.*\\d).{6,16}$";
         if(TextUtils.isEmpty(password))
             return false;
         else
