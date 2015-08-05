@@ -1,5 +1,7 @@
 package com.fifteentec.Fragment;
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.util.Log;
@@ -10,6 +12,7 @@ import android.widget.TextView;
 
 import com.fifteentec.Component.calendar.CalView;
 import com.fifteentec.Component.calendar.CalendarController;
+import com.fifteentec.Component.calendar.EventListView;
 import com.fifteentec.yoko.R;
 
 import java.util.ArrayList;
@@ -26,6 +29,8 @@ public class CalViewFragment extends Fragment {
 
     private TextView mMonthText;
     private TextView mYearText;
+    private FragmentManager mFragmentManager;
+    private EventListViewFragment mListView;
 
 
     @Override
@@ -34,6 +39,7 @@ public class CalViewFragment extends Fragment {
         {
             mDate = new CalendarController();
         }
+        mFragmentManager = getFragmentManager();
         super.onCreate(savedInstanceState);
 
     }
@@ -60,6 +66,9 @@ public class CalViewFragment extends Fragment {
                 mYearText.setText(mDate.getCurYear() + "");
             }
         });
+        FragmentTransaction mTrans = mFragmentManager.beginTransaction();
+        mListView = new EventListViewFragment();
+        mTrans.add(R.id.id_event_content,mListView).commit();
 
         return view;
     }
