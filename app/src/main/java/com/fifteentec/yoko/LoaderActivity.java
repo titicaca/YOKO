@@ -1,6 +1,5 @@
 package com.fifteentec.yoko;
 
-import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
 import android.content.Loader;

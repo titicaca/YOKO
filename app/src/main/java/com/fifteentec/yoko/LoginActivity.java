@@ -3,18 +3,11 @@ package com.fifteentec.yoko;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.Activity;
-import android.app.LoaderManager.LoaderCallbacks;
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.Loader;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.AsyncTask;
 
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
@@ -31,15 +24,12 @@ import com.API.APIJsonCallbackResponse;
 import com.API.APIKey;
 import com.API.APIServer;
 import com.API.APIUrl;
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
+import com.fifteentec.Component.User.UserServer;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -260,16 +250,33 @@ public class LoginActivity extends LoaderActivity {
                 e.printStackTrace();
             }
 
-            loginHeaders.put(APIKey.KEY_HEADER_AUTH, APIKey.KEY_HEADER_AUTH_VALUE);
+            loginHeaders.put(APIKey.KEY_AUTHORIZATION, APIKey.KEY_REQUEST_TOKEN_VALUE);
+            loginHeaders.put(APIKey.KEY_ACCEPT, APIKey.KEY_ACCEPT_VALUE);
 
-            APIServer.getInstance()._sendJsonPost(APIUrl.URL_LOGIN,
+            APIServer._JsonPost jsonPost = new APIServer._JsonPost(APIUrl.URL_LOGIN,
                     loginParams, loginHeaders, new APIJsonCallbackResponse() {
                         @Override
                         public void run() {
-                            Toast.makeText(getApplicationContext(), "登录成功！\n" + this.getResponse().toString(),
+                            Toast.makeText(getApplicationContext(), ((this.getResponse() == null)
+                                            ? "登录失败!\n"
+                                            : "登录成功!\n" + this.getResponse().toString()),
                                     Toast.LENGTH_LONG).show();
+                            try {
+                                UserServer.getInstance().setAccessToken("Bearer " +
+                                        this.getResponse().getString(APIKey.KEY_ACCESS_TOKEN));
+                                UserServer.getInstance().setRefreshToken("Basic " +
+                                        this.getResponse().getString(APIKey.KEY_REFRESH_TOKEN));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                            Intent intent = new Intent(LoginActivity.this,
+                                    TestActivity.class);
+                            startActivity(intent);
                         }
                     }, getRequestQueue(), null);
+
+            jsonPost.send();
 
             return true;
         }

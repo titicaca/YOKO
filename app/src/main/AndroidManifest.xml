@@ -53,6 +53,13 @@
         </activity>
 
         <activity
+            android:name=".TestActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateVisible" >
+        </activity>
+
+        <activity
             android:name=".TabActivity"
             android:label="TabAvtivity"
             android:windowSoftInputMode="adjustPan|stateHidden" >
@@ -62,6 +69,5 @@
             </intent-filter>
         </activity>
     </application>
-
 
 </manifest>

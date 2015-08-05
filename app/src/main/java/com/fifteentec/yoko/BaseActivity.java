@@ -7,9 +7,6 @@ import com.Database.DBManager;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 
-/**
- * Created by benbush on 15/8/3.
- */
 public abstract class BaseActivity extends Activity {
     protected RequestQueue requestQueue;
     protected DBManager dbManager;

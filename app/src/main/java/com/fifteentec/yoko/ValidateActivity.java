@@ -2,12 +2,10 @@ package com.fifteentec.yoko;
 
 import cn.smssdk.EventHandler;
 import cn.smssdk.SMSSDK;
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -17,25 +15,12 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
-import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.FrameLayout.LayoutParams;
 
-import com.API.APIJsonCallbackResponse;
-import com.API.APIServer;
-import com.API.APIStringCallbackResponse;
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.NetworkImageView;
-import com.android.volley.toolbox.Volley;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.w3c.dom.Text;
-
-import java.util.List;
+import com.fifteentec.Component.User.UserServer;
 
 public class ValidateActivity extends LoaderActivity implements OnClickListener {
 
@@ -63,6 +48,8 @@ public class ValidateActivity extends LoaderActivity implements OnClickListener 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_validate);
+
+        UserServer.getInstance().autoLogin(this, TestActivity.class);
 
         init();
 
@@ -207,7 +194,8 @@ public class ValidateActivity extends LoaderActivity implements OnClickListener 
                         Intent intent = new Intent(ValidateActivity.this,
                                 isChangePassword ? ChangePswdActivity.class : RegisterActivity.class);
                         intent.putExtra("FROM_WHERE", "VALIDATE_ACTIVITY");
-                        intent.putExtra("PHONE", mInputPhoneEt.getText().toString().replaceAll("[\\s\\-]+", ""));
+                        UserServer.getInstance().setPhone(
+                                mInputPhoneEt.getText().toString().replaceAll("[\\s\\-]+", ""));
                         startActivity(intent);
                     } else if (event == SMSSDK.EVENT_GET_VERIFICATION_CODE) {
                         Toast.makeText(getApplicationContext(), "验证码已经发送",

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">YoKo</string>
+    <string name="app_name">YOKO</string>
     <string name="string_login">登录</string>
     <string name="string_register">注册</string>
     <string name="string_change_password">修改密码</string>
