@@ -1,45 +1,23 @@
 package com.fifteentec.yoko;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
-import android.app.Activity;
-import android.app.LoaderManager.LoaderCallbacks;
-import android.content.ContentResolver;
-import android.content.CursorLoader;
-import android.content.Loader;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.AsyncTask;
 
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.text.TextUtils;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.API.APIJsonCallbackResponse;
 import com.API.APIKey;
 import com.API.APIServer;
 import com.API.APIUrl;
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
+import com.fifteentec.Component.User.UserServer;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class RegisterActivity extends BaseActivity {
     private static final String[] DUMMY_CREDENTIALS = new String[]{};
@@ -58,7 +36,7 @@ public class RegisterActivity extends BaseActivity {
 
         String message = getIntent().getStringExtra("FROM_WHERE");
         if(message != null && message.equals("VALIDATE_ACTIVITY")) {
-            mPhone = "0_" + getIntent().getStringExtra("PHONE");
+            mPhone = "0_" + UserServer.getInstance().getPhone();
         } else {
             mPhone = "";
         }
@@ -186,18 +164,21 @@ public class RegisterActivity extends BaseActivity {
 
             JSONObject regParams = new JSONObject();
             try {
-                regParams.put(APIKey.KEY_NICKNAME, mUsername);
-                regParams.put(APIKey.KEY_PHONE, mPhone);
+                regParams.put(APIKey.KEY_NAME, mUsername);
+                regParams.put(APIKey.KEY_ROLE_MOBILE, mPhone);
                 regParams.put(APIKey.KEY_PASSWORD, mPassword);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            APIServer.getInstance().sendJsonPost(APIUrl.URL_REGISTER,
+            APIServer.JsonPost jsonPost = new APIServer.JsonPost(APIUrl.URL_REGISTER,
                     regParams, null, new APIJsonCallbackResponse() {
                         @Override
                         public void run() {
-                            Toast.makeText(getApplicationContext(), "恭喜你！注册成功！\n" + this.getResponse().toString(),
-                                    Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(), ((this.getResponse() == null)
+                                    ? "注册失败!请重试!\n"
+                                    : "恭喜你!注册成功!\n" + this.getResponse().toString()),                                    Toast.LENGTH_LONG).show();
+                            UserServer.getInstance().setUsername(mUsername);
+                            UserServer.getInstance().setPassword(mPassword);
                         }
                     }, getRequestQueue(), null);
 

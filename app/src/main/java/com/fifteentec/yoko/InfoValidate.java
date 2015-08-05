@@ -2,8 +2,6 @@ package com.fifteentec.yoko;
 
 import android.text.TextUtils;
 
-import org.w3c.dom.Text;
-
 public class InfoValidate {
 
     /**

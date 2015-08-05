@@ -3,9 +3,6 @@ package com.Database;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
-/**
- * Created by benbush on 15/8/3.
- */
 public class DBManager {
     private DBHelper dbHelper;
     private SQLiteDatabase db;
