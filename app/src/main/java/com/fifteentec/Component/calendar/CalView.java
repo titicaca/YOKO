@@ -1,5 +1,7 @@
 package com.fifteentec.Component.calendar;
 
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.Context;
 
 import android.graphics.Canvas;
@@ -9,7 +11,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 
 import android.util.AttributeSet;
-import android.util.Log;
 
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -18,8 +19,11 @@ import android.view.View;
 
 import android.view.ViewGroup;
 
+import com.fifteentec.Fragment.CalViewFragment;
+
 import java.util.ArrayList;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -31,7 +35,7 @@ public class CalView extends View implements GestureDetector.OnGestureListener{
     private ArrayList<Integer> mCurDateList;
     private GregorianCalendar mTodayDate;
     private mSurface mSurface;
-    private final int YEAR_RANGE = 1;
+    private final int YEAR_RANGE = 31;
 
     private final int COLUM_NUM =CalUtil.LENTH_OF_WEEK;
     private final int MONTH_OF_YEAR=12;
@@ -48,9 +52,8 @@ public class CalView extends View implements GestureDetector.OnGestureListener{
 
     public interface CalViewListener
     {
-        public void MonthChange(int month);
-        public void YearChange(int year);
-        public void DayChange(int year);
+        public void DateChange(GregorianCalendar arry);
+
     }
 
     public void setCalViewListner (CalViewListener a)
@@ -134,9 +137,14 @@ public class CalView extends View implements GestureDetector.OnGestureListener{
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        mSurface.mViewHeight = mSurface.mViewWidth = getResources().getDisplayMetrics().widthPixels;
+
+
+
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
         if(firstEnter) {
+            mSurface.mViewWidth = getResources().getDisplayMetrics().widthPixels;
+            mSurface.mViewHeight = (int)(getResources().getDisplayMetrics().widthPixels*0.8f);
             mSurface.init();
             ViewGroup.LayoutParams Params = getLayoutParams();
             Params.height = mSurface.mViewHeight;
@@ -152,6 +160,7 @@ public class CalView extends View implements GestureDetector.OnGestureListener{
             mCurDateList.add(week);
             mCurDateList.add(day);
             ScrollToSelect(mCurDateList);
+            UpdateCurTime();
         }
     }
 
@@ -161,85 +170,115 @@ public class CalView extends View implements GestureDetector.OnGestureListener{
         Rect mBound = new Rect();
         float drawx =0,drawy =0;
         if(mMode) {
-            drawAutoCircle(canvas);
-            ArrayList<Integer> mSelectedDate = findIndexByPosition(findAutoSelectPosition().get(0), findAutoSelectPosition().get(1));
+            float SelectedX = findAutoSelectPosition().get(0);
+            float SelectedY = findAutoSelectPosition().get(1);
+            ArrayList<Integer> mSelectedDate = findIndexByPosition(SelectedX, SelectedY);
             for (int year = 0; year < YEAR_RANGE; year++) {
-                for (int month = 0; month < MONTH_OF_YEAR; month++) {
-                    mDate = CalculateDate(year, month);
-                    for (int week = 0; week < ROW_NUM; week++) {
-                        for (int day = 0; day < COLUM_NUM; day++) {
-                            int index = week * COLUM_NUM + day;
+                if(Math.abs(year - mCurDateList.get(0))<2) {
+                    for (int month = 0; month < MONTH_OF_YEAR; month++) {
 
+                        if(Math.abs((month + (year - mCurDateList.get(0)) * MONTH_OF_YEAR)-mCurDateList.get(1))<3) {
 
-                            if (mDate.get(index) == 0) {
-                                drawx += mSurface.mCellWidth;
-                            } else {
+                            mDate = CalculateDate(year, month);
+                            for (int week = 0; week < ROW_NUM; week++) {
+                                if((year == mSelectedDate.get(0)) && (month == mSelectedDate.get(1)) && (week == mSelectedDate.get(2))){
+                                    canvas.drawRect(0,SelectedY, mSurface.mViewWidth, SelectedY+ mSurface.mCellHeight, mSurface.mRecPaint);
+                                    canvas.drawCircle(SelectedX + mSurface.mCellWidth / 2,SelectedY + mSurface.mCellHeight / 2f, mSurface.mCellWidth / 2.5f, mSurface.mCirclePaint);
+                                }
+                                for (int day = 0; day < COLUM_NUM; day++) {
+                                    int index = week * COLUM_NUM + day;
 
-                                if ((year == (YEAR_RANGE - 1) / 2) && (month == mTodayDate.get(Calendar.MONTH)) && (index - CalUtil.FindFirstDayofMonthInWeek(mTodayDate) + 1 == mTodayDate.get(Calendar.DAY_OF_MONTH) - 1)) {
-                                    mSurface.mTodayPaint.getTextBounds(String.valueOf(mDate.get(index)), 0, String.valueOf(mDate.get(index)).length(), mBound);
-                                    canvas.drawText(mDate.get(index) + "",
-                                            drawx + mSurface.mCellWidth / 2 - mBound.width() / 2,
-                                            drawy + mSurface.mCellHeight / 2 + mBound.height() / 2,
-                                            mSurface.mTodayPaint);
-                                    drawx += mSurface.mCellWidth;
-                                } else {
-                                    if ((year == mSelectedDate.get(0)) && (month == mSelectedDate.get(1)) && (week == mSelectedDate.get(2)) && (day == mSelectedDate.get(3))) {
-                                        mSurface.mDatePaint.getTextBounds(String.valueOf(mDate.get(index)), 0, String.valueOf(mDate.get(index)).length(), mBound);
-                                        canvas.drawText(mDate.get(index) + "",
-                                                drawx + mSurface.mCellWidth / 2 - mBound.width() / 2,
-                                                drawy + mSurface.mCellHeight / 2 + mBound.height() / 2,
-                                                mSurface.mSelectedPaint);
-
+                                    if (mDate.get(index) == 0) {
+                                        drawx += mSurface.mCellWidth;
                                     } else {
-                                        mSurface.mDatePaint.getTextBounds(String.valueOf(mDate.get(index)), 0, String.valueOf(mDate.get(index)).length(), mBound);
-                                        canvas.drawText(mDate.get(index) + "",
-                                                drawx + mSurface.mCellWidth / 2 - mBound.width() / 2,
-                                                drawy + mSurface.mCellHeight / 2 + mBound.height() / 2,
-                                                mSurface.mDatePaint);
+
+                                        if ((year == (YEAR_RANGE - 1) / 2) && (month == mTodayDate.get(Calendar.MONTH)) && (index - CalUtil.FindFirstDayofMonthInWeek(mTodayDate) + 1 == mTodayDate.get(Calendar.DAY_OF_MONTH) - 1)) {
+
+                                            mSurface.mTodayPaint.getTextBounds(String.valueOf(mDate.get(index)), 0, String.valueOf(mDate.get(index)).length(), mBound);
+
+                                            canvas.drawText(mDate.get(index) + "",
+                                                    drawx + mSurface.mCellWidth / 2 - mBound.width() / 2,
+                                                    drawy + mSurface.mCellHeight / 2 + mBound.height() / 2,
+                                                    mSurface.mTodayPaint);
+                                            drawx += mSurface.mCellWidth;
+                                        } else {
+                                            if ((year == mSelectedDate.get(0)) && (month == mSelectedDate.get(1)) && (week == mSelectedDate.get(2)) && (day == mSelectedDate.get(3))) {
+
+                                                mSurface.mDatePaint.getTextBounds(String.valueOf(mDate.get(index)), 0, String.valueOf(mDate.get(index)).length(), mBound);
+                                                canvas.drawText(mDate.get(index) + "",
+                                                        drawx + mSurface.mCellWidth / 2 - mBound.width() / 2,
+                                                        drawy + mSurface.mCellHeight / 2 + mBound.height() / 2,
+                                                        mSurface.mSelectedPaint);
+
+                                            } else {
+                                                mSurface.mDatePaint.getTextBounds(String.valueOf(mDate.get(index)), 0, String.valueOf(mDate.get(index)).length(), mBound);
+                                                canvas.drawText(mDate.get(index) + "",
+                                                        drawx + mSurface.mCellWidth / 2 - mBound.width() / 2,
+                                                        drawy + mSurface.mCellHeight / 2 + mBound.height() / 2,
+                                                        mSurface.mDatePaint);
+                                            }
+
+                                            drawx += mSurface.mCellWidth;
+                                        }
                                     }
 
-                                    drawx += mSurface.mCellWidth;
                                 }
+                                drawx = 0;
+                                drawy += mSurface.mCellHeight;
                             }
-
+                        }else{
+                            drawy +=mSurface.mCellHeight*ROW_NUM;
                         }
-                        drawx = 0;
-                        drawy += mSurface.mCellHeight;
                     }
+                }else {
+                    drawy += mSurface.mCellHeight*ROW_NUM*MONTH_OF_YEAR;
                 }
             }
         }else{
             int WidthCount = MinDayOfFirstWeek;
-            int weekCount = 0;
+            GregorianCalendar temp = new GregorianCalendar(mTodayDate.get(Calendar.YEAR)  - (YEAR_RANGE - 1) / 2, 1, 1);
             for(int year = 0;year < YEAR_RANGE;year++){
-                for(int month = 0 ;month<MONTH_OF_YEAR;month++){
-                    mDate = CalculateDate(year,month);
-                    GregorianCalendar temp = new GregorianCalendar(mTodayDate.get(Calendar.YEAR)+(year-(YEAR_RANGE-1)/2),month,1);
-                    int FirstDay = CalUtil.FindFirstDayofMonthInWeek(temp);
-                    for(int day = 0;day< mDate.size();day++){
 
-                        if(mDate.get(day) != 0 ){
-                            mSurface.mDatePaint.getTextBounds(String.valueOf(mDate.get(day)), 0, String.valueOf(mDate.get(day)).length(), mBound);
-                            if(mCurDateList.get(0)==year&&mCurDateList.get(1)==month&&mCurDateList.get(2)*COLUM_NUM+mCurDateList.get(3) == day)
-                            {
-                                canvas.drawCircle((weekCount*mSurface.mViewWidth)+ (WidthCount%COLUM_NUM)*mSurface.mCellWidth+mSurface.mCellWidth/2,mSurface.mCellHeight/2,mSurface.mCellWidth/2.5f,mSurface.mCirclePaint);
-                                canvas.drawText(mDate.get(day) + "",
-                                        (weekCount * mSurface.mViewWidth) + (WidthCount % COLUM_NUM) * mSurface.mCellWidth + mSurface.mCellWidth / 2 - mBound.width() / 2,
-                                        mSurface.mCellHeight / 2 + mBound.height() / 2,
-                                        mSurface.mSelectedPaint);
-                            }else {
+                if(Math.abs(year-mCurDateList.get(0))<2) {
 
-                                canvas.drawText(mDate.get(day) + "",
-                                        (weekCount * mSurface.mViewWidth) + (WidthCount % COLUM_NUM) * mSurface.mCellWidth + mSurface.mCellWidth / 2 - mBound.width() / 2,
-                                        mSurface.mCellHeight / 2 + mBound.height() / 2,
-                                        mSurface.mDatePaint);
+                    for (int month = 0; month < MONTH_OF_YEAR; month++) {
+                        if(Math.abs((month + (year - mCurDateList.get(0)) * MONTH_OF_YEAR-mCurDateList.get(1)))<2) {
+
+                            mDate = CalculateDate(year, month);
+
+                            for (int day = 0; day < mDate.size(); day++) {
+
+                                if (mDate.get(day) != 0) {
+                                    mSurface.mDatePaint.getTextBounds(String.valueOf(mDate.get(day)), 0, String.valueOf(mDate.get(day)).length(), mBound);
+                                    if (mCurDateList.get(0) == year && mCurDateList.get(1) == month && mCurDateList.get(2) * COLUM_NUM + mCurDateList.get(3) == day) {
+                                        canvas.drawCircle(((WidthCount/COLUM_NUM) * mSurface.mViewWidth) + (WidthCount % COLUM_NUM) * mSurface.mCellWidth + mSurface.mCellWidth / 2, mSurface.mCellHeight / 2, mSurface.mCellWidth / 2.5f, mSurface.mCirclePaint);
+                                        canvas.drawText(mDate.get(day) + "",
+                                                ((WidthCount/COLUM_NUM) * mSurface.mViewWidth) + (WidthCount % COLUM_NUM) * mSurface.mCellWidth + mSurface.mCellWidth / 2 - mBound.width() / 2,
+                                                mSurface.mCellHeight / 2 + mBound.height() / 2,
+                                                mSurface.mSelectedPaint);
+                                    } else {
+
+                                        canvas.drawText(mDate.get(day) + "",
+                                                ((WidthCount/COLUM_NUM)* mSurface.mViewWidth) + (WidthCount % COLUM_NUM) * mSurface.mCellWidth + mSurface.mCellWidth / 2 - mBound.width() / 2,
+                                                mSurface.mCellHeight / 2 + mBound.height() / 2,
+                                                mSurface.mDatePaint);
+                                    }
+                                    WidthCount++;
+                                }
                             }
-                            WidthCount ++;
-                            if(WidthCount%COLUM_NUM == 0){
-                                weekCount+=1;
-                            }
+                        }else{
+                            WidthCount += CalUtil.LENTH_OF_MONTH.get(month);
                         }
                     }
+                }else{
+                    if(temp.isLeapYear(temp.get(Calendar.YEAR))){
+                        WidthCount+=366;
+
+                    }else
+                    {
+                        WidthCount+=365;
+                    }
+                    temp.add(Calendar.YEAR,1);
                 }
             }
 
@@ -294,14 +333,6 @@ public class CalView extends View implements GestureDetector.OnGestureListener{
         return temp;
     }
 
-    private void drawAutoCircle(Canvas canvas) {
-
-        float drawy = findAutoSelectPosition().get(1);
-        float drawx = findAutoSelectPosition().get(0);
-        canvas.drawRect(0, drawy, mSurface.mViewWidth, drawy + mSurface.mCellHeight, mSurface.mRecPaint);
-        canvas.drawCircle(drawx + mSurface.mCellWidth / 2, drawy + mSurface.mCellHeight / 2f, mSurface.mCellWidth / 2.5f, mSurface.mCirclePaint);
-
-    }
 
     private List<Integer> CalculateDate(int yearoffset,int month) {
 
@@ -319,15 +350,38 @@ public class CalView extends View implements GestureDetector.OnGestureListener{
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
-        int action = event.getAction();
-        if(event.getAction() == MotionEvent.ACTION_UP){
-            Log.d("Test","Up");
+        switch (mMotion.ACTION_STATE) {
+
+            case mMotion.SCROLL:
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    if(mMode){
+
+                    }else {
+                        float ex_posX = mMotion.mDownPosX % mSurface.mViewWidth;
+                        if ((Math.abs(getScrollX() - mMotion.mDownPosX) > mSurface.mViewWidth * mMotion.mScreenDistanceRatio)) {
+                            if (getScrollX() > mMotion.mDownPosX) {
+                                DateChange(WEEK, 1);
+                                scrollTo((int) (mMotion.mDownPosX - ex_posX + mSurface.mViewWidth), 0);
+                            } else {
+                                DateChange(WEEK, -1);
+                                scrollTo((int) (mMotion.mDownPosX - ex_posX - mSurface.mViewWidth), 0);
+                            }
+                        }else{
+                            scrollTo((int)(mMotion.mDownPosX-ex_posX),0);
+                        }
+                        UpdateCurTime();
+                    }
+                }
+                break;
         }
         return mGestureDetector.onTouchEvent(event);
     }
 
     @Override
     public boolean onDown(MotionEvent e) {
+        mMotion.mDownPosX = getScrollX();
+        mMotion.mDownPosY = getScrollY();
+
         return true;
     }
 
@@ -356,31 +410,46 @@ public class CalView extends View implements GestureDetector.OnGestureListener{
 
     @Override
     public void onShowPress(MotionEvent e) {
-        Log.d("Test", "Show");
 
     }
 
     @Override
     public boolean onSingleTapUp(MotionEvent e) {
+        float posX = e.getX();
+        float posY = e.getY();
         if(mMode) {
-            float posX = e.getX();
-            float posY = e.getY();
+
             float CurY = getScrollY() + posY;
             mCurDateList = findIndexByPosition(posX, CurY);
             ScrollToSelect(mCurDateList);
 
+        }else{
+            int num = (int) posX/mSurface.mCellWidth;
+            int nowDate = mCurDateList.get(3);
+            DateChange(DAY,num-nowDate);
+            invalidate();
         }
+        UpdateCurTime();
         return  true;
 
     }
 
+    private void UpdateCurTime (){
+        GregorianCalendar date = new GregorianCalendar((mTodayDate.get(Calendar.YEAR)+mCurDateList.get(0)-(YEAR_RANGE-1)/2),mCurDateList.get(1),1);
+        int firstday = CalUtil.FindFirstDayofMonthInWeek(date)-1;
+        int day = mCurDateList.get(2)*COLUM_NUM+mCurDateList.get(3)-firstday;
+        date.add(Calendar.DAY_OF_MONTH, day);
+        mCalViewListener.DateChange(date);
+    }
     @Override
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+        mMotion.ACTION_STATE = mMotion.SCROLL;
         if(mMode) {
             if ((distanceY < 0 && getScrollY() > 0) || (distanceY > 0 && getScrollY() < mSurface.mMaxHeight)) {
                 scrollBy(0, (int) distanceY);
             }
             mCurDateList =findIndexByPosition(findAutoSelectPosition().get(0),findAutoSelectPosition().get(1));
+            UpdateCurTime();
 
         }else{
             if((distanceX <0 && getScaleX()>0)||(distanceX >0 && getScaleX() < mSurface.mMaxWidth)){
@@ -391,17 +460,14 @@ public class CalView extends View implements GestureDetector.OnGestureListener{
     }
 
     @Override
-    public void onLongPress(MotionEvent e) {
-        Log.d("Test","LongPress");
-    }
+    public void onLongPress(MotionEvent e) {}
 
 
     private void DateChange(int timefield,int value){
         GregorianCalendar temp = new GregorianCalendar(mCurDateList.get(0)-(YEAR_RANGE-1)/2+mTodayDate.get(Calendar.YEAR),mCurDateList.get(1),1);
-        GregorianCalendar tempDate = new GregorianCalendar(mCurDateList.get(0)-(YEAR_RANGE-1)/2+mTodayDate.get(Calendar.YEAR),mCurDateList.get(1),1);
         int first = CalUtil.FindFirstDayofMonthInWeek(temp) -1;
         int day = mCurDateList.get(2)*COLUM_NUM+mCurDateList.get(3)-first;
-        temp.add(Calendar.DAY_OF_MONTH, day - 1);
+        temp.add(Calendar.DAY_OF_MONTH, day);
         switch (timefield){
 
             case DAY:
@@ -420,41 +486,30 @@ public class CalView extends View implements GestureDetector.OnGestureListener{
                 break;
         }
         mCurDateList.clear();
-        mCurDateList.add((tempDate.get(Calendar.YEAR) - temp.get(Calendar.YEAR)) + (YEAR_RANGE - 1) / 2);
+        mCurDateList.add(temp.get(Calendar.YEAR)-mTodayDate.get(Calendar.YEAR)+ (YEAR_RANGE - 1) / 2);
         mCurDateList.add(temp.get(Calendar.MONTH));
         first = CalUtil.FindFirstDayofMonthInWeek(temp)-1;
-        int week =( temp.get(Calendar.DAY_OF_MONTH)+first)/COLUM_NUM;
+        int week =( temp.get(Calendar.DAY_OF_MONTH)-1+first)/COLUM_NUM;
         mCurDateList.add(week);
-        day = (temp.get(Calendar.DAY_OF_MONTH)+first)%COLUM_NUM;
+        day = (temp.get(Calendar.DAY_OF_MONTH)-1+first)%COLUM_NUM;
         mCurDateList.add(day);
 
     }
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
 
-        if(!mMode) {
-            float pos = e1.getX()+getScrollX();
-            float ex_horizen = pos%mSurface.mViewWidth;
-            pos -=ex_horizen;
-            if((Math.abs(e1.getX()-e2.getX()) > mMotion.mMinFlingDistance)&&((Math.abs(velocityX)>mMotion.mMinFlingVelocity))) {
-                if (velocityX < 0) {
-                    DateChange(WEEK, 1);
-                    scrollTo((int)pos+mSurface.mViewWidth, 0);
-
-                } else {
-                    DateChange(WEEK, -1);
-                    scrollTo((int)pos-mSurface.mViewWidth, 0);
-
-                }
-            }
-        }
-        return true;
+        return false;
     }
 
     private static class mMotion{
-        public static int mMinFlingDistance= 250;
-        public static int mMinFlingVelocity=2500;
-        public static boolean ScrollX = false;
+        public static int mMinFlingDistance= 100;
+        public static int mMinFlingVelocity=1500;
+        public static float mDownPosX;
+        public static float mDownPosY;
+        public static final int SCROLL=0x01;
+        public static final int WAIT=0x00;
+        public static int ACTION_STATE = WAIT;
+        public static float mScreenDistanceRatio = 0.3f;
     }
     private class mSurface {
         public float mdensity;
@@ -494,15 +549,15 @@ public class CalView extends View implements GestureDetector.OnGestureListener{
             mDatePaint = new Paint();
             mDatePaint.setColor(mTextColor);
             mDatePaint.setAntiAlias(true);
-            mDatePaint.setTextSize(mCellHeight * 0.5f);
+            mDatePaint.setTextSize(mCellHeight * 0.3f);
             mSelectedPaint = new Paint();
             mSelectedPaint.setColor(mCellSelectedColoe);
             mSelectedPaint.setAntiAlias(true);
-            mSelectedPaint.setTextSize(mCellHeight * 0.5f);
+            mSelectedPaint.setTextSize(mCellHeight * 0.3f);
             mTodayPaint = new Paint();
             mTodayPaint.setColor(mTodayColor);
             mTodayPaint.setAntiAlias(true);
-            mTodayPaint.setTextSize(mCellHeight * 0.7f);
+            mTodayPaint.setTextSize(mCellHeight * 0.5f);
             mMonthPaint = new Paint();
             mMonthPaint.setColor(mMonthColor);
             mMonthPaint.setAntiAlias(true);

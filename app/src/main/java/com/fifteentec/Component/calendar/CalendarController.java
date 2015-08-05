@@ -1,13 +1,15 @@
 package com.fifteentec.Component.calendar;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 public class CalendarController {
 
     private GregorianCalendar mTimeCur;
-
+    public final ArrayList<String> MONTH_NAME = new ArrayList<>(Arrays.asList("Jan.","Feb.","Mar.","Apr.","May","Jun.","Jul.","Aug.","Sept.","Oct.","Nov.","Dec."));
     private   ArrayList<Integer> mCurDate;
     private int mCurDayOfMonth;
     private int mCurDayOfWeek;
@@ -29,7 +31,6 @@ public class CalendarController {
 
     public CalendarController()
     {
-        // Locale.setDefault(Locale.CHINA);
         mTimeNow = new GregorianCalendar();
         mNowDayOfMonth = mTimeNow.get(Calendar.DAY_OF_MONTH);
         mNowDayOfWeek = mTimeNow.get(Calendar.DAY_OF_WEEK);

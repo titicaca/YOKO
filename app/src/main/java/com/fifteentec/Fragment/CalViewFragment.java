@@ -2,6 +2,7 @@ package com.fifteentec.Fragment;
 
 import android.os.Bundle;
 import android.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,8 @@ public class CalViewFragment extends Fragment {
     private CalendarController mDate;
 
     private TextView mMonthText;
+    private TextView mYearText;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -35,41 +38,26 @@ public class CalViewFragment extends Fragment {
 
     }
 
-    /*public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            Bundle mbundle = getArguments();
-
-            if(mbundle !=null)
-            {
-                ArrayList<Integer> mDateArray;
-                mDateArray = mbundle.getIntegerArrayList("Date");
-                myear = mDateArray.get(0);
-                mmonth = mDateArray.get(1);
-                mdayofweek = mDateArray.get(3);
-                mdayofmonth = mDateArray.get(2);
-                mCurDate = new GregorianCalendar(myear,mmonth,mdayofmonth);
-            }
-        }
-
-        public static CalViewFragment newInstance(ArrayList<Integer> date)
-        {
-            Bundle mbundle = new Bundle();
-            mbundle.putIntegerArrayList("Date", date);
-            CalViewFragment mCalViewFragment = new CalViewFragment();
-            mCalViewFragment.setArguments(mbundle);
-            return mCalViewFragment;
-        }
-    */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.fragment_calendar_main_layout,container,false);
-        mCalView =  (CalView) view.findViewById(R.id.id_cal_view);
-        mCalView.init(mDate.getNowCalendar());
         mMonthText = (TextView) view.findViewById(R.id.id_cal_view_month);
         mMonthText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mCalView.SwitchMode();
+            }
+        });
+        mYearText = (TextView) view.findViewById(R.id.id_cal_view_year);
+        mCalView =  (CalView) view.findViewById(R.id.id_cal_view);
+        mCalView.init(mDate.getNowCalendar());
+        mCalView.setCalViewListner(new CalView.CalViewListener() {
+            @Override
+            public void DateChange(GregorianCalendar arry) {
+                mDate.UpdateCur(arry);
+                mMonthText.setText(mDate.MONTH_NAME.get(mDate.getCurMonth()));
+                mYearText.setText(mDate.getCurYear() + "");
             }
         });
 
