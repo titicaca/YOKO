@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.fifteentec.yoko">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.fifteentec.yoko">
 
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
@@ -19,48 +20,49 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
             android:name=".ValidateActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustPan">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:windowSoftInputMode="adjustPan"></activity>
 
         <activity
             android:name=".RegisterActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize|stateVisible" >
-        </activity>
+            android:windowSoftInputMode="adjustResize|stateVisible"></activity>
 
         <activity
             android:name=".LoginActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize|stateVisible" >
-        </activity>
+            android:windowSoftInputMode="adjustResize|stateVisible"></activity>
 
         <activity
             android:name=".ChangePswdActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize|stateVisible" >
-        </activity>
+            android:windowSoftInputMode="adjustResize|stateVisible"></activity>
 
         <activity
             android:name=".TabActivity"
             android:label="TabAvtivity"
-            android:windowSoftInputMode="adjustPan|stateHidden" >
+            android:windowSoftInputMode="adjustPan|stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name="com.fifteentec.yoko.friends.FriendDetailsActivity"></activity>
+        <activity android:name="com.fifteentec.yoko.friends.NewFriendActivity"></activity>
+        <activity android:name="com.fifteentec.yoko.friends.LabelActivity"></activity>
+        <activity android:name="com.fifteentec.yoko.friends.NewFriendsListActivity"></activity>
+        <activity android:name="com.fifteentec.yoko.friends.NewLabelActivity"></activity>
+        <activity android:name="com.fifteentec.yoko.friends.NewLabelGvAddActivity"></activity>
+
+
     </application>
 
 

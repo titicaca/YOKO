@@ -22,9 +22,13 @@ public abstract class BaseActivity extends Activity {
         return this.dbManager;
     }
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
         /**
          * 初始化volley请求队列
          */

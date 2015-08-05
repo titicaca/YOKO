@@ -24,7 +24,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp" />
 
-        <AutoCompleteTextView
+        <EditText
             android:id="@+id/validate_input_phone_et"
             android:layout_width="280dp"
             android:layout_height="wrap_content"
@@ -65,8 +65,7 @@
             android:singleLine="true"
             android:layout_below="@+id/validate_input_code_et"
             android:clickable="true"
-            android:focusable="false"
-            android:layout_marginTop="10dp" />
+            android:focusable="false" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -96,12 +95,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:clickable="false"
-        android:layout_marginBottom="5dp">
+        android:clickable="false">
 
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="25dp"
             android:text="@string/string_try_app"
             android:id="@+id/try_app_tv"
             android:layout_alignParentBottom="true"

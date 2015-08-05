@@ -3,6 +3,8 @@ package com.API;
 public class APIUrl {
     private final static String URL_BASE = "http://192.168.0.110:8080";
 
+    public final static String URL_FRIENDLIST = URL_BASE + "/friend/all";
+
     public final static String URL_HOME = URL_BASE + "/" + "home";
 
     public final static String URL_LOGIN = URL_BASE + "/" + "oauth/token";
