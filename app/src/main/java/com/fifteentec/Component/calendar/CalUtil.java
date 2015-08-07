@@ -11,6 +11,7 @@ public class CalUtil {
 
     public static final List<Integer> LENTH_OF_MONTH = new ArrayList<>(Arrays.asList(31,28,31,30,31,30,31,31,30,31,30,31));
 
+    public static final List<String> WEEK_NAME = new ArrayList<>(Arrays.asList("Non","Sun.","Mon.","Tue.","Wed.","Thr.","Fri.","Sat."));
     public static boolean isLeapYear (int year){
         GregorianCalendar temp = new GregorianCalendar(year,1,1);
 

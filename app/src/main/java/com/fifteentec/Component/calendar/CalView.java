@@ -39,10 +39,10 @@ public class CalView extends View implements GestureDetector.OnGestureListener{
 
     private final int COLUM_NUM =CalUtil.LENTH_OF_WEEK;
     private final int MONTH_OF_YEAR=12;
-    private final int ROW_NUM = 6;
+    private final int ROW_NUM = 7; //  周视图显示的行数
     private final int DAY_OF_MONTH = COLUM_NUM*ROW_NUM;
     private GestureDetector mGestureDetector;
-    private boolean mMode =true;
+    private boolean mMode =true; //true为月模式,flase为周模式
     private CalViewListener mCalViewListener;
     private boolean firstEnter = true;
     private final int DAY=0x00;
@@ -143,8 +143,8 @@ public class CalView extends View implements GestureDetector.OnGestureListener{
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
         if(firstEnter) {
-            mSurface.mViewWidth = getResources().getDisplayMetrics().widthPixels;
-            mSurface.mViewHeight = (int)(getResources().getDisplayMetrics().widthPixels*0.8f);
+            mSurface.mViewWidth = getMeasuredWidth();
+            mSurface.mViewHeight = (int)(getMeasuredWidth()*0.8f);
             mSurface.init();
             ViewGroup.LayoutParams Params = getLayoutParams();
             Params.height = mSurface.mViewHeight;
@@ -287,6 +287,27 @@ public class CalView extends View implements GestureDetector.OnGestureListener{
 
     }
 
+    private void ScrollToSelectWeek(ArrayList<Integer> date){
+        int DayCount = MinDayOfFirstWeek;
+        for(int i =0;i<date.get(0);i++){
+            GregorianCalendar temp = new GregorianCalendar(mTodayDate.get(Calendar.YEAR)-(YEAR_RANGE-1)/2+i,1,1);
+            if(temp.isLeapYear(temp.get(Calendar.YEAR))){
+                DayCount +=366;
+            }else {
+                DayCount +=365;
+            }
+        }
+        GregorianCalendar temp = new GregorianCalendar(mTodayDate.get(Calendar.YEAR)-(YEAR_RANGE-1)/2+date.get(0),1,1);
+        for(int i =0;i<date.get(1);i++){
+            DayCount += CalUtil.LENTH_OF_MONTH.get(i);
+            if(i==1&&temp.isLeapYear(temp.get(Calendar.YEAR))){
+                DayCount+=1;
+            }
+        }
+        for(int i=0;i<date.get(2);i++) DayCount +=COLUM_NUM;
+        scrollTo((DayCount/7)*mSurface.mViewWidth,0);
+    }
+
     private ArrayList<Integer> findIndexByPosition(float x,float y)
     {
         int heightIndex = (int) (y/mSurface.mCellHeight );
@@ -400,13 +421,29 @@ public class CalView extends View implements GestureDetector.OnGestureListener{
         return y;
     }
 
-    private void ScrollToSelect(ArrayList<Integer> List) {
+    public void ScrollToSelect(ArrayList<Integer> List) {
 
-        float y = findPositionByIndex(List.get(0),List.get(1),List.get(2),List.get(3));
-        int targetY =(int)(y - mSurface.mViewHeight/2 +(List.get(3))*mSurface.mScaleHeight);
+            float y = findPositionByIndex(List.get(0), List.get(1), List.get(2), List.get(3));
+            int targetY = (int) (y - mSurface.mViewHeight / 2 + (List.get(3)) * mSurface.mScaleHeight);
 
-        scrollTo(0, targetY);
+            scrollTo(0, targetY);
     }
+
+    public void UpdateTime(GregorianCalendar temp){
+        mCurDateList.clear();
+        int fisrtDay = CalUtil.FindFirstDayofMonthInWeek(temp)-1;
+        mCurDateList.add(mTodayDate.get(Calendar.YEAR)-temp.get(Calendar.YEAR)+(YEAR_RANGE-1)/2);
+        mCurDateList.add(temp.get(Calendar.MONTH));
+        mCurDateList.add((temp.get(Calendar.DAY_OF_MONTH) + fisrtDay - 1) / COLUM_NUM);
+        mCurDateList.add((temp.get(Calendar.DAY_OF_MONTH) + fisrtDay - 1) % COLUM_NUM);
+        invalidate();
+        if(mMode){
+            ScrollToSelect(mCurDateList);
+        }else {
+            ScrollToSelectWeek(mCurDateList);
+        }
+    }
+
 
     @Override
     public void onShowPress(MotionEvent e) {

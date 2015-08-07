@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.fifteentec.Component.calendar.CalView;
@@ -31,6 +32,10 @@ public class CalViewFragment extends Fragment {
     private TextView mYearText;
     private FragmentManager mFragmentManager;
     private EventListViewFragment mListView;
+    private LinearLayout mll;
+
+    private final int EVENT_LIST = 0x00;
+    private final int CAL_VIEW_MONTH_TAP = 0x01;
 
 
     @Override
@@ -62,14 +67,36 @@ public class CalViewFragment extends Fragment {
             @Override
             public void DateChange(GregorianCalendar arry) {
                 mDate.UpdateCur(arry);
-                mMonthText.setText(mDate.MONTH_NAME.get(mDate.getCurMonth()));
-                mYearText.setText(mDate.getCurYear() + "");
+                UpdateTime(CAL_VIEW_MONTH_TAP);
+
             }
         });
+
         FragmentTransaction mTrans = mFragmentManager.beginTransaction();
-        mListView = new EventListViewFragment();
+        mListView = EventListViewFragment.newInstance(mDate.getNowArray());
+        mListView.setEventFragmentListener(new EventListViewFragment.EventListFragmentListener() {
+            @Override
+            public void ListDateChange(ArrayList<Integer> list) {
+                mDate.UpdateCur(list);
+                UpdateTime(EVENT_LIST);
+            }
+        });
         mTrans.add(R.id.id_event_content,mListView).commit();
 
+
         return view;
+    }
+
+    private void UpdateTime(int Updater) {
+        mMonthText.setText(mDate.MONTH_NAME.get(mDate.getCurMonth()));
+        mYearText.setText(mDate.getCurYear() + "");
+        switch (Updater){
+            case CAL_VIEW_MONTH_TAP:
+                mListView.UpdateTime(mDate.getCurArray());
+                break;
+            case EVENT_LIST:
+                GregorianCalendar temp =mDate.getCurCalendar();
+                mCalView.UpdateTime(temp);
+        }
     }
 }

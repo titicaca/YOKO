@@ -46,6 +46,7 @@ public class CalendarController {
         mNowDate.add(mNowDayOfMonth);
         mNowDate.add(mNowDayOfWeek);
 
+        mTimeCur = new GregorianCalendar(mNowYear,mNowMonth,mNowDayOfMonth);
         mCurDate = new ArrayList<>(4);
 
         UpdateCur(mTimeNow);
@@ -62,6 +63,7 @@ public class CalendarController {
         this.mCurMonth = mTime.get(Calendar.MONTH);
         this.mCurDayOfMonth = mTime.get(Calendar.DAY_OF_MONTH);
         this.mCurDayOfWeek = mTime.get(Calendar.DAY_OF_WEEK);
+        this.mTimeCur = new GregorianCalendar(mCurYear,mCurMonth,mCurDayOfMonth);
 
     }
 
@@ -76,6 +78,7 @@ public class CalendarController {
             this.mCurMonth = date.get(1);
             this.mCurDayOfMonth = date.get(2);
             this.mCurDayOfWeek = date.get(3);
+            this.mTimeCur = new GregorianCalendar(mCurYear,mCurMonth,mCurDayOfMonth);
         }
     }
 
@@ -113,7 +116,7 @@ public class CalendarController {
     public ArrayList<Integer> getCurArray() {
         return this.mCurDate;
     }
-    public GregorianCalendar getCurCalendar() {return mTimeCur;};
+    public GregorianCalendar getCurCalendar() {return CalUtil.CopyDate(mTimeCur);};
     public GregorianCalendar getNowCalendar() {return mTimeNow;};
 
     public ArrayList<Integer> getNowArray() {
