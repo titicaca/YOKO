@@ -5,7 +5,7 @@ import java.io.InputStream;
 /**
  * 用于接收InputStream格式的Response
  */
-public abstract class APIFileCallbackResponse implements APICallbackResponse<InputStream>{
+public abstract class APIFileCallbackResponse implements APICallbackResponse<InputStream> {
     private InputStream response;
 
     public InputStream getResponse() {

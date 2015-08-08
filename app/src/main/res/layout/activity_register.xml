@@ -2,20 +2,20 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:clickable="false">
+    android:clickable="false"
+    android:orientation="vertical">
 
     <RadioButton
+        android:id="@+id/register_rbtn"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/string_register"
-        android:id="@+id/register_rbtn"
-        android:layout_alignParentTop="false"
         android:layout_alignParentLeft="false"
         android:layout_alignParentStart="false"
-        android:checked="true"
+        android:layout_alignParentTop="false"
         android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp" />
+        android:layout_marginTop="10dp"
+        android:checked="true"
+        android:text="@string/string_register" />
 
     <EditText
         android:id="@+id/register_input_username_et"
@@ -33,34 +33,32 @@
         android:layout_width="280dp"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/register_input_username_et"
+        android:layout_below="@+id/register_input_username_et"
         android:hint="@string/hint_password"
         android:inputType="textPassword"
-        android:singleLine="false"
-        android:layout_below="@+id/register_input_username_et">
-    </EditText>
+        android:singleLine="false"></EditText>
 
     <EditText
         android:id="@+id/register_reinput_code_et"
         android:layout_width="280dp"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/register_input_code_et"
+        android:layout_below="@+id/register_input_code_et"
         android:hint="@string/hint_reinput_password"
         android:inputType="textPassword"
-        android:singleLine="false"
-        android:layout_below="@+id/register_input_code_et">
-    </EditText>
+        android:singleLine="false"></EditText>
 
     <Button
+        android:id="@+id/finish_btn"
         android:layout_width="280dp"
         android:layout_height="wrap_content"
-        android:text="@string/string_finish"
-        android:id="@+id/finish_btn"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentStart="false"
         android:layout_alignParentLeft="false"
+        android:layout_alignParentStart="false"
+        android:layout_below="@+id/register_reinput_code_et"
+        android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
         android:clickable="true"
         android:enabled="true"
-        android:layout_below="@+id/register_reinput_code_et" />
+        android:text="@string/string_finish" />
 
 </RelativeLayout>
