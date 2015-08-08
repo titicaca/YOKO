@@ -27,8 +27,7 @@ public class CalViewFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        if(mDate == null)
-        {
+        if (mDate == null) {
             mDate = new CalendarController();
         }
         super.onCreate(savedInstanceState);
@@ -62,8 +61,8 @@ public class CalViewFragment extends Fragment {
     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_calendar_main_layout,container,false);
-        mCalView =  (CalView) view.findViewById(R.id.id_cal_view);
+        View view = inflater.inflate(R.layout.fragment_calendar_main_layout, container, false);
+        mCalView = (CalView) view.findViewById(R.id.id_cal_view);
         mCalView.init(mDate.getNowCalendar());
         mMonthText = (TextView) view.findViewById(R.id.id_cal_view_month);
         mMonthText.setOnClickListener(new View.OnClickListener() {

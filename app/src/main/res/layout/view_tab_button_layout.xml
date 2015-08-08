@@ -1,101 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:orientation="horizontal"
-    android:background="#ffe5e5e5">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffe5e5e5"
+    android:orientation="horizontal">
 
     <LinearLayout
-        android:orientation="vertical"
+        android:id="@+id/tab_button_ll_1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:id="@+id/tab_button_ll_1"
         android:gravity="center_horizontal"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp">
+        android:orientation="vertical"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp">
 
         <ImageView
+            android:id="@+id/tab_button_image_1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/tab_button_image_1"
             android:src="@drawable/calendar" />
 
         <TextView
+            android:id="@+id/tab_button_text_1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="日程"
-            android:id="@+id/tab_button_text_1" />
+            android:textAppearance="?android:attr/textAppearanceSmall" />
     </LinearLayout>
 
     <LinearLayout
-        android:orientation="vertical"
+        android:id="@+id/tab_button_ll_2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:id="@+id/tab_button_ll_2"
         android:gravity="center_horizontal"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp">
+        android:orientation="vertical"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp">
 
         <ImageView
+            android:id="@+id/tab_button_image_2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/tab_button_image_2"
             android:src="@drawable/found" />
 
         <TextView
+            android:id="@+id/tab_button_text_2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="发现"
-            android:id="@+id/tab_button_text_2" />
+            android:textAppearance="?android:attr/textAppearanceSmall" />
     </LinearLayout>
+
     <LinearLayout
-        android:orientation="vertical"
+        android:id="@+id/tab_button_ll_3"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:id="@+id/tab_button_ll_3"
         android:gravity="center_horizontal"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp">
+        android:orientation="vertical"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp">
 
         <ImageView
+            android:id="@+id/tab_button_image_3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/tab_button_image_3"
             android:src="@drawable/friend" />
 
         <TextView
+            android:id="@+id/tab_button_text_3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="交友"
-            android:id="@+id/tab_button_text_3" />
+            android:textAppearance="?android:attr/textAppearanceSmall" />
     </LinearLayout>
+
     <LinearLayout
-        android:orientation="vertical"
+        android:id="@+id/tab_button_ll_4"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:id="@+id/tab_button_ll_4"
         android:gravity="center_horizontal"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp">
+        android:orientation="vertical"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp">
 
         <ImageView
+            android:id="@+id/tab_button_image_4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/tab_button_image_4"
             android:src="@drawable/me" />
 
         <TextView
+            android:id="@+id/tab_button_text_4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="账户"
-            android:id="@+id/tab_button_text_4" />
+            android:textAppearance="?android:attr/textAppearanceSmall" />
     </LinearLayout>
 
 </LinearLayout>

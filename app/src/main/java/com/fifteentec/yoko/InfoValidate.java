@@ -6,6 +6,7 @@ public class InfoValidate {
 
     /**
      * 判断一个字符串的位数
+     *
      * @param str
      * @param length
      * @return
@@ -18,9 +19,9 @@ public class InfoValidate {
         }
     }
 
-    public static boolean isPhoneValid(String phone){
+    public static boolean isPhoneValid(String phone) {
         /*
-		 * 移动：134、135、136、137、138、139、150、151、157(TD)、158、159、187、188
+         * 移动：134、135、136、137、138、139、150、151、157(TD)、158、159、187、188
 		 * 联通：130、131、132、152、155、156、185、186 电信：133、153、180、189、（1349卫通）
 		 * 总结起来就是第一位必定为1，第二位必定为3或5或8，其他位置的可以为0-9
 		 */
@@ -31,9 +32,9 @@ public class InfoValidate {
             return phone.matches(telRegex);
     }
 
-    public static boolean isUsernameValid(String username){
+    public static boolean isUsernameValid(String username) {
         String usernameRegex = "^[\\u4E00-\\u9FA5\\uF900-\\uFA2Da-zA-Z\\d~!@#$%^&*()_+`\\-={}:\\\";'<>?,.\\\\/]{1,16}$";
-        if(TextUtils.isEmpty(username))
+        if (TextUtils.isEmpty(username))
             return false;
         else
             return username.matches(usernameRegex);
@@ -47,7 +48,7 @@ public class InfoValidate {
     public static boolean isPasswordValid(String password) {
         //String pswRegex = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[~!@#$%^&*()_+`\\-={}:\";'<>?,.\\\\/]).{4,16}$";
         String pswRegex = "^(?=.*[a-zA-Z])(?=.*\\d).{6,16}$";
-        if(TextUtils.isEmpty(password))
+        if (TextUtils.isEmpty(password))
             return false;
         else
             return password.matches(pswRegex);

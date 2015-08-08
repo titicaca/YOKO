@@ -5,9 +5,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-/**
- * Created by benbush on 15/8/3.
- */
 public class DBHelper extends SQLiteOpenHelper {
     private final static String DATABASE_NAME = "YOKO_DB";
     private final static int DATABASE_VERSION = 1;

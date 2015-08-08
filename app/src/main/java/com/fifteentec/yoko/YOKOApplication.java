@@ -34,6 +34,7 @@ public class YOKOApplication extends Application {
         //sp.edit().clear().commit();
         UserServer.getInstance().setSharedPreferences(sp);
         UserServer.getInstance().loadSharedPreferences();
+        UserServer.getInstance().setApplication(this);
     }
 
     @Override
@@ -51,7 +52,7 @@ public class YOKOApplication extends Application {
     }
 
     @Override
-    public void onLowMemory(){
+    public void onLowMemory() {
         super.onLowMemory();
     }
 }

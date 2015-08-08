@@ -5,7 +5,7 @@ import org.json.JSONArray;
 /**
  * 用于接收JsonArray格式的Response
  */
-public abstract class APIJsonArrayCallbackResponse implements APICallbackResponse<JSONArray>{
+public abstract class APIJsonArrayCallbackResponse implements APICallbackResponse<JSONArray> {
     private JSONArray response;
 
     public JSONArray getResponse() {
