@@ -31,7 +31,7 @@ import java.util.Map;
 public class APIServer {
     public final static int VALUE_NETWORK_CONNECTION_ERROR = -1;
     public final static int VALUE_UNAUTHORIZED = 401;
-    public final static String STRING_NETWORK_CONNECTION_ERROR = "无法连接到网络";
+    public final static String STRING_NETWORK_CONNECTION_ERROR = "无法连接到服务器";
 
     private static APIServer server = new APIServer();
 
@@ -39,51 +39,10 @@ public class APIServer {
         return server;
     }
 
-    public static class JsonArrayPost implements Response.ErrorListener {
-        private final APICallbackResponse callbackResponse;
-        private final RequestQueue queue;
-        private final JsonArrayRequest request;
-
-        /**
-         * 用于发送JsonArray格式的POST请求
-         *
-         * @param url              请求目标地址
-         * @param params           请求所需参数
-         * @param headers          请求所需文件头
-         * @param callbackResponse 用于接收返回的实例化回调类
-         * @param queue            Volley队列
-         * @param tag              请求的Tag标签
-         */
-        public JsonArrayPost(String url, JSONArray params, final Map<String, String> headers,
-                             final APICallbackResponse callbackResponse,
-                             final RequestQueue queue, final Object tag) {
-            this.callbackResponse = callbackResponse;
-            this.queue = queue;
-
-            this.request = new JsonArrayRequest(
-                    Method.GET,
-                    url,
-                    params,
-                    new Response.Listener<JSONArray>() {
-                        @Override
-                        public void onResponse(JSONArray response) {
-                            callbackResponse.setResponse(response);
-                            callbackResponse.run();
-                        }
-                    }, this) {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    if (headers == null)
-                        return Collections.<String, String>emptyMap();
-
-                    if (headers.containsKey(APIKey.KEY_AUTHORIZATION)) {
-                        headers.put(APIKey.KEY_AUTHORIZATION, UserServer.getInstance().getAccessToken());
-                    }
-                    return headers;
-                }
-            };
-            if (tag != null) this.request.setTag(tag);
-        }
+    public abstract static class APINetworkRequest implements Response.ErrorListener {
+        protected APICallbackResponse callbackResponse;
+        protected RequestQueue queue;
+        protected Request request;
 
         @Override
         public void onErrorResponse(VolleyError error) {
@@ -112,11 +71,49 @@ public class APIServer {
         }
     }
 
-    public static class JsonPost implements Response.ErrorListener {
-        private final APICallbackResponse callbackResponse;
-        private final RequestQueue queue;
-        private final JsonObjectRequest request;
+    public static class JsonArrayPost extends APINetworkRequest {
+        /**
+         * 用于发送JsonArray格式的POST请求
+         *
+         * @param url              请求目标地址
+         * @param params           请求所需参数
+         * @param headers          请求所需文件头
+         * @param callbackResponse 用于接收返回的实例化回调类
+         * @param queue            Volley队列
+         * @param tag              请求的Tag标签
+         */
+        public JsonArrayPost(String url, JSONArray params, final Map<String, String> headers,
+                             final APICallbackResponse callbackResponse,
+                             final RequestQueue queue, final Object tag) {
+            this.callbackResponse = callbackResponse;
+            this.queue = queue;
+            this.request = new JsonArrayRequest(
+                    Method.GET,
+                    url,
+                    params,
+                    new Response.Listener<JSONArray>() {
+                        @Override
+                        public void onResponse(JSONArray response) {
+                            callbackResponse.setResponse(response);
+                            callbackResponse.run();
+                        }
+                    }, this) {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    if (headers == null)
+                        return Collections.<String, String>emptyMap();
 
+                    if (headers.containsKey(APIKey.KEY_AUTHORIZATION)) {
+                        headers.put(APIKey.KEY_AUTHORIZATION, UserServer.getInstance().getAccessToken());
+                    }
+                    return headers;
+                }
+            };
+            if (tag != null) this.request.setTag(tag);
+        }
+    }
+
+    public static class JsonPost extends APINetworkRequest {
         /**
          * 用于发送Json格式的POST请求
          *
@@ -156,39 +153,9 @@ public class APIServer {
             };
             if (tag != null) this.request.setTag(tag);
         }
-
-        @Override
-        public void onErrorResponse(VolleyError error) {
-            Log.v("VolleyError", (error.networkResponse == null)
-                    ? "error.networkResponse = null"
-                    : new String(error.networkResponse.data));
-
-            if (error.networkResponse != null
-                    && error.networkResponse.statusCode == VALUE_UNAUTHORIZED) {
-                requestAccessToken(request, queue);
-            } else {
-                try {
-                    Toast.makeText(BaseActivity.getCurrentActivity().getApplicationContext(),
-                            STRING_NETWORK_CONNECTION_ERROR,
-                            Toast.LENGTH_LONG).show();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                this.callbackResponse.setResponse(null);
-                this.callbackResponse.run();
-            }
-        }
-
-        public void send() {
-            this.queue.add(this.request);
-        }
     }
 
-    public static class _JsonPost implements Response.ErrorListener {
-        private final APICallbackResponse callbackResponse;
-        private final RequestQueue queue;
-        private final JsonObjectRequest request;
-
+    public static class _JsonPost extends APINetworkRequest {
         /**
          * 用于发送Json格式的POST请求
          *
@@ -255,43 +222,9 @@ public class APIServer {
             };
             if (tag != null) this.request.setTag(tag);
         }
-
-        @Override
-        public void onErrorResponse(VolleyError error) {
-            Log.v("VolleyError", (error.networkResponse == null)
-                    ? "error.networkResponse = null"
-                    : new String(error.networkResponse.data));
-
-            if (error.networkResponse != null
-                    && error.networkResponse.statusCode == VALUE_UNAUTHORIZED) {
-                requestAccessToken(request, queue);
-            } else {
-                try {
-                    try {
-                        Toast.makeText(BaseActivity.getCurrentActivity().getApplicationContext(),
-                                STRING_NETWORK_CONNECTION_ERROR,
-                                Toast.LENGTH_LONG).show();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                this.callbackResponse.setResponse(null);
-                this.callbackResponse.run();
-            }
-        }
-
-        public void send() {
-            this.queue.add(this.request);
-        }
     }
 
-    public static class JsonPut implements Response.ErrorListener {
-        private final APICallbackResponse callbackResponse;
-        private final RequestQueue queue;
-        private final JsonObjectRequest request;
-
+    public static class JsonPut extends APINetworkRequest {
         /**
          * 用于发送Json格式的PUT请求
          *
@@ -332,39 +265,9 @@ public class APIServer {
             };
             if (tag != null) this.request.setTag(tag);
         }
-
-        @Override
-        public void onErrorResponse(VolleyError error) {
-            Log.v("VolleyError", (error.networkResponse == null)
-                    ? "error.networkResponse = null"
-                    : new String(error.networkResponse.data));
-
-            if (error.networkResponse != null
-                    && error.networkResponse.statusCode == VALUE_UNAUTHORIZED) {
-                requestAccessToken(request, queue);
-            } else {
-                try {
-                    Toast.makeText(BaseActivity.getCurrentActivity().getApplicationContext(),
-                            STRING_NETWORK_CONNECTION_ERROR,
-                            Toast.LENGTH_LONG).show();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                this.callbackResponse.setResponse(null);
-                this.callbackResponse.run();
-            }
-        }
-
-        public void send() {
-            this.queue.add(this.request);
-        }
     }
 
-    public static class JsonGet implements Response.ErrorListener {
-        private final APICallbackResponse callbackResponse;
-        private final RequestQueue queue;
-        private final JsonObjectRequest request;
-
+    public static class JsonGet extends APINetworkRequest {
         /**
          * 用于发送Json格式的Get请求
          *
@@ -430,39 +333,9 @@ public class APIServer {
             };
             if (tag != null) this.request.setTag(tag);
         }
-
-        @Override
-        public void onErrorResponse(VolleyError error) {
-            Log.v("VolleyError", (error.networkResponse == null)
-                    ? "error.networkResponse = null"
-                    : new String(error.networkResponse.data));
-
-            if (error.networkResponse != null
-                    && error.networkResponse.statusCode == VALUE_UNAUTHORIZED) {
-                requestAccessToken(request, queue);
-            } else {
-                try {
-                    Toast.makeText(BaseActivity.getCurrentActivity().getApplicationContext(),
-                            STRING_NETWORK_CONNECTION_ERROR,
-                            Toast.LENGTH_LONG).show();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                this.callbackResponse.setResponse(null);
-                this.callbackResponse.run();
-            }
-        }
-
-        public void send() {
-            this.queue.add(this.request);
-        }
     }
 
-    public static class StringPost implements Response.ErrorListener {
-        private final APICallbackResponse callbackResponse;
-        private final RequestQueue queue;
-        private final StringRequest request;
-
+    public static class StringPost extends APINetworkRequest {
         /**
          * 用于发送String格式的POST请求
          *
@@ -508,39 +381,9 @@ public class APIServer {
             };
             if (tag != null) this.request.setTag(tag);
         }
-
-        @Override
-        public void onErrorResponse(VolleyError error) {
-            Log.v("VolleyError", (error.networkResponse == null)
-                    ? "error.networkResponse = null"
-                    : new String(error.networkResponse.data));
-
-            if (error.networkResponse != null
-                    && error.networkResponse.statusCode == VALUE_UNAUTHORIZED) {
-                requestAccessToken(request, queue);
-            } else {
-                try {
-                    Toast.makeText(BaseActivity.getCurrentActivity().getApplicationContext(),
-                            STRING_NETWORK_CONNECTION_ERROR,
-                            Toast.LENGTH_LONG).show();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                this.callbackResponse.setResponse(null);
-                this.callbackResponse.run();
-            }
-        }
-
-        public void send() {
-            this.queue.add(this.request);
-        }
     }
 
-    public static class StringGet implements Response.ErrorListener {
-        private final APICallbackResponse callbackResponse;
-        private final RequestQueue queue;
-        private final StringRequest request;
-
+    public static class StringGet extends APINetworkRequest {
         /**
          * 用于发送String格式的Get请求
          *
@@ -609,32 +452,6 @@ public class APIServer {
                 }
             };
             if (tag != null) this.request.setTag(tag);
-        }
-
-        @Override
-        public void onErrorResponse(VolleyError error) {
-            Log.v("VolleyError", (error.networkResponse == null)
-                    ? "error.networkResponse = null"
-                    : new String(error.networkResponse.data));
-
-            if (error.networkResponse != null
-                    && error.networkResponse.statusCode == VALUE_UNAUTHORIZED) {
-                requestAccessToken(request, queue);
-            } else {
-                try {
-                    Toast.makeText(BaseActivity.getCurrentActivity().getApplicationContext(),
-                            STRING_NETWORK_CONNECTION_ERROR,
-                            Toast.LENGTH_LONG).show();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                this.callbackResponse.setResponse(null);
-                this.callbackResponse.run();
-            }
-        }
-
-        public void send() {
-            this.queue.add(this.request);
         }
     }
 
