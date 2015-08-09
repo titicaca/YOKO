@@ -1,30 +1,35 @@
 package com.fifteentec.yoko;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
+
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.Menu;
 import android.widget.Toast;
 
 import com.fifteentec.Fragment.CalViewFragment;
+import com.fifteentec.Fragment.FindFragment;
+import com.fifteentec.Fragment.FindGroup;
 import com.fifteentec.Fragment.TabButtonFragment;
 
-public class TabActivity extends Activity implements TabButtonFragment.Ibutton{
+public class TabActivity extends FragmentActivity implements TabButtonFragment.Ibutton{
     private FragmentManager mFragmentManager;
     private final int EnterPage= 0;
     private TabButtonFragment mbuttonfg;
     private CalViewFragment mCalViewFragment;
-
+    private FindFragment mFindFragment;
+    private FragmentTransaction mFmTrans;
 
     @SuppressLint("NewApi")
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        mFragmentManager= this.getFragmentManager();
         setContentView(R.layout.activity_tab_main_layout);
+        mFragmentManager= this.getSupportFragmentManager();
         mbuttonfg=(TabButtonFragment)mFragmentManager.findFragmentById(R.id.tab_main_botton);
         mbuttonfg.setButton(this);
         TabSelector(R.integer.SelectorCal);
@@ -35,7 +40,7 @@ public class TabActivity extends Activity implements TabButtonFragment.Ibutton{
     @Override
     public void TabSelector(int id) {
         FragmentTransaction mFmTrans = mFragmentManager.beginTransaction();
-        HideAllView(mFmTrans);
+       HideAllView(mFmTrans);
         switch (id)
         {
             case R.integer.SelectorCal:
@@ -43,7 +48,7 @@ public class TabActivity extends Activity implements TabButtonFragment.Ibutton{
                         Toast.LENGTH_SHORT);
                 d.setDuration(Toast.LENGTH_SHORT);
                 d.show();
-                /*if(mCalViewFragment ==null){
+/*               if(mCalViewFragment ==null){
                     mCalViewFragment = new CalViewFragment();
                     mFmTrans.add(R.id.id_content,mCalViewFragment,"cal");
                 }
@@ -52,6 +57,14 @@ public class TabActivity extends Activity implements TabButtonFragment.Ibutton{
                 }*/
                 break;
             case R.integer.SelectorFrd:
+                if(mFindFragment == null){
+                    mFindFragment = new FindFragment();
+                    mFmTrans.add(R.id.id_content,mFindFragment,"find");
+                }
+                else{
+                    mFmTrans.show(mFindFragment);
+                }
+
                 Toast a = Toast.makeText(this, "Found",
                         Toast.LENGTH_SHORT);
                 a.setDuration(Toast.LENGTH_SHORT);
@@ -62,9 +75,7 @@ public class TabActivity extends Activity implements TabButtonFragment.Ibutton{
                         Toast.LENGTH_SHORT);
                 b.setDuration(Toast.LENGTH_SHORT);
                 b.show();
-
                 break;
-
             case R.integer.SelectorMe:
                 Toast c = Toast.makeText(this, "Count",
                         Toast.LENGTH_SHORT);
@@ -83,6 +94,17 @@ public class TabActivity extends Activity implements TabButtonFragment.Ibutton{
         if(mCalViewFragment != null){
             mFmTrans.hide(mCalViewFragment);
         }
+        if(mFindFragment != null){
+            mFmTrans.hide(mFindFragment);
+        }
 
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
 }

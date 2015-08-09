@@ -1,0 +1,7 @@
+<resources>
+    <string name="tab_group">组织</string>
+    <string name="tab_activity">活动</string>
+    <string name="tab_favorite">收藏</string>
+    <string name="button_list">公众号列表</string>
+    <string name="button_msg">消息盒子</string>
+</resources>
