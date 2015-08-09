@@ -30,7 +30,9 @@ import java.util.Map;
 
 public class APIServer {
     public final static int VALUE_NETWORK_CONNECTION_ERROR = -1;
+    public final static int VALUE_BAD_REQUEST = 400;
     public final static int VALUE_UNAUTHORIZED = 401;
+    public final static String STRING_ERROR_STATUS_CODE = "error_status_code";
     public final static String STRING_NETWORK_CONNECTION_ERROR = "无法连接到服务器";
 
     private static APIServer server = new APIServer();
@@ -50,9 +52,10 @@ public class APIServer {
                     ? "error.networkResponse = null"
                     : new String(error.networkResponse.data));
 
-            if (error.networkResponse != null
-                    && error.networkResponse.statusCode == VALUE_UNAUTHORIZED) {
-                requestAccessToken(request, queue);
+            if (error.networkResponse != null) {
+                if (error.networkResponse.statusCode == VALUE_UNAUTHORIZED) {
+                    requestAccessToken(request, queue);
+                }
             } else {
                 try {
                     Toast.makeText(BaseActivity.getCurrentActivity().getApplicationContext(),
@@ -131,75 +134,6 @@ public class APIServer {
             this.queue = queue;
 
             this.request = new JsonObjectRequest(
-                    url,
-                    params,
-                    new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            callbackResponse.setResponse(response);
-                            callbackResponse.run();
-                        }
-                    }, this) {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    if (headers == null)
-                        return Collections.<String, String>emptyMap();
-
-                    if (headers.containsKey(APIKey.KEY_AUTHORIZATION)) {
-                        headers.put(APIKey.KEY_AUTHORIZATION, UserServer.getInstance().getAccessToken());
-                    }
-                    return headers;
-                }
-            };
-            if (tag != null) this.request.setTag(tag);
-        }
-    }
-
-    public static class _JsonPost extends APINetworkRequest {
-        /**
-         * 用于发送Json格式的POST请求
-         *
-         * @param url              请求目标地址
-         * @param params           请求所需参数
-         * @param headers          请求所需文件头
-         * @param callbackResponse 用于接收返回的实例化回调类
-         * @param queue            Volley队列
-         * @param tag              请求的Tag标签
-         */
-        public _JsonPost(String url, JSONObject params, final Map<String, String> headers,
-                         final APICallbackResponse callbackResponse,
-                         final RequestQueue queue, final Object tag) {
-            this.callbackResponse = callbackResponse;
-            this.queue = queue;
-
-            if (params != null) {
-                Iterator<String> keys = params.keys();
-
-                boolean first = true;
-
-                while (keys.hasNext()) {
-                    String key = keys.next();
-
-                    if (first) {
-                        url += "?";
-                        first = false;
-                    } else {
-                        url += "&";
-                    }
-
-                    try {
-                        url += URLEncoder.encode(key, "UTF-8") + "="
-                                + URLEncoder.encode(params.get(key).toString(), "UTF-8");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            this.request = new JsonObjectRequest(
-                    Method.POST,
                     url,
                     params,
                     new Response.Listener<JSONObject>() {
@@ -455,6 +389,192 @@ public class APIServer {
         }
     }
 
+    public static class AccessTokenPost extends APINetworkRequest {
+        /**
+         * 用于发送Json格式的POST请求(access_token)
+         *
+         * @param url              请求目标地址
+         * @param params           请求所需参数
+         * @param headers          请求所需文件头
+         * @param callbackResponse 用于接收返回的实例化回调类
+         * @param queue            Volley队列
+         * @param tag              请求的Tag标签
+         */
+        public AccessTokenPost(String url, JSONObject params, final Map<String, String> headers,
+                               final APICallbackResponse callbackResponse,
+                               final RequestQueue queue, final Object tag) {
+            this.callbackResponse = callbackResponse;
+            this.queue = queue;
+
+            if (params != null) {
+                Iterator<String> keys = params.keys();
+
+                boolean first = true;
+
+                while (keys.hasNext()) {
+                    String key = keys.next();
+
+                    if (first) {
+                        url += "?";
+                        first = false;
+                    } else {
+                        url += "&";
+                    }
+
+                    try {
+                        url += URLEncoder.encode(key, "UTF-8") + "="
+                                + URLEncoder.encode(params.get(key).toString(), "UTF-8");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            this.request = new JsonObjectRequest(
+                    Method.POST,
+                    url,
+                    params,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            callbackResponse.setResponse(response);
+                            callbackResponse.run();
+                        }
+                    }, this) {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    return (headers == null) ? Collections.<String, String>emptyMap() : headers;
+                }
+            };
+            if (tag != null) this.request.setTag(tag);
+        }
+
+        @Override
+        public void onErrorResponse(VolleyError error) {
+            Log.v("VolleyError", (error.networkResponse == null)
+                    ? "error.networkResponse = null"
+                    : new String(error.networkResponse.data));
+
+            if (error.networkResponse != null) {
+                if (error.networkResponse.statusCode == VALUE_BAD_REQUEST) {
+                    JSONObject error_response = new JSONObject();
+                    try {
+                        error_response.put(STRING_ERROR_STATUS_CODE, VALUE_BAD_REQUEST);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    this.callbackResponse.setResponse(error_response);
+                    this.callbackResponse.run();
+                }
+            } else {
+                try {
+                    Toast.makeText(BaseActivity.getCurrentActivity().getApplicationContext(),
+                            STRING_NETWORK_CONNECTION_ERROR,
+                            Toast.LENGTH_LONG).show();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                this.callbackResponse.setResponse(null);
+                this.callbackResponse.run();
+            }
+        }
+    }
+
+    public static class TokenPost extends APINetworkRequest {
+        /**
+         * 用于发送Json格式的POST请求(access_token + refresh_token)
+         *
+         * @param url              请求目标地址
+         * @param params           请求所需参数
+         * @param headers          请求所需文件头
+         * @param callbackResponse 用于接收返回的实例化回调类
+         * @param queue            Volley队列
+         * @param tag              请求的Tag标签
+         */
+        public TokenPost(String url, JSONObject params, final Map<String, String> headers,
+                         final APICallbackResponse callbackResponse,
+                         final RequestQueue queue, final Object tag) {
+            this.callbackResponse = callbackResponse;
+            this.queue = queue;
+
+            if (params != null) {
+                Iterator<String> keys = params.keys();
+
+                boolean first = true;
+
+                while (keys.hasNext()) {
+                    String key = keys.next();
+
+                    if (first) {
+                        url += "?";
+                        first = false;
+                    } else {
+                        url += "&";
+                    }
+
+                    try {
+                        url += URLEncoder.encode(key, "UTF-8") + "="
+                                + URLEncoder.encode(params.get(key).toString(), "UTF-8");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            this.request = new JsonObjectRequest(
+                    Method.POST,
+                    url,
+                    params,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            callbackResponse.setResponse(response);
+                            callbackResponse.run();
+                        }
+                    }, this) {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    return (headers == null) ? Collections.<String, String>emptyMap() : headers;
+                }
+            };
+            if (tag != null) this.request.setTag(tag);
+        }
+
+        @Override
+        public void onErrorResponse(VolleyError error) {
+            Log.v("VolleyError", (error.networkResponse == null)
+                    ? "error.networkResponse = null"
+                    : new String(error.networkResponse.data));
+
+            if (error.networkResponse != null) {
+                if (error.networkResponse.statusCode == VALUE_BAD_REQUEST) {
+                    JSONObject error_response = new JSONObject();
+                    try {
+                        error_response.put(STRING_ERROR_STATUS_CODE, VALUE_BAD_REQUEST);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    this.callbackResponse.setResponse(error_response);
+                    this.callbackResponse.run();
+                }
+            } else {
+                try {
+                    Toast.makeText(BaseActivity.getCurrentActivity().getApplicationContext(),
+                            STRING_NETWORK_CONNECTION_ERROR,
+                            Toast.LENGTH_LONG).show();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                this.callbackResponse.setResponse(null);
+                this.callbackResponse.run();
+            }
+        }
+    }
+
     /**
      * 使用refresh_token请求access_token
      *
@@ -473,27 +593,33 @@ public class APIServer {
 
         headers.put(APIKey.KEY_AUTHORIZATION, APIKey.KEY_REQUEST_TOKEN_VALUE);
         headers.put(APIKey.KEY_ACCEPT, APIKey.KEY_ACCEPT_VALUE);
-        APIServer._JsonPost _jsonPost = new APIServer._JsonPost(APIUrl.URL_REQUEST_TOKEN,
+        APIServer.AccessTokenPost accessTokenPost = new APIServer.AccessTokenPost(APIUrl.URL_REQUEST_TOKEN,
                 params, headers, new APIJsonCallbackResponse() {
             @Override
             public void run() {
                 if (this.getResponse() != null) {
                     try {
-                        UserServer.getInstance().setAccessToken(APIKey.KEY_ACCESS_TONEN_HEADER_PREFIX +
-                                this.getResponse().getString(APIKey.KEY_ACCESS_TOKEN));
+                        if (this.getResponse().has(STRING_ERROR_STATUS_CODE) &&
+                                Integer.parseInt(this.getResponse().get(STRING_ERROR_STATUS_CODE).toString())
+                                        == VALUE_BAD_REQUEST) {
+                            requestToken(UserServer.getInstance().getPhone(),
+                                    UserServer.getInstance().getPassword(),
+                                    request, queue);
+                        } else {
+                            if (this.getResponse().has(APIKey.KEY_ACCESS_TOKEN)) {
+                                UserServer.getInstance().setAccessToken(APIKey.KEY_ACCESS_TONEN_HEADER_PREFIX +
+                                        this.getResponse().getString(APIKey.KEY_ACCESS_TOKEN));
+                                queue.add(request);
+                            }
+                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    queue.add(request);
-                } else {
-                    requestToken(UserServer.getInstance().getPhone(),
-                            UserServer.getInstance().getPassword(),
-                            request, queue);
                 }
             }
         }, queue, null);
 
-        _jsonPost.send();
+        accessTokenPost.send();
     }
 
     /**
@@ -519,25 +645,28 @@ public class APIServer {
         headers.put(APIKey.KEY_AUTHORIZATION, APIKey.KEY_REQUEST_TOKEN_VALUE);
         headers.put(APIKey.KEY_ACCEPT, APIKey.KEY_ACCEPT_VALUE);
 
-        APIServer._JsonPost _jsonPost = new APIServer._JsonPost(APIUrl.URL_REQUEST_TOKEN,
+        APIServer.TokenPost tokenPost = new APIServer.TokenPost(APIUrl.URL_REQUEST_TOKEN,
                 params, headers, new APIJsonCallbackResponse() {
             @Override
             public void run() {
                 if (this.getResponse() != null) {
                     try {
-                        UserServer.getInstance().setAccessToken(APIKey.KEY_ACCESS_TONEN_HEADER_PREFIX +
-                                this.getResponse().getString(APIKey.KEY_ACCESS_TOKEN));
-                        UserServer.getInstance().setRefreshToken(
-                                this.getResponse().getString(APIKey.KEY_REFRESH_TOKEN));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    queue.add(request);
-                } else {
-                    try {
-                        Intent intent = new Intent(BaseActivity.getCurrentActivity(),
-                                LoginActivity.class);
-                        BaseActivity.getCurrentActivity().startActivity(intent);
+                        if (this.getResponse().has(STRING_ERROR_STATUS_CODE) &&
+                                Integer.parseInt(this.getResponse().get(STRING_ERROR_STATUS_CODE).toString())
+                                        == VALUE_BAD_REQUEST) {
+                            Intent intent = new Intent(BaseActivity.getCurrentActivity(),
+                                    LoginActivity.class);
+                            BaseActivity.getCurrentActivity().startActivity(intent);
+                        } else {
+                            if (this.getResponse().has(APIKey.KEY_ACCESS_TOKEN) &&
+                                    this.getResponse().has(APIKey.KEY_REFRESH_TOKEN)) {
+                                UserServer.getInstance().setAccessToken(APIKey.KEY_ACCESS_TONEN_HEADER_PREFIX +
+                                        this.getResponse().getString(APIKey.KEY_ACCESS_TOKEN));
+                                UserServer.getInstance().setRefreshToken(
+                                        this.getResponse().getString(APIKey.KEY_REFRESH_TOKEN));
+                                queue.add(request);
+                            }
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -545,6 +674,6 @@ public class APIServer {
             }
         }, queue, null);
 
-        _jsonPost.send();
+        tokenPost.send();
     }
 }

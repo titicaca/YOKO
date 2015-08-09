@@ -133,7 +133,11 @@ public class UserServer {
             return;
 
         Map<String, String> headers = new HashMap<String, String>();
-        headers.put(APIKey.KEY_AUTHORIZATION, UserServer.getInstance().getAccessToken());
+        try {
+            headers.put(APIKey.KEY_AUTHORIZATION, UserServer.getInstance().getAccessToken());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         APIServer.JsonGet jsonGet = new APIServer.JsonGet(APIUrl.URL_REQUEST_USER_INFO,
                 null, headers, new APIJsonCallbackResponse() {
@@ -162,7 +166,7 @@ public class UserServer {
         headers.put(APIKey.KEY_AUTHORIZATION, APIKey.KEY_REQUEST_TOKEN_VALUE);
         headers.put(APIKey.KEY_ACCEPT, APIKey.KEY_ACCEPT_VALUE);
 
-        APIServer._JsonPost _jsonPost = new APIServer._JsonPost(APIUrl.URL_LOGIN,
+        APIServer.TokenPost tokenPost = new APIServer.TokenPost(APIUrl.URL_LOGIN,
                 params, headers, new APIJsonCallbackResponse() {
             @Override
             public void run() {
@@ -170,29 +174,37 @@ public class UserServer {
                                 ? "登录失败!"
                                 : "登录成功!\n" + this.getResponse().toString()),
                         Toast.LENGTH_LONG).show();
-                if (this.getResponse() != null) {
-                    try {
-                        UserServer.getInstance().setAccessToken(APIKey.KEY_ACCESS_TONEN_HEADER_PREFIX +
-                                this.getResponse().getString(APIKey.KEY_ACCESS_TOKEN));
-                        UserServer.getInstance().setRefreshToken(
-                                this.getResponse().getString(APIKey.KEY_REFRESH_TOKEN));
-                        UserServer.getInstance().setPhone(phone);
-                        UserServer.getInstance().setPassword(password);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+                try {
+                    if (this.getResponse() != null) {
+                        if (this.getResponse().has(APIServer.STRING_ERROR_STATUS_CODE) &&
+                                Integer.parseInt(this.getResponse().get(APIServer.STRING_ERROR_STATUS_CODE).toString())
+                                        == APIServer.VALUE_BAD_REQUEST) {
+                            activity.getAuthTask().afterPostExecute(false, this.getResponse());
+                        } else {
+                            UserServer.getInstance().setAccessToken(APIKey.KEY_ACCESS_TONEN_HEADER_PREFIX +
+                                    this.getResponse().getString(APIKey.KEY_ACCESS_TOKEN));
+                            UserServer.getInstance().setRefreshToken(
+                                    this.getResponse().getString(APIKey.KEY_REFRESH_TOKEN));
+                            UserServer.getInstance().setPhone(phone);
+                            UserServer.getInstance().setPassword(password);
 
-                    Intent intent = new Intent(activity,
-                            TestActivity.class);
-                    activity.startActivity(intent);
-                    activity.getAuthTask().afterPostExecute(true);
-                } else {
-                    activity.getAuthTask().afterPostExecute(false);
+                            Intent intent = new Intent(activity,
+                                    TestActivity.class);
+                            activity.startActivity(intent);
+                            activity.getAuthTask().afterPostExecute(true, null);
+                        }
+                    } else {
+                        JSONObject error_response = new JSONObject();
+                        error_response.put(APIServer.STRING_ERROR_STATUS_CODE, APIServer.VALUE_NETWORK_CONNECTION_ERROR);
+                        activity.getAuthTask().afterPostExecute(false, error_response);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
             }
         }, activity.getRequestQueue(), null);
 
-        _jsonPost.send();
+        tokenPost.send();
     }
 
     public void userLogout() {

@@ -10,6 +10,11 @@ public class DBHelper extends SQLiteOpenHelper {
     private final static int DATABASE_VERSION = 1;
 
     public final static String TABLE_FRIEND = "friend";
+    public final static String FRIEND_ID = "_id";
+    public final static String FRIEND_UID = "uid";
+    public final static String FRIEND_FUID = "fuid";
+    public final static String FRIEND_TAGID = "tagId";
+    public final static String FRIEND_TAGNAME = "tagName";
 
     public DBHelper(Context context) {
         //CursorFactory设置为null,使用默认值
@@ -25,20 +30,27 @@ public class DBHelper extends SQLiteOpenHelper {
          * 第二列是uid，为用户id
          * 第三列是fuid，为用户的friend的uid
          * 第四列是tagId，为朋友标签所属tag的id
-         * 第四列是tagName，为该标签的名称
+         * 第五列是tagName，为该标签的名称
          */
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_FRIEND +
-                "(_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "uid CHAR(20), " +
-                "fuid CHAR(20), " +
-                "tagId CHAR(20)," +
-                "tagName CHAR(255)" +
+                "(" + FRIEND_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                FRIEND_UID + " CHAR(20), " +
+                FRIEND_FUID + " CHAR(20), " +
+                FRIEND_TAGID + " CHAR(20)," +
+                FRIEND_TAGNAME + " CHAR(255)" +
                 ")");
     }
 
+    /**
+     * 如果DATABASE_VERSION值被修改,系统发现现有数据库版本不同,即会调用onUpgrade
+     *
+     * @param db
+     * @param oldVersion
+     * @param newVersion
+     */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        //todo
+        //TODO:
         Log.v("DATABASE", "version: " + db.getVersion());
     }
 }

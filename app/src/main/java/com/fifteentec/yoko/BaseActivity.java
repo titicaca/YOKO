@@ -1,6 +1,7 @@
 package com.fifteentec.yoko;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.Database.DBManager;
@@ -18,6 +19,11 @@ public abstract class BaseActivity extends Activity {
 
     public DBManager getDBManager() {
         return this.dbManager;
+    }
+
+    public Intent getServiceIntent() {
+        YOKOApplication application = (YOKOApplication)this.getApplication();
+        return application.getNetworkServiceIntent();
     }
 
     @Override
