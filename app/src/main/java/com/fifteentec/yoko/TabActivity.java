@@ -2,10 +2,11 @@ package com.fifteentec.yoko;
 
 import android.annotation.SuppressLint;
 
+import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+
 import android.util.Log;
 import android.view.Menu;
 import android.widget.Toast;
@@ -15,7 +16,7 @@ import com.fifteentec.Fragment.FindFragment;
 import com.fifteentec.Fragment.FindGroup;
 import com.fifteentec.Fragment.TabButtonFragment;
 
-public class TabActivity extends FragmentActivity implements TabButtonFragment.Ibutton{
+public class TabActivity extends Activity implements TabButtonFragment.Ibutton{
     private FragmentManager mFragmentManager;
     private final int EnterPage= 0;
     private TabButtonFragment mbuttonfg;
@@ -29,7 +30,7 @@ public class TabActivity extends FragmentActivity implements TabButtonFragment.I
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tab_main_layout);
-        mFragmentManager= this.getSupportFragmentManager();
+        mFragmentManager= this.getFragmentManager();
         mbuttonfg=(TabButtonFragment)mFragmentManager.findFragmentById(R.id.tab_main_botton);
         mbuttonfg.setButton(this);
         TabSelector(R.integer.SelectorCal);

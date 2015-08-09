@@ -3,11 +3,13 @@ package com.fifteentec.Adapter.commonAdapter;
 /**
  * Created by cj on 2015/8/7.
  */
+import android.app.Fragment;
+import android.app.FragmentManager;
+
+import com.fifteentec.item.FragmentPagerAdapter;
+
 import java.util.ArrayList;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 
 
 public class MyFragmentPagerAdapter extends FragmentPagerAdapter {

@@ -1,13 +1,13 @@
 package com.fifteentec.Fragment;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 
+import android.app.Fragment;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,18 +22,22 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.fifteentec.Adapter.commonAdapter.MyFragmentPagerAdapter;
 import com.fifteentec.yoko.R;
 
+import java.io.FileDescriptor;
+import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by cj on 2015/8/7.
  */
-public class FindFragment extends Fragment {
+public class FindFragment extends android.app.Fragment {
     private ViewPager mPager;
     private ArrayList<Fragment> fragmentsList;
     private int currIndex = 0;
     private TextView tabGroup, tabActivity,tabFavorite;
     private int offset = 0;
     private int position_one;
+    private int position_two;
     private ImageView bottomLine;
     private int bottomLineWidth;
     public final static int num = 3 ;
@@ -77,10 +81,12 @@ public class FindFragment extends Fragment {
         int screenW = dm.widthPixels;
         offset = (int) ((screenW / num - bottomLineWidth) / 2);
         int avg = (int) (screenW / num);
-        position_one = avg + offset;
+        position_one = avg+offset;
+        position_two = avg*2+offset;
 
     }
 
+    @SuppressLint("NewApi")
     private void InitViewPager(View parentView) {
         mPager = (ViewPager) parentView.findViewById(R.id.vPager);
         fragmentsList = new ArrayList<Fragment>();
@@ -125,29 +131,29 @@ public class FindFragment extends Fragment {
                         tabActivity.setTextColor(resources.getColor(R.color.gray));
                     }
                     if (currIndex == 2) {
-                        animation = new TranslateAnimation(position_one, offset, 0, 0);
+                        animation = new TranslateAnimation(position_two,0, 0, 0);
                         tabFavorite.setTextColor(resources.getColor(R.color.gray));
                     }
                     tabGroup.setTextColor(resources.getColor(R.color.black));
                     break;
                 case 1:
                     if (currIndex == 0) {
-                        animation = new TranslateAnimation(position_one, offset, 0, 0);
+                        animation = new TranslateAnimation(offset, position_one, 0, 0);
                         tabGroup.setTextColor(resources.getColor(R.color.gray));
                     }
                     if (currIndex == 2) {
-                        animation = new TranslateAnimation(position_one, offset, 0, 0);
+                        animation = new TranslateAnimation(position_two, position_one, 0, 0);
                         tabFavorite.setTextColor(resources.getColor(R.color.gray));
                     }
                     tabActivity.setTextColor(resources.getColor(R.color.black));
                     break;
                 case 2:
                     if (currIndex == 1) {
-                        animation = new TranslateAnimation(position_one, offset, 0, 0);
+                        animation = new TranslateAnimation(position_one, position_two, 0, 0);
                         tabActivity.setTextColor(resources.getColor(R.color.gray));
                     }
                     if (currIndex == 0) {
-                        animation = new TranslateAnimation(position_one, offset, 0, 0);
+                        animation = new TranslateAnimation(offset, position_two, 0, 0);
                         tabGroup.setTextColor(resources.getColor(R.color.black));
                     }
                     tabFavorite.setTextColor(resources.getColor(R.color.black));
