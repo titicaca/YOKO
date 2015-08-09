@@ -18,7 +18,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.API.APIServer;
 import com.fifteentec.Component.User.UserServer;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 /**
@@ -261,15 +265,23 @@ public class LoginActivity extends LoaderActivity {
             showProgress(false);
         }
 
-        public void afterPostExecute(final Boolean success) {
+        public void afterPostExecute(final Boolean success, JSONObject error_response) {
             mAuthTask = null;
             showProgress(false);
 
             if (success) {
                 finish();
             } else {
-                /*mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();*/
+                try {
+                    if (error_response.has(APIServer.STRING_ERROR_STATUS_CODE) &&
+                            Integer.parseInt(error_response.get(APIServer.STRING_ERROR_STATUS_CODE).toString())
+                                    == APIServer.VALUE_BAD_REQUEST) {
+                        mPasswordView.setError(getString(R.string.error_incorrect_password));
+                        mPasswordView.requestFocus();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

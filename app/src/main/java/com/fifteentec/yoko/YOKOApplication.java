@@ -15,6 +15,10 @@ public class YOKOApplication extends Application {
     Intent networkServiceIntent;
     public final static String applicationName = "YOKO";
 
+    public Intent getNetworkServiceIntent() {
+        return this.networkServiceIntent;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
