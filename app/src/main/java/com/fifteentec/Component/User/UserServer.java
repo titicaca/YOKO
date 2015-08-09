@@ -129,8 +129,12 @@ public class UserServer {
     }
 
     public void autoLogin(final BaseActivity activity) {
-        if (access_token == null || refresh_token == null)
+        if (access_token == null || refresh_token == null) {
+            Intent intent = new Intent(activity, LoginActivity.class);
+            activity.startActivity(intent);
+            activity.finish();
             return;
+        }
 
         Map<String, String> headers = new HashMap<String, String>();
         try {
