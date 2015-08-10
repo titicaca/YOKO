@@ -22,7 +22,7 @@ public abstract class BaseActivity extends Activity {
     }
 
     public Intent getServiceIntent() {
-        YOKOApplication application = (YOKOApplication)this.getApplication();
+        YOKOApplication application = (YOKOApplication) this.getApplication();
         return application.getNetworkServiceIntent();
     }
 
@@ -37,6 +37,18 @@ public abstract class BaseActivity extends Activity {
          * 初始化数据库管理模块
          */
         dbManager = new DBManager(this);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        if ((this instanceof LoginActivity) || (this instanceof TestActivity)) {
+            Intent intent = new Intent(getCurrentActivity(), BlankActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
+        }
     }
 
     @Override
@@ -64,11 +76,11 @@ public abstract class BaseActivity extends Activity {
         super.onDestroy();
     }
 
-    public static Activity getCurrentActivity(){
+    public static Activity getCurrentActivity() {
         return curActivity;
     }
 
-    public static void setCurrentActivity(Activity activity){
+    public static void setCurrentActivity(Activity activity) {
         curActivity = activity;
     }
 }
