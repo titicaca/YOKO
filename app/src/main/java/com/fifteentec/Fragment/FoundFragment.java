@@ -1,9 +1,10 @@
 package com.fifteentec.Fragment;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
@@ -13,24 +14,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
-import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.TextView;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import com.fifteentec.Adapter.commonAdapter.MyFragmentPagerAdapter;
 import com.fifteentec.yoko.R;
 
-import java.io.FileDescriptor;
-import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by cj on 2015/8/7.
  */
-public class FindFragment extends android.app.Fragment {
+public class FoundFragment extends android.app.Fragment {
     private ViewPager mPager;
     private ArrayList<Fragment> fragmentsList;
     private int currIndex = 0;
@@ -40,9 +36,11 @@ public class FindFragment extends android.app.Fragment {
     private int position_two;
     private ImageView bottomLine;
     private int bottomLineWidth;
+    private FragmentManager mFragmentManager;
+    private FoundMsgBoxFragment mMsgBoxFragment;
     public final static int num = 3 ;
-    Button group_list;
-    Button msg_box;
+    RadioButton group_list;
+    RadioButton msg_box;
     Fragment group;
     Fragment activity;
     Fragment favorite;
@@ -51,7 +49,7 @@ public class FindFragment extends android.app.Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_find_main_layout, null);
+        View view = inflater.inflate(R.layout.fragment_found_main_layout, null);
         resources = getResources();
         InitViewPager(view);
         InitUpperButtons(view);
@@ -64,8 +62,25 @@ public class FindFragment extends android.app.Fragment {
         return view;
     }
     private void InitUpperButtons(View parentView){
-        group_list = (Button) parentView.findViewById(R.id.button_list);
-        msg_box = (Button) parentView.findViewById(R.id.button_msg);
+        group_list = (RadioButton) parentView.findViewById(R.id.button_list);
+        msg_box = (RadioButton) parentView.findViewById(R.id.button_msg);
+        msg_box.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("NewApi")
+            @Override
+            public void onClick(View v) {
+                mFragmentManager = FoundFragment.this.getFragmentManager();
+                FragmentTransaction mFmTrans= mFragmentManager.beginTransaction();
+                if(mMsgBoxFragment == null){
+                    mMsgBoxFragment = new FoundMsgBoxFragment();
+                    mFmTrans.add(R.id.id_content, mMsgBoxFragment,"msg");
+                }
+                else{
+                    mFmTrans.show(mMsgBoxFragment);
+                }
+                mFmTrans.commit();
+                mFmTrans.hide(FoundFragment.this);
+            }
+        });
 
     }
 
@@ -91,9 +106,9 @@ public class FindFragment extends android.app.Fragment {
         mPager = (ViewPager) parentView.findViewById(R.id.vPager);
         fragmentsList = new ArrayList<Fragment>();
 
-        group = new FindGroup();
-        activity = new FindActivity();
-        favorite = new FindFavorite();
+        group = new FoundGroup();
+        activity = new FoundEvent();
+        favorite = new FoundFavorite();
 
         fragmentsList.add(group);
         fragmentsList.add(activity);
@@ -135,6 +150,7 @@ public class FindFragment extends android.app.Fragment {
                         tabFavorite.setTextColor(resources.getColor(R.color.gray));
                     }
                     tabGroup.setTextColor(resources.getColor(R.color.black));
+                    group_list.setText(resources.getString(R.string.button_list));
                     break;
                 case 1:
                     if (currIndex == 0) {
@@ -146,6 +162,7 @@ public class FindFragment extends android.app.Fragment {
                         tabFavorite.setTextColor(resources.getColor(R.color.gray));
                     }
                     tabActivity.setTextColor(resources.getColor(R.color.black));
+                    group_list.setText(resources.getString(R.string.button_activity));
                     break;
                 case 2:
                     if (currIndex == 1) {
@@ -157,6 +174,7 @@ public class FindFragment extends android.app.Fragment {
                         tabGroup.setTextColor(resources.getColor(R.color.black));
                     }
                     tabFavorite.setTextColor(resources.getColor(R.color.black));
+                    group_list.setText(resources.getString(R.string.button_favorite));
                     break;
             }
             currIndex = arg0;

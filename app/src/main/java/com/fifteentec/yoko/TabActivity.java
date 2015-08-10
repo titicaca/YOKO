@@ -8,12 +8,10 @@ import android.app.FragmentTransaction;
 import android.os.Bundle;
 
 import android.util.Log;
-import android.view.Menu;
 import android.widget.Toast;
 
 import com.fifteentec.Fragment.CalViewFragment;
-import com.fifteentec.Fragment.FindFragment;
-import com.fifteentec.Fragment.FindGroup;
+import com.fifteentec.Fragment.FoundFragment;
 import com.fifteentec.Fragment.TabButtonFragment;
 
 public class TabActivity extends Activity implements TabButtonFragment.Ibutton{
@@ -21,8 +19,7 @@ public class TabActivity extends Activity implements TabButtonFragment.Ibutton{
     private final int EnterPage= 0;
     private TabButtonFragment mbuttonfg;
     private CalViewFragment mCalViewFragment;
-    private FindFragment mFindFragment;
-    private FragmentTransaction mFmTrans;
+    private FoundFragment mFoundFragment;
 
     @SuppressLint("NewApi")
     @Override
@@ -41,7 +38,7 @@ public class TabActivity extends Activity implements TabButtonFragment.Ibutton{
     @Override
     public void TabSelector(int id) {
         FragmentTransaction mFmTrans = mFragmentManager.beginTransaction();
-       HideAllView(mFmTrans);
+        HideAllView(mFmTrans);
         switch (id)
         {
             case R.integer.SelectorCal:
@@ -58,12 +55,12 @@ public class TabActivity extends Activity implements TabButtonFragment.Ibutton{
                 }*/
                 break;
             case R.integer.SelectorFrd:
-                if(mFindFragment == null){
-                    mFindFragment = new FindFragment();
-                    mFmTrans.add(R.id.id_content,mFindFragment,"find");
+                if(mFoundFragment == null){
+                    mFoundFragment = new FoundFragment();
+                    mFmTrans.add(R.id.id_content, mFoundFragment,"found");
                 }
                 else{
-                    mFmTrans.show(mFindFragment);
+                    mFmTrans.show(mFoundFragment);
                 }
 
                 Toast a = Toast.makeText(this, "Found",
@@ -95,17 +92,10 @@ public class TabActivity extends Activity implements TabButtonFragment.Ibutton{
         if(mCalViewFragment != null){
             mFmTrans.hide(mCalViewFragment);
         }
-        if(mFindFragment != null){
-            mFmTrans.hide(mFindFragment);
+        if(mFoundFragment != null){
+            mFmTrans.hide(mFoundFragment);
         }
 
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
     }
 
 }

@@ -7,5 +7,5 @@ import android.app.Fragment;
 /**
  * Created by cj on 2015/8/7.
  */
-public class FindActivity extends Fragment {
+public class FoundEvent extends Fragment {
 }
