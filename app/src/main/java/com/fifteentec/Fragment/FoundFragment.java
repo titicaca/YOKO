@@ -26,7 +26,7 @@ import java.util.ArrayList;
 /**
  * Created by cj on 2015/8/7.
  */
-public class FoundFragment extends android.app.Fragment {
+public class FoundFragment extends Fragment {
     private ViewPager mPager;
     private ArrayList<Fragment> fragmentsList;
     private int currIndex = 0;
@@ -77,6 +77,7 @@ public class FoundFragment extends android.app.Fragment {
                 else{
                     mFmTrans.show(mMsgBoxFragment);
                 }
+                mFmTrans.addToBackStack("msg");
                 mFmTrans.commit();
                 mFmTrans.hide(FoundFragment.this);
             }

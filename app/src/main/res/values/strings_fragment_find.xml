@@ -2,8 +2,8 @@
     <string name="tab_group">组织</string>
     <string name="tab_activity">活动</string>
     <string name="tab_favorite">收藏</string>
-    <string name="tab_invited">受邀列表</string>
-    <string name="tab_inviting">邀请列表</string>
+    <string name="button_invited">受邀列表</string>
+    <string name="button_inviting">邀请列表</string>
     <string name="button_list">公众号列表</string>
     <string name="button_activity">活动</string>
     <string name="button_favorite">想去</string>

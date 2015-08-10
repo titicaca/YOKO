@@ -3,15 +3,18 @@ package com.fifteentec.yoko;
 import android.annotation.SuppressLint;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 
 import android.util.Log;
+import android.view.KeyEvent;
 import android.widget.Toast;
 
 import com.fifteentec.Fragment.CalViewFragment;
 import com.fifteentec.Fragment.FoundFragment;
+import com.fifteentec.Fragment.FoundMsgBoxFragment;
 import com.fifteentec.Fragment.TabButtonFragment;
 
 public class TabActivity extends Activity implements TabButtonFragment.Ibutton{
@@ -20,6 +23,7 @@ public class TabActivity extends Activity implements TabButtonFragment.Ibutton{
     private TabButtonFragment mbuttonfg;
     private CalViewFragment mCalViewFragment;
     private FoundFragment mFoundFragment;
+    private Fragment msgBox;
 
     @SuppressLint("NewApi")
     @Override
@@ -97,5 +101,4 @@ public class TabActivity extends Activity implements TabButtonFragment.Ibutton{
         }
 
     }
-
 }
