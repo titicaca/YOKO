@@ -42,6 +42,7 @@ public class LoginActivity extends LoaderActivity {
 
     // UI references.
     private AutoCompleteTextView mPhoneView;
+
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
@@ -92,6 +93,15 @@ public class LoginActivity extends LoaderActivity {
 
         mLoginFormView = findViewById(R.id.user_login_form);
         mProgressView = findViewById(R.id.login_progress);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(LoginActivity.this, BlankActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
     }
 
     /**

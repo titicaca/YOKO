@@ -61,7 +61,7 @@ public class UserServer {
         phone = sp.getString(APIKey.KEY_PHONE, null);
         username = sp.getString(APIKey.KEY_USERNAME, null);
         try {
-            password = APIEncrypt.AES.decrypt(APIKey.KEY_AES_SEED_PASSWORD, sp.getString(APIKey.KEY_PASSWORD, null));
+            password = APIEncrypt.AES.decrypt(APIKey.VALUE_AES_SEED_PASSWORD, sp.getString(APIKey.KEY_PASSWORD, null));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -99,7 +99,7 @@ public class UserServer {
         this.password = password;
         Editor edit = sp.edit();
         try {
-            edit.putString(APIKey.KEY_PASSWORD, APIEncrypt.AES.encrypt(APIKey.KEY_AES_SEED_PASSWORD, password));
+            edit.putString(APIKey.KEY_PASSWORD, APIEncrypt.AES.encrypt(APIKey.VALUE_AES_SEED_PASSWORD, password));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -132,7 +132,6 @@ public class UserServer {
         if (access_token == null || refresh_token == null) {
             Intent intent = new Intent(activity, LoginActivity.class);
             activity.startActivity(intent);
-            activity.finish();
             return;
         }
 
@@ -150,7 +149,6 @@ public class UserServer {
                 Intent intent = new Intent(activity,
                         (this.getResponse() == null) ? LoginActivity.class : TestActivity.class);
                 activity.startActivity(intent);
-                activity.finish();
             }
         }, activity.getRequestQueue(), null);
         jsonGet.send();
@@ -160,32 +158,32 @@ public class UserServer {
         JSONObject params = new JSONObject();
         Map<String, String> headers = new HashMap<String, String>();
         try {
-            params.put(APIKey.KEY_USERNAME, APIKey.KEY_ROLE_MOBILE_PREFIX + phone);
+            params.put(APIKey.KEY_USERNAME, APIKey.VALUE_ROLE_MOBILE_PREFIX + phone);
             params.put(APIKey.KEY_PASSWORD, APIEncrypt.MD5.encode(password));
             params.put(APIKey.KEY_GRANT_TYPE, APIKey.KEY_PASSWORD);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        headers.put(APIKey.KEY_AUTHORIZATION, APIKey.KEY_REQUEST_TOKEN_VALUE);
-        headers.put(APIKey.KEY_ACCEPT, APIKey.KEY_ACCEPT_VALUE);
+        headers.put(APIKey.KEY_AUTHORIZATION, APIKey.VALUE_REQUEST_TOKEN);
+        headers.put(APIKey.KEY_ACCEPT, APIKey.VALUE_ACCEPT);
 
         APIServer.TokenPost tokenPost = new APIServer.TokenPost(APIUrl.URL_LOGIN,
                 params, headers, new APIJsonCallbackResponse() {
             @Override
             public void run() {
-                Toast.makeText(activity.getApplicationContext(), ((this.getResponse() == null)
-                                ? "登录失败!"
-                                : "登录成功!\n" + this.getResponse().toString()),
-                        Toast.LENGTH_LONG).show();
                 try {
                     if (this.getResponse() != null) {
                         if (this.getResponse().has(APIServer.STRING_ERROR_STATUS_CODE) &&
                                 Integer.parseInt(this.getResponse().get(APIServer.STRING_ERROR_STATUS_CODE).toString())
                                         == APIServer.VALUE_BAD_REQUEST) {
+                            Toast.makeText(activity.getApplicationContext(), "登录失败!",
+                                    Toast.LENGTH_LONG).show();
                             activity.getAuthTask().afterPostExecute(false, this.getResponse());
                         } else {
-                            UserServer.getInstance().setAccessToken(APIKey.KEY_ACCESS_TONEN_HEADER_PREFIX +
+                            Toast.makeText(activity.getApplicationContext(), "登录成功!\n" + this.getResponse().toString(),
+                                    Toast.LENGTH_LONG).show();
+                            UserServer.getInstance().setAccessToken(APIKey.VALUE_ACCESS_TONEN_HEADER_PREFIX +
                                     this.getResponse().getString(APIKey.KEY_ACCESS_TOKEN));
                             UserServer.getInstance().setRefreshToken(
                                     this.getResponse().getString(APIKey.KEY_REFRESH_TOKEN));
@@ -198,6 +196,8 @@ public class UserServer {
                             activity.getAuthTask().afterPostExecute(true, null);
                         }
                     } else {
+                        Toast.makeText(activity.getApplicationContext(), "登录失败!",
+                                Toast.LENGTH_LONG).show();
                         JSONObject error_response = new JSONObject();
                         error_response.put(APIServer.STRING_ERROR_STATUS_CODE, APIServer.VALUE_NETWORK_CONNECTION_ERROR);
                         activity.getAuthTask().afterPostExecute(false, error_response);
@@ -287,5 +287,22 @@ public class UserServer {
             }
         }, activity.getRequestQueue(), null);
         jsonGet.send();
+    }
+
+    public void userDelUserInfo(final BaseActivity activity) {
+        Map<String, String> headers = new HashMap<String, String>();
+        headers.put(APIKey.KEY_AUTHORIZATION, UserServer.getInstance().getAccessToken());
+
+        APIServer.JsonDel jsonDel = new APIServer.JsonDel(APIUrl.URL_REQUEST_USER_INFO,
+                null, headers, new APIJsonCallbackResponse() {
+            @Override
+            public void run() {
+                Toast.makeText(activity.getApplicationContext(), ((this.getResponse() == null)
+                                ? "获取用户信息失败!"
+                                : "获取用户信息成功!\n" + this.getResponse().toString()),
+                        Toast.LENGTH_LONG).show();
+            }
+        }, activity.getRequestQueue(), null);
+        jsonDel.send();
     }
 }

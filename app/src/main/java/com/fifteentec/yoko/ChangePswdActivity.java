@@ -1,5 +1,6 @@
 package com.fifteentec.yoko;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -26,7 +27,7 @@ public class ChangePswdActivity extends BaseActivity {
 
         String message = getIntent().getStringExtra("FROM_WHERE");
         if (message != null && message.equals("VALIDATE_ACTIVITY")) {
-            mPhone = APIKey.KEY_ROLE_MOBILE_PREFIX + UserServer.getInstance().getPhone();
+            mPhone = APIKey.VALUE_ROLE_MOBILE_PREFIX + UserServer.getInstance().getPhone();
         } else {
             mPhone = "";
         }
