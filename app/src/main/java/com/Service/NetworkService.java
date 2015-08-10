@@ -15,9 +15,6 @@ import com.Database.DBManager;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 
-/**
- * Created by benbush on 15/8/3.
- */
 public class NetworkService extends Service{
     private APIServer apiServer;
     private RequestQueue requestQueue;

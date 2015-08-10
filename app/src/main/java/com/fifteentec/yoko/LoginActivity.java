@@ -3,18 +3,10 @@ package com.fifteentec.yoko;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.Activity;
-import android.app.LoaderManager.LoaderCallbacks;
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.Loader;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.AsyncTask;
-
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
@@ -25,22 +17,12 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.API.APIJsonCallbackResponse;
-import com.API.APIKey;
 import com.API.APIServer;
-import com.API.APIUrl;
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
+import com.fifteentec.Component.User.UserServer;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -71,6 +53,7 @@ public class LoginActivity extends LoaderActivity {
 
         // Set up the login form.
         mPhoneView = (AutoCompleteTextView) findViewById(R.id.phone_actv);
+        mPhoneView.setText(UserServer.getInstance().getPhone());
         mPasswordView = (EditText) findViewById(R.id.password_et);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -99,6 +82,14 @@ public class LoginActivity extends LoaderActivity {
             }
         });
 
+        TextView mRegisterTv = (TextView) findViewById(R.id.register_tv);
+        mRegisterTv.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                register();
+            }
+        });
+
         mLoginFormView = findViewById(R.id.user_login_form);
         mProgressView = findViewById(R.id.login_progress);
     }
@@ -124,8 +115,7 @@ public class LoginActivity extends LoaderActivity {
         boolean cancel = false;
         View focusView = null;
 
-        while(true)
-        {
+        while (true) {
             // Check for a valid phone.
             if (TextUtils.isEmpty(phone)) {
                 mPhoneView.setError(getString(R.string.error_field_required));
@@ -145,7 +135,7 @@ public class LoginActivity extends LoaderActivity {
                 focusView = mPasswordView;
                 cancel = true;
                 break;
-            } else if(!InfoValidate.isPasswordValid(password)) {
+            } else if (!InfoValidate.isPasswordValid(password)) {
                 mPasswordView.setError(getString(R.string.error_invalid_password));
                 focusView = mPasswordView;
                 cancel = true;
@@ -168,11 +158,16 @@ public class LoginActivity extends LoaderActivity {
         }
     }
 
-    public void changePassword()
-    {
+    public void changePassword() {
         Intent intent = new Intent(LoginActivity.this,
                 ValidateActivity.class);
         intent.putExtra("FROM_WHERE", "LOGIN_ACTIVITY");
+        startActivity(intent);
+    }
+
+    public void register() {
+        Intent intent = new Intent(LoginActivity.this,
+                ValidateActivity.class);
         startActivity(intent);
     }
 
@@ -185,10 +180,10 @@ public class LoginActivity extends LoaderActivity {
         // for very easy animations. If available, use these APIs to fade-in
         // the progress spinner.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+            int animTime = getResources().getInteger(android.R.integer.config_longAnimTime);
 
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
+            mLoginFormView.animate().setDuration(animTime).alpha(
                     show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
@@ -197,7 +192,7 @@ public class LoginActivity extends LoaderActivity {
             });
 
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
+            mProgressView.animate().setDuration(animTime).alpha(
                     show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
@@ -215,6 +210,10 @@ public class LoginActivity extends LoaderActivity {
     @Override
     protected void setAdapter(ArrayAdapter<String> adapter) {
         mPhoneView.setAdapter(adapter);
+    }
+
+    public UserLoginTask getAuthTask() {
+        return mAuthTask;
     }
 
     /**
@@ -237,7 +236,7 @@ public class LoginActivity extends LoaderActivity {
 
             try {
                 // Simulate network access.
-                Thread.sleep(2000);
+                Thread.sleep(0);
             } catch (InterruptedException e) {
                 return false;
             }
@@ -250,47 +249,40 @@ public class LoginActivity extends LoaderActivity {
                 }
             }
 
-            JSONObject loginParams = new JSONObject();
-            Map<String, String> loginHeaders = new HashMap<String, String>();
-            try {
-                loginParams.put(APIKey.KEY_USERNAME, "0_" + mPhone);
-                loginParams.put(APIKey.KEY_PASSWORD, mPassword);
-                loginParams.put(APIKey.KEY_GRANT_TYPE, "password");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            UserServer.getInstance().userLogin(LoginActivity.this, mPhone, mPassword);
 
-            loginHeaders.put(APIKey.KEY_HEADER_AUTH, APIKey.KEY_HEADER_AUTH_VALUE);
-
-            APIServer.getInstance()._sendJsonPost(APIUrl.URL_LOGIN,
-                    loginParams, loginHeaders, new APIJsonCallbackResponse() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(), "登录成功！\n" + this.getResponse().toString(),
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    }, getRequestQueue(), null);
-
-            return true;
+            return false;
         }
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-            showProgress(false);
-
-            if (success) {
-                finish();
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
-            }
+//            afterPostExecute(success);
         }
 
         @Override
         protected void onCancelled() {
             mAuthTask = null;
             showProgress(false);
+        }
+
+        public void afterPostExecute(final Boolean success, JSONObject error_response) {
+            mAuthTask = null;
+            showProgress(false);
+
+            if (success) {
+                finish();
+            } else {
+                try {
+                    if (error_response.has(APIServer.STRING_ERROR_STATUS_CODE) &&
+                            Integer.parseInt(error_response.get(APIServer.STRING_ERROR_STATUS_CODE).toString())
+                                    == APIServer.VALUE_BAD_REQUEST) {
+                        mPasswordView.setError(getString(R.string.error_incorrect_password));
+                        mPasswordView.requestFocus();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }

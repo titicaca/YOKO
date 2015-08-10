@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:clickable="false">
+    android:clickable="false"
+    android:orientation="vertical">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:clickable="false">
+        android:clickable="false"
+        android:orientation="vertical">
 
         <RadioButton
+            android:id="@+id/register_rbtn"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/string_register"
-            android:id="@+id/register_rbtn"
-            android:layout_alignParentTop="false"
             android:layout_alignParentLeft="false"
             android:layout_alignParentStart="false"
-            android:checked="true"
+            android:layout_alignParentTop="false"
             android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp" />
+            android:layout_marginTop="10dp"
+            android:checked="true"
+            android:text="@string/string_register" />
 
         <EditText
             android:id="@+id/validate_input_phone_et"
@@ -31,63 +31,63 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="107dp"
             android:hint="@string/hint_input_your_phone"
-            android:inputType="phone"
-            android:layout_alignParentStart="false" />
+            android:inputType="phone" />
 
         <EditText
             android:id="@+id/validate_input_code_et"
-            android:hint="@string/hint_input_validate_code"
-            android:singleLine="true"
-            android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:layout_below="@+id/validate_input_phone_et"
+            android:layout_height="wrap_content"
             android:layout_alignLeft="@+id/validate_input_phone_et"
+            android:layout_below="@+id/validate_input_phone_et"
             android:layout_toLeftOf="@+id/validate_request_code_btn"
-            android:inputType="number" />
+            android:hint="@string/hint_input_validate_code"
+            android:inputType="number"
+            android:singleLine="true" />
 
         <Button
             android:id="@+id/validate_request_code_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/validate_input_code_et"
             android:layout_alignRight="@+id/validate_input_phone_et"
             android:layout_alignTop="@+id/validate_input_code_et"
-            android:text="@string/string_get_validate_code"
-            android:layout_alignBottom="@+id/validate_input_code_et"
-            android:layout_marginBottom="0dp" />
+            android:layout_marginBottom="0dp"
+            android:text="@string/string_get_validate_code" />
 
         <Button
             android:id="@+id/register_commit_btn"
             android:layout_width="280dp"
             android:layout_height="wrap_content"
             android:layout_alignLeft="@+id/validate_input_code_et"
-            android:text="@string/string_register"
-            android:enabled="true"
-            android:singleLine="true"
             android:layout_below="@+id/validate_input_code_et"
-            android:clickable="true"
-            android:focusable="false" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/string_have_an_account"
-            android:id="@+id/have_an_account_tv"
-            android:layout_below="@+id/register_commit_btn"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="10dp" />
-
-        <Button
-            android:layout_width="280dp"
-            android:layout_height="wrap_content"
-            android:text="@string/string_login"
-            android:id="@+id/login_btn"
-            android:layout_below="@+id/have_an_account_tv"
-            android:layout_centerHorizontal="true"
-            android:layout_alignParentStart="false"
-            android:layout_alignParentLeft="false"
             android:layout_marginTop="10dp"
             android:clickable="true"
-            android:enabled="true" />
+            android:enabled="true"
+            android:focusable="false"
+            android:singleLine="true"
+            android:text="@string/string_register" />
+
+        <TextView
+            android:id="@+id/have_an_account_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/register_commit_btn"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:text="@string/string_have_an_account" />
+
+        <Button
+            android:id="@+id/login_btn"
+            android:layout_width="280dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="false"
+            android:layout_alignParentStart="false"
+            android:layout_below="@+id/have_an_account_tv"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:clickable="true"
+            android:enabled="true"
+            android:text="@string/string_login" />
 
     </RelativeLayout>
 
@@ -95,17 +95,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:clickable="false">
+        android:clickable="false"
+        android:layout_marginBottom="5dp">
 
         <TextView
+            android:id="@+id/try_app_tv"
             android:layout_width="match_parent"
             android:layout_height="25dp"
-            android:text="@string/string_try_app"
-            android:id="@+id/try_app_tv"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:gravity="center_horizontal" />
-
+            android:gravity="center_horizontal"
+            android:text="@string/string_try_app" />
     </RelativeLayout>
 
 </LinearLayout>

@@ -1,6 +1,7 @@
 package com.fifteentec.yoko;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -10,11 +11,13 @@ import com.fifteentec.Component.User.UserServer;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
-/**
- * Created by benbush on 15/8/3.
- */
 public class YOKOApplication extends Application {
     Intent networkServiceIntent;
+    public final static String applicationName = "YOKO";
+
+    public Intent getNetworkServiceIntent() {
+        return this.networkServiceIntent;
+    }
 
     @Override
     public void onCreate() {
@@ -31,9 +34,11 @@ public class YOKOApplication extends Application {
          */
         ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(this));
 
-        SharedPreferences sp = this.getSharedPreferences(this.getApplicationInfo().name, 0);
+        SharedPreferences sp = this.getSharedPreferences(applicationName, Context.MODE_PRIVATE);
         //sp.edit().clear().commit();
         UserServer.getInstance().setSharedPreferences(sp);
+        UserServer.getInstance().loadSharedPreferences();
+        UserServer.getInstance().setApplication(this);
     }
 
     @Override
@@ -51,7 +56,7 @@ public class YOKOApplication extends Application {
     }
 
     @Override
-    public void onLowMemory(){
+    public void onLowMemory() {
         super.onLowMemory();
     }
 }

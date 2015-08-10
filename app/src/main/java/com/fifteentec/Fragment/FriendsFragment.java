@@ -389,9 +389,9 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
     }
 
     private void LoadFriendsList() {
-        APIServer api = APIServer.getInstance();
-        api.sendJsonGet(
+        new APIServer.JsonGet(
                 APIUrl.URL_FRIENDLIST,
+                null,
                 null,
                 new APIJsonCallbackResponse() {
 
@@ -412,7 +412,7 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
                     }
                 },
                 activity.getRequestQueue(),
-                null);
+                null).send();
     }
 }
 

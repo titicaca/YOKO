@@ -1,18 +1,17 @@
 package com.fifteentec.yoko;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.Database.DBManager;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 
-/**
- * Created by benbush on 15/8/3.
- */
 public abstract class BaseActivity extends Activity {
     protected RequestQueue requestQueue;
     protected DBManager dbManager;
+    private static Activity curActivity = null;
 
     public RequestQueue getRequestQueue() {
         return this.requestQueue;
@@ -22,7 +21,10 @@ public abstract class BaseActivity extends Activity {
         return this.dbManager;
     }
 
-
+    public Intent getServiceIntent() {
+        YOKOApplication application = (YOKOApplication)this.getApplication();
+        return application.getNetworkServiceIntent();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +42,18 @@ public abstract class BaseActivity extends Activity {
     }
 
     @Override
+    protected void onResume() {
+        setCurrentActivity(this);
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        setCurrentActivity(null);
+        super.onPause();
+    }
+
+    @Override
     protected void onDestroy() {
         /**
          * 关闭请求队列
@@ -50,5 +64,13 @@ public abstract class BaseActivity extends Activity {
          */
         dbManager.closeDB();
         super.onDestroy();
+    }
+
+    public static Activity getCurrentActivity(){
+        return curActivity;
+    }
+
+    public static void setCurrentActivity(Activity activity){
+        curActivity = activity;
     }
 }
