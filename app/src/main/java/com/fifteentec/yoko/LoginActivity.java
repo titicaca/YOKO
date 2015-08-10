@@ -95,15 +95,6 @@ public class LoginActivity extends LoaderActivity {
         mProgressView = findViewById(R.id.login_progress);
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        Intent intent = new Intent(LoginActivity.this, BlankActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
-        finish();
-    }
-
     /**
      * Attempts to sign in or register the account specified by the login form.
      * If there are form errors (invalid phone, missing fields, etc.), the
