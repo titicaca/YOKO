@@ -18,13 +18,15 @@ import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
-import com.API.APIKey;
 import com.fifteentec.Component.User.UserServer;
 
 import cn.smssdk.EventHandler;
 import cn.smssdk.SMSSDK;
 
 public class ValidateActivity extends LoaderActivity implements OnClickListener {
+
+    public final static String SMSSDK_APP_KEY = "93ca809b9373";
+    public final static String SMSSDK_APP_SECRET = "5b30e106b61eb8638e4a5ba6d1374289";
 
     private AutoCompleteTextView mInputPhoneEt;
     private EditText mInputCodeEt;
@@ -73,7 +75,7 @@ public class ValidateActivity extends LoaderActivity implements OnClickListener 
         }
 
         // 启动短信验证sdk
-        SMSSDK.initSDK(this, APIKey.KEY_SMSSDK_APP_KEY, APIKey.KEY_SMSSDK_APP_SECRET);
+        SMSSDK.initSDK(this, SMSSDK_APP_KEY, SMSSDK_APP_SECRET);
         EventHandler eventHandler = new EventHandler() {
             /**
              * 在操作之后被触发
@@ -109,7 +111,8 @@ public class ValidateActivity extends LoaderActivity implements OnClickListener 
         switch (v.getId()) {
             case R.id.validate_request_code_btn:
                 // 1. 通过规则判断手机号
-                if (!judgePhoneNums(phoneNums)) {
+                if (!InfoValidate.isPhoneValid(phoneNums)) {
+                    Toast.makeText(this, "手机号码输入有误！", Toast.LENGTH_SHORT).show();
                     return;
                 } // 2. 通过sdk发送短信验证
                 SMSSDK.getVerificationCode("86", phoneNums);
@@ -196,21 +199,6 @@ public class ValidateActivity extends LoaderActivity implements OnClickListener 
             }
         }
     };
-
-
-    /**
-     * 判断手机号码是否合理
-     *
-     * @param phoneNums
-     */
-    private boolean judgePhoneNums(String phoneNums) {
-        if (InfoValidate.isMatchLength(phoneNums, 11)
-                && InfoValidate.isPhoneValid(phoneNums)) {
-            return true;
-        }
-        Toast.makeText(this, "手机号码输入有误！", Toast.LENGTH_SHORT).show();
-        return false;
-    }
 
     /**
      * progressbar
