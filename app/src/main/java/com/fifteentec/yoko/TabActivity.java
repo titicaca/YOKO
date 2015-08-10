@@ -10,6 +10,7 @@ import android.widget.Toast;
 import com.fifteentec.Fragment.CalViewFragment;
 import com.fifteentec.Fragment.FriendsFragment;
 import com.fifteentec.Fragment.TabButtonFragment;
+import com.fifteentec.TestRicheng.TestFragment;
 
 public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutton {
     private FragmentManager mFragmentManager;
@@ -17,6 +18,9 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
     private TabButtonFragment mbuttonfg;
     private CalViewFragment mCalViewFragment;
     private FriendsFragment friendsFragment;
+
+
+    private TestFragment tf;
 
 
     @SuppressLint("NewApi")
@@ -61,11 +65,12 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
                         Toast.LENGTH_SHORT);
                 b.setDuration(Toast.LENGTH_SHORT);
                 b.show();
-                if (null == friendsFragment) {
-                    friendsFragment = new FriendsFragment();
-                    mFmTrans.add(R.id.id_content, friendsFragment, "frd");
+                //为了测试testfragment，所以替换掉friendsFragment
+                if (null == tf) {
+                    tf = new TestFragment();
+                    mFmTrans.add(R.id.id_content, tf, "frd");
                 } else {
-                    mFmTrans.show(friendsFragment);
+                    mFmTrans.show(tf);
                 }
 
 //                if (friendsFragment == null) {
