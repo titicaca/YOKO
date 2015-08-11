@@ -9,6 +9,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,10 +69,13 @@ public class FoundFragment extends Fragment {
             @SuppressLint("NewApi")
             @Override
             public void onClick(View v) {
+                msg_box.setChecked(false);
                 mFragmentManager = FoundFragment.this.getFragmentManager();
                 FragmentTransaction mFmTrans= mFragmentManager.beginTransaction();
-                if(mMsgBoxFragment == null){
+                if(mMsgBoxFragment == null) {
                     mMsgBoxFragment = new FoundMsgBoxFragment();
+                    mFmTrans.add(R.id.id_content, mMsgBoxFragment,"msg");
+                }else if(mFragmentManager.findFragmentByTag("msg")==null){
                     mFmTrans.add(R.id.id_content, mMsgBoxFragment,"msg");
                 }
                 else{

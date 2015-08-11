@@ -8,6 +8,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,15 +41,14 @@ public class FoundMsgBoxFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_found_msgbox_layout, null);
         mFragmentManager = getFragmentManager();
         FragmentTransaction mFmTrans = mFragmentManager.beginTransaction();
+        InitUpperButtons(view);
 
-        HideAllView(mFmTrans);
-        if(home == null){
-            home = new FoundMsgHome();
-            mFmTrans.add(R.id.id_msg_content,home,"home");
+        if((home = mFragmentManager.findFragmentByTag("msgHome"))!=null){
+            Log.e("msgHome","begin to delete home");
+            mFmTrans.remove(home);
         }
-        else{
-            mFmTrans.show(home);
-        }
+        home = new FoundMsgHome();
+        mFmTrans.add(R.id.id_msg_content, home, "msgHome");
         mFmTrans.commit();
         return view;
     }
@@ -64,16 +64,16 @@ public class FoundMsgBoxFragment extends Fragment {
 
     }
 
-    private void HideAllView(FragmentTransaction mFmTrans) {
-        if(home != null){
-            mFmTrans.hide(home);
-        }
-        if(inviting != null){
-            mFmTrans.hide(inviting);
-        }
-        if(invited != null){
-            mFmTrans.hide(invited);
-        }
-    }
+//    private void HideAllView(FragmentTransaction mFmTrans) {
+//        if(home != null){
+//            mFmTrans.hide(home);
+//        }
+//        if(inviting != null){
+//            mFmTrans.hide(inviting);
+//        }
+//        if(invited != null){
+//            mFmTrans.hide(invited);
+//        }
+//    }
 
 }

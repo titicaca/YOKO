@@ -52,6 +52,9 @@ public class FoundMsgHome extends Fragment {
                     mFoundMsgInvited = new FoundMsgInvited();
                     mFmTrans.add(R.id.id_msg_content, mFoundMsgInvited,"invited");
                 }
+                else if(mFragmentManager.findFragmentByTag("invited")==null){
+                    mFmTrans.add(R.id.id_msg_content, mFoundMsgInvited,"invited");
+                }
                 else{
                     mFmTrans.show(mFoundMsgInvited);
                 }
@@ -69,13 +72,14 @@ public class FoundMsgHome extends Fragment {
                     mFoundMsgInviting = new FoundMsgInviting();
                     mFmTrans.add(R.id.id_msg_content, mFoundMsgInviting,"inviting");
                 }
+                else if(mFragmentManager.findFragmentByTag("inviting")==null){
+                    mFmTrans.add(R.id.id_msg_content, mFoundMsgInviting,"inviting");
+                }
                 else{
                     mFmTrans.show(mFoundMsgInviting);
                 }
                 mFmTrans.addToBackStack("inviting");
                 mFmTrans.commit();
-                mFmTrans.hide(FoundMsgHome.this);
-
             }
         });
 

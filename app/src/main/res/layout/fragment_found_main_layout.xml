@@ -24,6 +24,7 @@
                 android:gravity="center_vertical"
                 android:text="@string/button_list"
                 android:checked="true"
+
                 android:textSize="14sp"
                 android:textColor="@color/black"
                 android:paddingLeft="5dp"
