@@ -15,6 +15,8 @@ public class APIUrl {
 
     public final static String URL_REQUEST_USER_INFO = URL_BASE + "/" + "user";
 
+    public final static String URL_DELETE_USER_INFO = URL_BASE + "/" + "home";
+
     public final static String URL_REQUEST_TOKEN = URL_BASE + "/" + "oauth/token";
 
     private final static String URL_DOWNLOAD_BASE = "";

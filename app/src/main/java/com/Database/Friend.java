@@ -9,24 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Friend extends DBTable {
-    public int _id;
-    public String uid;
-    public String fuid;
-    public String tagId;
-    public String tagName;
-
-    public Friend() {
-    }
 
     public Friend(SQLiteDatabase db) {
         super(db);
-    }
-
-    public Friend(String uid, String fuid, String tagId, String tagName) {
-        this.uid = uid;
-        this.fuid = fuid;
-        this.tagId = tagId;
-        this.tagName = tagName;
     }
 
     @Override
@@ -37,7 +22,7 @@ public class Friend extends DBTable {
     @Override
     public void createUniqueIndex() {
         try {
-            db.execSQL("create unique index " + DBHelper.TABLE_FRIEND + "_unique_index" + " on " +
+            db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS " + DBHelper.TABLE_FRIEND + "_unique_index" + " ON " +
                     DBHelper.TABLE_FRIEND + " (" +
                     DBHelper.FRIEND_UID + ", " +
                     DBHelper.FRIEND_FUID + ", " +
@@ -53,25 +38,25 @@ public class Friend extends DBTable {
 
     }
 
-    public void addFriend(Friend friend) {
+    public void addFriend(FriendRecord friendRecord) {
         db.beginTransaction();
 
         try {
-            db.execSQL("insert or ignore into " + DBHelper.TABLE_FRIEND + " values(null, ?, ?, ?, ?)",
-                    new Object[]{friend.uid, friend.fuid, friend.tagId, friend.tagName});
+            db.execSQL("INSERT OR IGNORE INTO " + DBHelper.TABLE_FRIEND + " VALUES(NULL, ?, ?, ?, ?)",
+                    new Object[]{friendRecord.uid, friendRecord.fuid, friendRecord.tagId, friendRecord.tagName});
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
         }
     }
 
-    public void addFriends(List<Friend> friends) {
+    public void addFriends(List<FriendRecord> friendRecords) {
         db.beginTransaction();
 
         try {
-            for (Friend friend : friends) {
-                db.execSQL("insert or ignore into " + DBHelper.TABLE_FRIEND + " values(null, ?, ?, ?, ?)",
-                        new Object[]{friend.uid, friend.fuid, friend.tagId, friend.tagName});
+            for (FriendRecord friendRecord : friendRecords) {
+                db.execSQL("INSERT OR IGNORE INTO " + DBHelper.TABLE_FRIEND + " VALUES(NULL, ?, ?, ?, ?)",
+                        new Object[]{friendRecord.uid, friendRecord.fuid, friendRecord.tagId, friendRecord.tagName});
             }
             db.setTransactionSuccessful();
         } finally {
@@ -79,136 +64,136 @@ public class Friend extends DBTable {
         }
     }
 
-    public void updateFuid(Friend newFriend, Friend oldFriend) {
+    public void updateFuid(FriendRecord newFriendRecord, FriendRecord oldFriendRecord) {
         try {
             ContentValues cv = new ContentValues();
-            cv.put(DBHelper.FRIEND_FUID, newFriend.fuid);
+            cv.put(DBHelper.FRIEND_FUID, newFriendRecord.fuid);
             db.update(DBHelper.TABLE_FRIEND, cv,
-                    DBHelper.FRIEND_UID + " = ?" + " and " +
-                            DBHelper.FRIEND_FUID + " = ?" + " and " +
-                            DBHelper.FRIEND_TAGID + " = ?" + " and " +
+                    DBHelper.FRIEND_UID + " = ?" + " AND " +
+                            DBHelper.FRIEND_FUID + " = ?" + " AND " +
+                            DBHelper.FRIEND_TAGID + " = ?" + " AND " +
                             DBHelper.FRIEND_TAGNAME + " = ?",
-                    new String[]{oldFriend.uid, oldFriend.fuid, oldFriend.tagId, oldFriend.tagName});
+                    new String[]{oldFriendRecord.uid, oldFriendRecord.fuid, oldFriendRecord.tagId, oldFriendRecord.tagName});
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void updateTagId(Friend newFriend, Friend oldFriend) {
+    public void updateTagId(FriendRecord newFriendRecord, FriendRecord oldFriendRecord) {
         try {
             ContentValues cv = new ContentValues();
-            cv.put(DBHelper.FRIEND_TAGID, newFriend.tagId);
+            cv.put(DBHelper.FRIEND_TAGID, newFriendRecord.tagId);
             db.update(DBHelper.TABLE_FRIEND, cv,
-                    DBHelper.FRIEND_UID + " = ?" + " and " +
-                            DBHelper.FRIEND_FUID + " = ?" + " and " +
-                            DBHelper.FRIEND_TAGID + " = ?" + " and " +
+                    DBHelper.FRIEND_UID + " = ?" + " AND " +
+                            DBHelper.FRIEND_FUID + " = ?" + " AND " +
+                            DBHelper.FRIEND_TAGID + " = ?" + " AND " +
                             DBHelper.FRIEND_TAGNAME + " = ?",
-                    new String[]{oldFriend.uid, oldFriend.fuid, oldFriend.tagId, oldFriend.tagName});
+                    new String[]{oldFriendRecord.uid, oldFriendRecord.fuid, oldFriendRecord.tagId, oldFriendRecord.tagName});
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void updateTagName(Friend newFriend, Friend oldFriend) {
+    public void updateTagName(FriendRecord newFriendRecord, FriendRecord oldFriendRecord) {
         try {
             ContentValues cv = new ContentValues();
-            cv.put(DBHelper.FRIEND_TAGNAME, newFriend.tagName);
+            cv.put(DBHelper.FRIEND_TAGNAME, newFriendRecord.tagName);
             db.update(DBHelper.TABLE_FRIEND, cv,
-                    DBHelper.FRIEND_UID + " = ?" + " and " +
-                            DBHelper.FRIEND_FUID + " = ?" + " and " +
-                            DBHelper.FRIEND_TAGID + " = ?" + " and " +
+                    DBHelper.FRIEND_UID + " = ?" + " AND " +
+                            DBHelper.FRIEND_FUID + " = ?" + " AND " +
+                            DBHelper.FRIEND_TAGID + " = ?" + " AND " +
                             DBHelper.FRIEND_TAGNAME + " = ?",
-                    new String[]{oldFriend.uid, oldFriend.fuid, oldFriend.tagId, oldFriend.tagName});
+                    new String[]{oldFriendRecord.uid, oldFriendRecord.fuid, oldFriendRecord.tagId, oldFriendRecord.tagName});
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void updateFriend(Friend newFriend, Friend oldFriend) {
+    public void updateFriend(FriendRecord newFriendRecord, FriendRecord oldFriendRecord) {
         try {
             ContentValues cv = new ContentValues();
-            cv.put(DBHelper.FRIEND_FUID, newFriend.fuid);
-            cv.put(DBHelper.FRIEND_TAGID, newFriend.tagId);
-            cv.put(DBHelper.FRIEND_TAGNAME, newFriend.tagName);
+            cv.put(DBHelper.FRIEND_FUID, newFriendRecord.fuid);
+            cv.put(DBHelper.FRIEND_TAGID, newFriendRecord.tagId);
+            cv.put(DBHelper.FRIEND_TAGNAME, newFriendRecord.tagName);
             db.update(DBHelper.TABLE_FRIEND, cv,
-                    DBHelper.FRIEND_UID + " = ?" + " and " +
-                            DBHelper.FRIEND_FUID + " = ?" + " and " +
-                            DBHelper.FRIEND_TAGID + " = ?" + " and " +
+                    DBHelper.FRIEND_UID + " = ?" + " AND " +
+                            DBHelper.FRIEND_FUID + " = ?" + " AND " +
+                            DBHelper.FRIEND_TAGID + " = ?" + " AND " +
                             DBHelper.FRIEND_TAGNAME + " = ?",
-                    new String[]{oldFriend.uid, oldFriend.fuid, oldFriend.tagId, oldFriend.tagName});
+                    new String[]{oldFriendRecord.uid, oldFriendRecord.fuid, oldFriendRecord.tagId, oldFriendRecord.tagName});
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void deleteFriend(Friend friend) {
+    public void deleteFriend(FriendRecord friendRecord) {
         try {
             db.delete(DBHelper.TABLE_FRIEND,
-                    DBHelper.FRIEND_UID + " = ?" + " and " +
+                    DBHelper.FRIEND_UID + " = ?" + " AND " +
                             DBHelper.FRIEND_FUID + " = ?",
-                    new String[]{friend.uid, friend.fuid});
+                    new String[]{friendRecord.uid, friendRecord.fuid});
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void deleteFriendTag(Friend friend) {
+    public void deleteFriendTag(FriendRecord friendRecord) {
         try {
             db.delete(DBHelper.TABLE_FRIEND,
-                    DBHelper.FRIEND_UID + " = ?" + " and " +
-                            DBHelper.FRIEND_FUID + " = ?" + " and " +
-                            DBHelper.FRIEND_TAGID + " = ?" + " and " +
+                    DBHelper.FRIEND_UID + " = ?" + " AND " +
+                            DBHelper.FRIEND_FUID + " = ?" + " AND " +
+                            DBHelper.FRIEND_TAGID + " = ?" + " AND " +
                             DBHelper.FRIEND_TAGNAME + " = ?",
-                    new String[]{friend.uid, friend.fuid, friend.tagId, friend.tagName});
+                    new String[]{friendRecord.uid, friendRecord.fuid, friendRecord.tagId, friendRecord.tagName});
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public List<Friend> queryFriend(Friend friend) {
+    public List<FriendRecord> queryFriend(FriendRecord friendRecord) {
         try {
             Cursor cs = db.query(DBHelper.TABLE_FRIEND, null,
-                    DBHelper.FRIEND_UID + " = ?" + " and " +
+                    DBHelper.FRIEND_UID + " = ?" + " AND " +
                             DBHelper.FRIEND_FUID + " = ?",
-                    new String[]{friend.uid, friend.fuid},
+                    new String[]{friendRecord.uid, friendRecord.fuid},
                     null, null, DBHelper.FRIEND_FUID);
-            List<Friend> friends = cursorToList(cs);
+            List<FriendRecord> friendRecords = cursorToList(cs);
             cs.close();
-            return friends;
+            return friendRecords;
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public List<Friend> queryAll() {
+    public List<FriendRecord> queryAll() {
         try {
             Cursor cs = db.query(DBHelper.TABLE_FRIEND, null, null, null,
                     null, null, DBHelper.FRIEND_FUID);
-            List<Friend> friends = cursorToList(cs);
+            List<FriendRecord> friendRecords = cursorToList(cs);
             cs.close();
-            return friends;
+            return friendRecords;
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public List<Friend> cursorToList(Cursor cs) {
-        List<Friend> friends = new ArrayList<Friend>();
+    public List<FriendRecord> cursorToList(Cursor cs) {
+        List<FriendRecord> friendRecords = new ArrayList<FriendRecord>();
         try {
             while (cs.moveToNext()) {
-                Friend friend = new Friend();
-                friend._id = cs.getInt(cs.getColumnIndex(DBHelper.FRIEND_ID));
-                friend.uid = cs.getString(cs.getColumnIndex(DBHelper.FRIEND_UID));
-                friend.fuid = cs.getString(cs.getColumnIndex(DBHelper.FRIEND_FUID));
-                friend.tagId = cs.getString(cs.getColumnIndex(DBHelper.FRIEND_TAGID));
-                friend.tagName = cs.getString(cs.getColumnIndex(DBHelper.FRIEND_TAGNAME));
-                friends.add(friend);
+                FriendRecord friendRecord = new FriendRecord();
+                friendRecord._id = cs.getInt(cs.getColumnIndex(DBHelper.FRIEND_ID));
+                friendRecord.uid = cs.getString(cs.getColumnIndex(DBHelper.FRIEND_UID));
+                friendRecord.fuid = cs.getString(cs.getColumnIndex(DBHelper.FRIEND_FUID));
+                friendRecord.tagId = cs.getString(cs.getColumnIndex(DBHelper.FRIEND_TAGID));
+                friendRecord.tagName = cs.getString(cs.getColumnIndex(DBHelper.FRIEND_TAGNAME));
+                friendRecords.add(friendRecord);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return friends;
+        return friendRecords;
     }
 }

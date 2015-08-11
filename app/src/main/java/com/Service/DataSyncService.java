@@ -6,16 +6,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
+import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
 import com.API.APIServer;
 import com.Common.NetworkState;
 import com.Database.DBManager;
+import com.Database.FriendRecord;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 
-public class NetworkService extends Service{
+import java.util.List;
+
+public class DataSyncService extends Service {
     private APIServer apiServer;
     private RequestQueue requestQueue;
     private DBManager dbManager;
@@ -24,14 +28,14 @@ public class NetworkService extends Service{
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            Log.v("Network Service", "action: " + action);
+            Log.v("Data Sync Service", "action: " + action);
             //判断是否接受的事件为网络状态改变事件
             if (action.equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
                 //判断当前网络是否链接
                 if (NetworkState.isWifiConnected(context)) {
-                    Log.v("Network Service", "Wi-Fi connect");
+                    Log.v("Data Sync Service", "Wi-Fi connect");
                 } else {
-                    Log.v("Network Service", "Wi-Fi disconnect");
+                    Log.v("Data Sync Service", "Wi-Fi disconnect");
                 }
             }
         }
@@ -69,13 +73,23 @@ public class NetworkService extends Service{
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.v("Network Service", "start");
+        Log.v("Data Sync Service", "start");
         return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        //todo
-        return null;
+        return new DataSyncServiceBinder();
+    }
+
+    public class DataSyncServiceBinder extends Binder {
+        public void SyncFriend(List<FriendRecord> friendRecords) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    //todo
+                }
+            }).start();
+        }
     }
 }

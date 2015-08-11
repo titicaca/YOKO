@@ -42,6 +42,7 @@ public class LoginActivity extends LoaderActivity {
 
     // UI references.
     private AutoCompleteTextView mPhoneView;
+
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;

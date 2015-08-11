@@ -72,152 +72,8 @@ public class APIServer {
         public void send() {
             this.queue.add(this.request);
         }
-    }
 
-    public static class JsonArrayPost extends APINetworkRequest {
-        /**
-         * 用于发送JsonArray格式的POST请求
-         *
-         * @param url              请求目标地址
-         * @param params           请求所需参数
-         * @param headers          请求所需文件头
-         * @param callbackResponse 用于接收返回的实例化回调类
-         * @param queue            Volley队列
-         * @param tag              请求的Tag标签
-         */
-        public JsonArrayPost(String url, JSONArray params, final Map<String, String> headers,
-                             final APICallbackResponse callbackResponse,
-                             final RequestQueue queue, final Object tag) {
-            this.callbackResponse = callbackResponse;
-            this.queue = queue;
-            this.request = new JsonArrayRequest(
-                    Method.GET,
-                    url,
-                    params,
-                    new Response.Listener<JSONArray>() {
-                        @Override
-                        public void onResponse(JSONArray response) {
-                            callbackResponse.setResponse(response);
-                            callbackResponse.run();
-                        }
-                    }, this) {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    if (headers == null)
-                        return Collections.<String, String>emptyMap();
-
-                    if (headers.containsKey(APIKey.KEY_AUTHORIZATION)) {
-                        headers.put(APIKey.KEY_AUTHORIZATION, UserServer.getInstance().getAccessToken());
-                    }
-                    return headers;
-                }
-            };
-            if (tag != null) this.request.setTag(tag);
-        }
-    }
-
-    public static class JsonPost extends APINetworkRequest {
-        /**
-         * 用于发送Json格式的POST请求
-         *
-         * @param url              请求目标地址
-         * @param params           请求所需参数
-         * @param headers          请求所需文件头
-         * @param callbackResponse 用于接收返回的实例化回调类
-         * @param queue            Volley队列
-         * @param tag              请求的Tag标签
-         */
-        public JsonPost(String url, JSONObject params, final Map<String, String> headers,
-                        final APICallbackResponse callbackResponse,
-                        final RequestQueue queue, final Object tag) {
-            this.callbackResponse = callbackResponse;
-            this.queue = queue;
-
-            this.request = new JsonObjectRequest(
-                    url,
-                    params,
-                    new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            callbackResponse.setResponse(response);
-                            callbackResponse.run();
-                        }
-                    }, this) {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    if (headers == null)
-                        return Collections.<String, String>emptyMap();
-
-                    if (headers.containsKey(APIKey.KEY_AUTHORIZATION)) {
-                        headers.put(APIKey.KEY_AUTHORIZATION, UserServer.getInstance().getAccessToken());
-                    }
-                    return headers;
-                }
-            };
-            if (tag != null) this.request.setTag(tag);
-        }
-    }
-
-    public static class JsonPut extends APINetworkRequest {
-        /**
-         * 用于发送Json格式的PUT请求
-         *
-         * @param url              请求目标地址
-         * @param params           请求所需参数
-         * @param headers          请求所需文件头
-         * @param callbackResponse 用于接收返回的实例化回调类
-         * @param queue            Volley队列
-         * @param tag              请求的Tag标签
-         */
-        public JsonPut(String url, JSONObject params, final Map<String, String> headers,
-                       final APICallbackResponse callbackResponse,
-                       final RequestQueue queue, final Object tag) {
-            this.callbackResponse = callbackResponse;
-            this.queue = queue;
-
-            this.request = new JsonObjectRequest(
-                    Method.PUT,
-                    url,
-                    params,
-                    new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            callbackResponse.setResponse(response);
-                            callbackResponse.run();
-                        }
-                    }, this) {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    if (headers == null)
-                        return Collections.<String, String>emptyMap();
-
-                    if (headers.containsKey(APIKey.KEY_AUTHORIZATION)) {
-                        headers.put(APIKey.KEY_AUTHORIZATION, UserServer.getInstance().getAccessToken());
-                    }
-                    return headers;
-                }
-            };
-            if (tag != null) this.request.setTag(tag);
-        }
-    }
-
-    public static class JsonGet extends APINetworkRequest {
-        /**
-         * 用于发送Json格式的Get请求
-         *
-         * @param url              请求目标地址
-         * @param params           请求所需参数
-         * @param headers          请求所需文件头
-         * @param callbackResponse 用于接收返回的实例化回调类
-         * @param queue            Volley队列
-         * @param tag              请求的Tag标签
-         */
-        public JsonGet(String url, JSONObject params, final Map<String, String> headers,
-                       final APICallbackResponse callbackResponse,
-                       final RequestQueue queue, final Object tag) {
-            this.callbackResponse = callbackResponse;
-            this.queue = queue;
-
+        public String urlcat(String url, JSONObject params) {
             if (params != null) {
                 Iterator<String> keys = params.keys();
 
@@ -244,9 +100,34 @@ public class APIServer {
                 }
             }
 
+            return url;
+        }
+    }
+
+    public abstract static class APIJsonNetworkRequest extends APINetworkRequest {
+        /**
+         * 用于发送Json格式的请求(GET, POST, PUT, DELETE等)
+         *
+         * @param method           请求的方法
+         * @param url              请求目标地址
+         * @param params           请求所需参数
+         * @param headers          请求所需文件头
+         * @param callbackResponse 用于接收返回的实例化回调类
+         * @param queue            Volley队列
+         * @param tag              请求的Tag标签
+         */
+        public APIJsonNetworkRequest(final int method, String url,
+                                     final JSONObject params,
+                                     final Map<String, String> headers,
+                                     final APICallbackResponse callbackResponse,
+                                     final RequestQueue queue, final Object tag) {
+            this.callbackResponse = callbackResponse;
+            this.queue = queue;
+
             this.request = new JsonObjectRequest(
-                    url,
-                    null,
+                    method,
+                    (method == Method.GET) ? urlcat(url, params) : url,
+                    (method == Method.GET) ? null : params,
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
@@ -269,10 +150,11 @@ public class APIServer {
         }
     }
 
-    public static class StringPost extends APINetworkRequest {
+    public abstract static class APIStringNetworkRequest extends APINetworkRequest {
         /**
          * 用于发送String格式的POST请求
          *
+         * @param method           请求的方法
          * @param url              请求目标地址
          * @param params           请求所需参数
          * @param headers          请求所需文件头
@@ -280,16 +162,17 @@ public class APIServer {
          * @param queue            Volley队列
          * @param tag              请求的Tag标签
          */
-        public StringPost(String url, final Map<String, String> params,
-                          final Map<String, String> headers,
-                          final APICallbackResponse callbackResponse,
-                          final RequestQueue queue, final Object tag) {
+        public APIStringNetworkRequest(final int method, String url,
+                                       final JSONObject params,
+                                       final Map<String, String> headers,
+                                       final APICallbackResponse callbackResponse,
+                                       final RequestQueue queue, final Object tag) {
             this.callbackResponse = callbackResponse;
             this.queue = queue;
 
             this.request = new StringRequest(
-                    Request.Method.POST,
-                    url,
+                    method,
+                    (method == Method.GET) ? urlcat(url, params) : url,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
@@ -299,7 +182,27 @@ public class APIServer {
                     }, this) {
                 @Override
                 protected Map<String, String> getParams() throws AuthFailureError {
-                    return params;
+                    if (method == Method.GET || params == null)
+                        return Collections.<String, String>emptyMap();
+                    else {
+                        Map<String, String> _params = new HashMap<>();
+                        Iterator<String> keys = params.keys();
+
+                        while (keys.hasNext()) {
+                            String key = keys.next();
+                            String value = null;
+
+                            try {
+                                value = params.get(key).toString();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                            _params.put(key, value);
+                        }
+
+                        return _params;
+                    }
                 }
 
                 @Override
@@ -317,9 +220,9 @@ public class APIServer {
         }
     }
 
-    public static class StringGet extends APINetworkRequest {
+    public static class JsonArrayPost extends APINetworkRequest {
         /**
-         * 用于发送String格式的Get请求
+         * 用于发送JsonArray格式的POST请求
          *
          * @param url              请求目标地址
          * @param params           请求所需参数
@@ -328,52 +231,23 @@ public class APIServer {
          * @param queue            Volley队列
          * @param tag              请求的Tag标签
          */
-        public StringGet(String url, final Map<String, String> params,
-                         final Map<String, String> headers,
-                         final APICallbackResponse callbackResponse,
-                         final RequestQueue queue, final Object tag) {
+        public JsonArrayPost(String url, final JSONArray params,
+                             final Map<String, String> headers,
+                             final APICallbackResponse callbackResponse,
+                             final RequestQueue queue, final Object tag) {
             this.callbackResponse = callbackResponse;
             this.queue = queue;
-
-            if (params != null) {
-                Iterator<String> keys = params.keySet().iterator();
-
-                boolean first = true;
-
-                while (keys.hasNext()) {
-                    String key = keys.next();
-
-                    if (first) {
-                        url += "?";
-                        first = false;
-                    } else {
-                        url += "&";
-                    }
-
-                    try {
-                        url += URLEncoder.encode(key, "UTF-8") + "="
-                                + URLEncoder.encode(params.get(key), "UTF-8");
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            this.request = new StringRequest(
-                    Method.GET,
+            this.request = new JsonArrayRequest(
+                    Method.POST,
                     url,
-                    new Response.Listener<String>() {
+                    params,
+                    new Response.Listener<JSONArray>() {
                         @Override
-                        public void onResponse(String response) {
+                        public void onResponse(JSONArray response) {
                             callbackResponse.setResponse(response);
                             callbackResponse.run();
                         }
                     }, this) {
-                @Override
-                protected Map<String, String> getParams() throws AuthFailureError {
-                    return params;
-                }
-
                 @Override
                 public Map<String, String> getHeaders() throws AuthFailureError {
                     if (headers == null)
@@ -386,6 +260,120 @@ public class APIServer {
                 }
             };
             if (tag != null) this.request.setTag(tag);
+        }
+    }
+
+    public static class JsonGet extends APIJsonNetworkRequest {
+        /**
+         * 用于发送Json格式的Get请求
+         *
+         * @param url              请求目标地址
+         * @param params           请求所需参数
+         * @param headers          请求所需文件头
+         * @param callbackResponse 用于接收返回的实例化回调类
+         * @param queue            Volley队列
+         * @param tag              请求的Tag标签
+         */
+        public JsonGet(String url, final JSONObject params,
+                       final Map<String, String> headers,
+                       final APICallbackResponse callbackResponse,
+                       final RequestQueue queue, final Object tag) {
+            super(Method.GET, url, params, headers, callbackResponse, queue, tag);
+        }
+    }
+
+    public static class JsonPost extends APIJsonNetworkRequest {
+        /**
+         * 用于发送Json格式的POST请求
+         *
+         * @param url              请求目标地址
+         * @param params           请求所需参数
+         * @param headers          请求所需文件头
+         * @param callbackResponse 用于接收返回的实例化回调类
+         * @param queue            Volley队列
+         * @param tag              请求的Tag标签
+         */
+        public JsonPost(String url, final JSONObject params,
+                        final Map<String, String> headers,
+                        final APICallbackResponse callbackResponse,
+                        final RequestQueue queue, final Object tag) {
+            super(Method.POST, url, params, headers, callbackResponse, queue, tag);
+        }
+    }
+
+    public static class JsonPut extends APIJsonNetworkRequest {
+        /**
+         * 用于发送Json格式的PUT请求
+         *
+         * @param url              请求目标地址
+         * @param params           请求所需参数
+         * @param headers          请求所需文件头
+         * @param callbackResponse 用于接收返回的实例化回调类
+         * @param queue            Volley队列
+         * @param tag              请求的Tag标签
+         */
+        public JsonPut(String url, final JSONObject params,
+                       final Map<String, String> headers,
+                       final APICallbackResponse callbackResponse,
+                       final RequestQueue queue, final Object tag) {
+            super(Method.PUT, url, params, headers, callbackResponse, queue, tag);
+        }
+    }
+
+    public static class JsonDel extends APIJsonNetworkRequest {
+        /**
+         * 用于发送Json格式的DELETE请求
+         *
+         * @param url              请求目标地址
+         * @param params           请求所需参数
+         * @param headers          请求所需文件头
+         * @param callbackResponse 用于接收返回的实例化回调类
+         * @param queue            Volley队列
+         * @param tag              请求的Tag标签
+         */
+        public JsonDel(String url, final JSONObject params,
+                       final Map<String, String> headers,
+                       final APICallbackResponse callbackResponse,
+                       final RequestQueue queue, final Object tag) {
+            super(Method.DELETE, url, params, headers, callbackResponse, queue, tag);
+        }
+    }
+
+    public static class StringPost extends APIStringNetworkRequest {
+        /**
+         * 用于发送String格式的POST请求
+         *
+         * @param url              请求目标地址
+         * @param params           请求所需参数
+         * @param headers          请求所需文件头
+         * @param callbackResponse 用于接收返回的实例化回调类
+         * @param queue            Volley队列
+         * @param tag              请求的Tag标签
+         */
+        public StringPost(String url, final JSONObject params,
+                          final Map<String, String> headers,
+                          final APICallbackResponse callbackResponse,
+                          final RequestQueue queue, final Object tag) {
+            super(Method.POST, url, params, headers, callbackResponse, queue, tag);
+        }
+    }
+
+    public static class StringGet extends APIStringNetworkRequest {
+        /**
+         * 用于发送String格式的Get请求
+         *
+         * @param url              请求目标地址
+         * @param params           请求所需参数
+         * @param headers          请求所需文件头
+         * @param callbackResponse 用于接收返回的实例化回调类
+         * @param queue            Volley队列
+         * @param tag              请求的Tag标签
+         */
+        public StringGet(String url, final JSONObject params,
+                         final Map<String, String> headers,
+                         final APICallbackResponse callbackResponse,
+                         final RequestQueue queue, final Object tag) {
+            super(Method.GET, url, params, headers, callbackResponse, queue, tag);
         }
     }
 
@@ -573,6 +561,7 @@ public class APIServer {
                 this.callbackResponse.run();
             }
         }
+
     }
 
     /**
@@ -591,9 +580,9 @@ public class APIServer {
             e.printStackTrace();
         }
 
-        headers.put(APIKey.KEY_AUTHORIZATION, APIKey.KEY_REQUEST_TOKEN_VALUE);
-        headers.put(APIKey.KEY_ACCEPT, APIKey.KEY_ACCEPT_VALUE);
-        APIServer.AccessTokenPost accessTokenPost = new APIServer.AccessTokenPost(APIUrl.URL_REQUEST_TOKEN,
+        headers.put(APIKey.KEY_AUTHORIZATION, APIKey.VALUE_REQUEST_TOKEN);
+        headers.put(APIKey.KEY_ACCEPT, APIKey.VALUE_ACCEPT);
+        new APIServer.AccessTokenPost(APIUrl.URL_REQUEST_TOKEN,
                 params, headers, new APIJsonCallbackResponse() {
             @Override
             public void run() {
@@ -607,7 +596,7 @@ public class APIServer {
                                     request, queue);
                         } else {
                             if (this.getResponse().has(APIKey.KEY_ACCESS_TOKEN)) {
-                                UserServer.getInstance().setAccessToken(APIKey.KEY_ACCESS_TONEN_HEADER_PREFIX +
+                                UserServer.getInstance().setAccessToken(APIKey.VALUE_ACCESS_TONEN_HEADER_PREFIX +
                                         this.getResponse().getString(APIKey.KEY_ACCESS_TOKEN));
                                 queue.add(request);
                             }
@@ -617,9 +606,7 @@ public class APIServer {
                     }
                 }
             }
-        }, queue, null);
-
-        accessTokenPost.send();
+        }, queue, null).send();
     }
 
     /**
@@ -635,17 +622,17 @@ public class APIServer {
         JSONObject params = new JSONObject();
         Map<String, String> headers = new HashMap<String, String>();
         try {
-            params.put(APIKey.KEY_USERNAME, APIKey.KEY_ROLE_MOBILE_PREFIX + phone);
+            params.put(APIKey.KEY_USERNAME, APIKey.VALUE_ROLE_MOBILE_PREFIX + phone);
             params.put(APIKey.KEY_PASSWORD, APIEncrypt.MD5.encode(password));
             params.put(APIKey.KEY_GRANT_TYPE, APIKey.KEY_PASSWORD);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        headers.put(APIKey.KEY_AUTHORIZATION, APIKey.KEY_REQUEST_TOKEN_VALUE);
-        headers.put(APIKey.KEY_ACCEPT, APIKey.KEY_ACCEPT_VALUE);
+        headers.put(APIKey.KEY_AUTHORIZATION, APIKey.VALUE_REQUEST_TOKEN);
+        headers.put(APIKey.KEY_ACCEPT, APIKey.VALUE_ACCEPT);
 
-        APIServer.TokenPost tokenPost = new APIServer.TokenPost(APIUrl.URL_REQUEST_TOKEN,
+        new APIServer.TokenPost(APIUrl.URL_REQUEST_TOKEN,
                 params, headers, new APIJsonCallbackResponse() {
             @Override
             public void run() {
@@ -660,7 +647,7 @@ public class APIServer {
                         } else {
                             if (this.getResponse().has(APIKey.KEY_ACCESS_TOKEN) &&
                                     this.getResponse().has(APIKey.KEY_REFRESH_TOKEN)) {
-                                UserServer.getInstance().setAccessToken(APIKey.KEY_ACCESS_TONEN_HEADER_PREFIX +
+                                UserServer.getInstance().setAccessToken(APIKey.VALUE_ACCESS_TONEN_HEADER_PREFIX +
                                         this.getResponse().getString(APIKey.KEY_ACCESS_TOKEN));
                                 UserServer.getInstance().setRefreshToken(
                                         this.getResponse().getString(APIKey.KEY_REFRESH_TOKEN));
@@ -672,8 +659,6 @@ public class APIServer {
                     }
                 }
             }
-        }, queue, null);
-
-        tokenPost.send();
+        }, queue, null).send();
     }
 }

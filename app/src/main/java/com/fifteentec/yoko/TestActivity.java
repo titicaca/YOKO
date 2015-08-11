@@ -1,5 +1,6 @@
 package com.fifteentec.yoko;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -10,6 +11,7 @@ import com.fifteentec.Component.User.UserServer;
 public class TestActivity extends BaseActivity {
     private Button mTestBtn;
     private EditText mTokenTv;
+    private EditText mTestJsonTv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,6 +20,7 @@ public class TestActivity extends BaseActivity {
 
         mTestBtn = (Button) findViewById(R.id.test_btn);
         mTokenTv = (EditText) findViewById(R.id.token_tv);
+        mTestJsonTv = (EditText) findViewById(R.id.json_test_tv);
         mTestBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -30,5 +33,6 @@ public class TestActivity extends BaseActivity {
         UserServer.getInstance().userGetUserInfo(TestActivity.this);
         mTokenTv.setText("access_token: " + UserServer.getInstance().getAccessToken() + "\n" +
                 "refresh_token: " + UserServer.getInstance().getRefreshToken());
+
     }
 }

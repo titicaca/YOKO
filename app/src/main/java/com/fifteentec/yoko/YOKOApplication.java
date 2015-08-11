@@ -6,17 +6,20 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 
-import com.Service.NetworkService;
+import com.Service.DataSyncService;
+import com.baidu.android.pushservice.PushConstants;
+import com.baidu.android.pushservice.PushManager;
 import com.fifteentec.Component.User.UserServer;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 public class YOKOApplication extends Application {
-    Intent networkServiceIntent;
+    Intent dataSyncServiceIntent;
     public final static String applicationName = "YOKO";
+    private final static String baiduPushApiKey = "api_key";
 
-    public Intent getNetworkServiceIntent() {
-        return this.networkServiceIntent;
+    public Intent getDataSyncServiceIntent() {
+        return this.dataSyncServiceIntent;
     }
 
     @Override
@@ -26,8 +29,8 @@ public class YOKOApplication extends Application {
         /**
          * 开启数据上传服务器
          */
-        networkServiceIntent = new Intent(this, NetworkService.class);
-        startService(networkServiceIntent);
+        dataSyncServiceIntent = new Intent(this, DataSyncService.class);
+        startService(dataSyncServiceIntent);
         /**
          * 初始化universalImageLoader
          * todo 请自定义初始化设置
@@ -39,14 +42,23 @@ public class YOKOApplication extends Application {
         UserServer.getInstance().setSharedPreferences(sp);
         UserServer.getInstance().loadSharedPreferences();
         UserServer.getInstance().setApplication(this);
+
+        /**
+         * 开启百度云推送服务器
+         */
+        PushManager.startWork(this, PushConstants.LOGIN_TYPE_API_KEY, baiduPushApiKey);
     }
 
     @Override
     public void onTerminate() {
         /**
+         * 关闭百度云推送服务器
+         */
+        PushManager.stopWork(this);
+        /**
          * 关闭数据上传服务器
          */
-        stopService(networkServiceIntent);
+        stopService(dataSyncServiceIntent);
         super.onTerminate();
     }
 
