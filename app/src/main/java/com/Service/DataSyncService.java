@@ -28,14 +28,14 @@ public class DataSyncService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            Log.v("Network Service", "action: " + action);
+            Log.v("Data Sync Service", "action: " + action);
             //判断是否接受的事件为网络状态改变事件
             if (action.equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
                 //判断当前网络是否链接
                 if (NetworkState.isWifiConnected(context)) {
-                    Log.v("Network Service", "Wi-Fi connect");
+                    Log.v("Data Sync Service", "Wi-Fi connect");
                 } else {
-                    Log.v("Network Service", "Wi-Fi disconnect");
+                    Log.v("Data Sync Service", "Wi-Fi disconnect");
                 }
             }
         }

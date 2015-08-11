@@ -51,6 +51,9 @@ public class YOKOApplication extends Application {
 
     @Override
     public void onTerminate() {
+        /**
+         * 关闭百度云推送服务器
+         */
         PushManager.stopWork(this);
         /**
          * 关闭数据上传服务器

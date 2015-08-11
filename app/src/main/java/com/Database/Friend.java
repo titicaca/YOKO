@@ -22,7 +22,7 @@ public class Friend extends DBTable {
     @Override
     public void createUniqueIndex() {
         try {
-            db.execSQL("CREATE UNIQUE INDEX " + DBHelper.TABLE_FRIEND + "_unique_index" + " ON " +
+            db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS " + DBHelper.TABLE_FRIEND + "_unique_index" + " ON " +
                     DBHelper.TABLE_FRIEND + " (" +
                     DBHelper.FRIEND_UID + ", " +
                     DBHelper.FRIEND_FUID + ", " +
