@@ -7,6 +7,8 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 
 import com.Service.DataSyncService;
+import com.baidu.android.pushservice.PushConstants;
+import com.baidu.android.pushservice.PushManager;
 import com.fifteentec.Component.User.UserServer;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -14,6 +16,7 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 public class YOKOApplication extends Application {
     Intent dataSyncServiceIntent;
     public final static String applicationName = "YOKO";
+    private final static String baiduPushApiKey = "api_key";
 
     public Intent getDataSyncServiceIntent() {
         return this.dataSyncServiceIntent;
@@ -39,10 +42,16 @@ public class YOKOApplication extends Application {
         UserServer.getInstance().setSharedPreferences(sp);
         UserServer.getInstance().loadSharedPreferences();
         UserServer.getInstance().setApplication(this);
+
+        /**
+         * 开启百度云推送服务器
+         */
+        PushManager.startWork(this, PushConstants.LOGIN_TYPE_API_KEY, baiduPushApiKey);
     }
 
     @Override
     public void onTerminate() {
+        PushManager.stopWork(this);
         /**
          * 关闭数据上传服务器
          */
