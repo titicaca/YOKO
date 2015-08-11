@@ -3,6 +3,8 @@ package com.fifteentec.yoko;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.fifteentec.Component.User.UserServer;
+
 public class BlankActivity extends BaseActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {

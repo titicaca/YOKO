@@ -1,5 +1,6 @@
 package com.fifteentec.yoko;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -60,7 +61,8 @@ public abstract class BaseActivity extends Activity {
     public void onBackPressed() {
         super.onBackPressed();
 
-        if ((this instanceof LoginActivity) || (this instanceof TestActivity)) {
+        if ((this instanceof LoginActivity) || (this instanceof TestActivity)||
+                (this instanceof TabActivity)) {
             Intent intent = new Intent(getCurrentActivity(), BlankActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);

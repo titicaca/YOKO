@@ -14,6 +14,7 @@ import com.API.APIServer;
 import com.API.APIUrl;
 import com.fifteentec.yoko.BaseActivity;
 import com.fifteentec.yoko.LoginActivity;
+import com.fifteentec.yoko.TabActivity;
 import com.fifteentec.yoko.TestActivity;
 
 import org.json.JSONException;
@@ -147,7 +148,7 @@ public class UserServer {
             @Override
             public void run() {
                 Intent intent = new Intent(activity,
-                        (this.getResponse() == null) ? LoginActivity.class : TestActivity.class);
+                        (this.getResponse() == null) ? LoginActivity.class : TabActivity.class);
                 activity.startActivity(intent);
             }
         }, activity.getRequestQueue(), null);
@@ -181,8 +182,10 @@ public class UserServer {
                                     Toast.LENGTH_LONG).show();
                             activity.getAuthTask().afterPostExecute(false, this.getResponse());
                         } else {
+/*
                             Toast.makeText(activity.getApplicationContext(), "登录成功!\n" + this.getResponse().toString(),
                                     Toast.LENGTH_LONG).show();
+*/
                             UserServer.getInstance().setAccessToken(APIKey.VALUE_ACCESS_TONEN_HEADER_PREFIX +
                                     this.getResponse().getString(APIKey.KEY_ACCESS_TOKEN));
                             UserServer.getInstance().setRefreshToken(
@@ -191,7 +194,7 @@ public class UserServer {
                             UserServer.getInstance().setPassword(password);
 
                             Intent intent = new Intent(activity,
-                                    TestActivity.class);
+                                    TabActivity.class);
                             activity.startActivity(intent);
                             activity.getAuthTask().afterPostExecute(true, null);
                         }

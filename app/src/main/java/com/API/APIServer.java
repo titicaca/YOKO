@@ -32,8 +32,11 @@ public class APIServer {
     public final static int VALUE_NETWORK_CONNECTION_ERROR = -1;
     public final static int VALUE_BAD_REQUEST = 400;
     public final static int VALUE_UNAUTHORIZED = 401;
+    public final static int VALUE_NOT_FOUND = 404;
+    public final static int VALUE_METHOD_NOT_ALLOW = 405;
     public final static String STRING_ERROR_STATUS_CODE = "error_status_code";
     public final static String STRING_NETWORK_CONNECTION_ERROR = "无法连接到服务器";
+    public final static String STRING_REQUEST_FAIL = "请求失败";
 
     private static APIServer server = new APIServer();
 
@@ -55,6 +58,12 @@ public class APIServer {
             if (error.networkResponse != null) {
                 if (error.networkResponse.statusCode == VALUE_UNAUTHORIZED) {
                     requestAccessToken(request, queue);
+                } else {
+                    Toast.makeText(BaseActivity.getCurrentActivity().getApplicationContext(),
+                            STRING_REQUEST_FAIL,
+                            Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(BaseActivity.getCurrentActivity(), LoginActivity.class);
+                    BaseActivity.getCurrentActivity().startActivity(intent);
                 }
             } else {
                 try {

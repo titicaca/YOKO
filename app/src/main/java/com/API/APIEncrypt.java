@@ -65,6 +65,8 @@ public class APIEncrypt {
          */
         public static String encrypt(String seed, String cleartext) throws Exception {
             try {
+                if(cleartext == null)
+                    return null;
                 byte[] rawKey = getRawKey(seed.getBytes());
                 byte[] result = encrypt(rawKey, cleartext.getBytes());
                 return byteArrayToHexString(result);
@@ -79,6 +81,8 @@ public class APIEncrypt {
          */
         public static String decrypt(String seed, String encrypted) throws Exception {
             try {
+                if (encrypted == null)
+                    return null;
                 byte[] rawKey = getRawKey(seed.getBytes());
                 byte[] enc = hexStringToByteArray(encrypted);
                 byte[] result = decrypt(rawKey, enc);

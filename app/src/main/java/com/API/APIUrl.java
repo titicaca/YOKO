@@ -1,7 +1,7 @@
 package com.API;
 
 public class APIUrl {
-    private final static String URL_BASE = "http://192.168.0.110:8080";
+    private final static String URL_BASE = "http://192.168.1.107:8080";
 
     public final static String URL_LOGIN = URL_BASE + "/" + "oauth/token";
 
@@ -9,7 +9,7 @@ public class APIUrl {
 
     public final static String URL_CHANGE_PASSWORD = URL_BASE + "/" + "signup/user";
 
-    public final static String URL_REQUEST_USER_INFO = URL_BASE + "/" + "user";
+    public final static String URL_REQUEST_USER_INFO = URL_BASE + "/" + "user" + "/" + "userinfo";
 
     public final static String URL_DELETE_USER_INFO = URL_BASE + "/" + "home";
 
