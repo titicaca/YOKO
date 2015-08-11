@@ -6,17 +6,17 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 
-import com.Service.NetworkService;
+import com.Service.DataSyncService;
 import com.fifteentec.Component.User.UserServer;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 public class YOKOApplication extends Application {
-    Intent networkServiceIntent;
+    Intent dataSyncServiceIntent;
     public final static String applicationName = "YOKO";
 
-    public Intent getNetworkServiceIntent() {
-        return this.networkServiceIntent;
+    public Intent getDataSyncServiceIntent() {
+        return this.dataSyncServiceIntent;
     }
 
     @Override
@@ -26,8 +26,8 @@ public class YOKOApplication extends Application {
         /**
          * 开启数据上传服务器
          */
-        networkServiceIntent = new Intent(this, NetworkService.class);
-        startService(networkServiceIntent);
+        dataSyncServiceIntent = new Intent(this, DataSyncService.class);
+        startService(dataSyncServiceIntent);
         /**
          * 初始化universalImageLoader
          * todo 请自定义初始化设置
@@ -46,7 +46,7 @@ public class YOKOApplication extends Application {
         /**
          * 关闭数据上传服务器
          */
-        stopService(networkServiceIntent);
+        stopService(dataSyncServiceIntent);
         super.onTerminate();
     }
 

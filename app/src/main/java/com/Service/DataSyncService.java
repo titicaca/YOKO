@@ -6,16 +6,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
+import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
 import com.API.APIServer;
 import com.Common.NetworkState;
 import com.Database.DBManager;
+import com.Database.FriendRecord;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 
-public class NetworkService extends Service{
+import java.util.List;
+
+public class DataSyncService extends Service {
     private APIServer apiServer;
     private RequestQueue requestQueue;
     private DBManager dbManager;
@@ -69,13 +73,23 @@ public class NetworkService extends Service{
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.v("Network Service", "start");
+        Log.v("Data Sync Service", "start");
         return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        //todo
-        return null;
+        return new DataSyncServiceBinder();
+    }
+
+    public class DataSyncServiceBinder extends Binder {
+        public void SyncFriend(List<FriendRecord> friendRecords) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    //todo
+                }
+            }).start();
+        }
     }
 }

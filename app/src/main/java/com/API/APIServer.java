@@ -189,7 +189,7 @@ public class APIServer {
                         Iterator<String> keys = params.keys();
 
                         while (keys.hasNext()) {
-                            String key = (String) keys.next();
+                            String key = keys.next();
                             String value = null;
 
                             try {
@@ -582,7 +582,7 @@ public class APIServer {
 
         headers.put(APIKey.KEY_AUTHORIZATION, APIKey.VALUE_REQUEST_TOKEN);
         headers.put(APIKey.KEY_ACCEPT, APIKey.VALUE_ACCEPT);
-        APIServer.AccessTokenPost accessTokenPost = new APIServer.AccessTokenPost(APIUrl.URL_REQUEST_TOKEN,
+        new APIServer.AccessTokenPost(APIUrl.URL_REQUEST_TOKEN,
                 params, headers, new APIJsonCallbackResponse() {
             @Override
             public void run() {
@@ -606,9 +606,7 @@ public class APIServer {
                     }
                 }
             }
-        }, queue, null);
-
-        accessTokenPost.send();
+        }, queue, null).send();
     }
 
     /**
@@ -634,7 +632,7 @@ public class APIServer {
         headers.put(APIKey.KEY_AUTHORIZATION, APIKey.VALUE_REQUEST_TOKEN);
         headers.put(APIKey.KEY_ACCEPT, APIKey.VALUE_ACCEPT);
 
-        APIServer.TokenPost tokenPost = new APIServer.TokenPost(APIUrl.URL_REQUEST_TOKEN,
+        new APIServer.TokenPost(APIUrl.URL_REQUEST_TOKEN,
                 params, headers, new APIJsonCallbackResponse() {
             @Override
             public void run() {
@@ -661,8 +659,6 @@ public class APIServer {
                     }
                 }
             }
-        }, queue, null);
-
-        tokenPost.send();
+        }, queue, null).send();
     }
 }
