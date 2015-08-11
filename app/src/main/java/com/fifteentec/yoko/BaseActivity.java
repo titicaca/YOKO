@@ -16,7 +16,7 @@ import com.Service.DataSyncService.DataSyncServiceBinder;
 public abstract class BaseActivity extends Activity {
     protected RequestQueue requestQueue;
     protected DBManager dbManager;
-    private static Activity curActivity = null;
+    private static BaseActivity curActivity = null;
     private DataSyncServiceBinder dataSyncServiceBinder = null;
 
     private ServiceConnection dataSyncServiceConnection = new ServiceConnection() {
@@ -98,11 +98,11 @@ public abstract class BaseActivity extends Activity {
         super.onDestroy();
     }
 
-    public static Activity getCurrentActivity() {
+    public static BaseActivity getCurrentActivity() {
         return curActivity;
     }
 
-    public static void setCurrentActivity(Activity activity) {
+    public static void setCurrentActivity(BaseActivity activity) {
         curActivity = activity;
     }
 

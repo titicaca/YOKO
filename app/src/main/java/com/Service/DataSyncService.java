@@ -83,7 +83,7 @@ public class DataSyncService extends Service {
     }
 
     public class DataSyncServiceBinder extends Binder {
-        public void SyncFriend(List<FriendRecord> friendRecords) {
+        public void syncFriend(List<FriendRecord> friendRecords) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
