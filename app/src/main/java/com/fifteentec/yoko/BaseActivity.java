@@ -1,17 +1,35 @@
 package com.fifteentec.yoko;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 
 import com.Database.DBManager;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import com.Service.DataSyncService.DataSyncServiceBinder;
 
 public abstract class BaseActivity extends Activity {
     protected RequestQueue requestQueue;
     protected DBManager dbManager;
     private static Activity curActivity = null;
+    private DataSyncServiceBinder dataSyncServiceBinder = null;
+
+    private ServiceConnection dataSyncServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            dataSyncServiceBinder = (DataSyncServiceBinder)service;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            dataSyncServiceBinder = null;
+        }
+    };
 
     public RequestQueue getRequestQueue() {
         return this.requestQueue;
@@ -21,9 +39,8 @@ public abstract class BaseActivity extends Activity {
         return this.dbManager;
     }
 
-    public Intent getServiceIntent() {
-        YOKOApplication application = (YOKOApplication) this.getApplication();
-        return application.getNetworkServiceIntent();
+    public DataSyncServiceBinder getDataSyncServiceBinder() {
+        return this.dataSyncServiceBinder;
     }
 
     @Override
@@ -53,12 +70,17 @@ public abstract class BaseActivity extends Activity {
 
     @Override
     protected void onResume() {
-        setCurrentActivity(this);
         super.onResume();
+        setCurrentActivity(this);
+
+        Intent intent = ((YOKOApplication)this.getApplication()).getDataSyncServiceIntent();
+        bindService(intent, dataSyncServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
     protected void onPause() {
+        unbindService(dataSyncServiceConnection);
+
         setCurrentActivity(null);
         super.onPause();
     }
@@ -83,4 +105,5 @@ public abstract class BaseActivity extends Activity {
     public static void setCurrentActivity(Activity activity) {
         curActivity = activity;
     }
+
 }
