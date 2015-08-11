@@ -65,20 +65,20 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
                         Toast.LENGTH_SHORT);
                 b.setDuration(Toast.LENGTH_SHORT);
                 b.show();
-                //Ϊ�˲���testfragment�������滻��friendsFragment
-//                if (null == tf) {
-//                    tf = new TestFragment();
-//                    mFmTrans.add(R.id.id_content, tf, "frd");
-//                } else {
-//                    mFmTrans.show(tf);
-//                }
-
-                if (friendsFragment == null) {
-                    friendsFragment = new FriendsFragment();
-                    mFmTrans.add(R.id.id_content, friendsFragment, "cal");
+                //testfragment  &  friendsFragment
+                if (null == tf) {
+                    tf = new TestFragment();
+                    mFmTrans.add(R.id.id_content, tf, "frd");
                 } else {
-                    mFmTrans.show(friendsFragment);
+                    mFmTrans.show(tf);
                 }
+
+//                if (friendsFragment == null) {
+//                    friendsFragment = new FriendsFragment();
+//                    mFmTrans.add(R.id.id_content, friendsFragment, "cal");
+//                } else {
+//                    mFmTrans.show(friendsFragment);
+//                }
 
 
                 break;

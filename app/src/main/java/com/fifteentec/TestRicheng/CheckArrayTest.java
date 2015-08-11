@@ -7,5 +7,8 @@ public class CheckArrayTest {
 
     public int w;
     public int h;
+    public int isMoveorClick;
+    public int top;
+    public int bottom;
 
 }

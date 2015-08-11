@@ -8,7 +8,6 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.os.Build;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,11 +30,19 @@ public class DrawCanvasViewgroupTest extends ViewGroup implements View.OnLongCli
     private Paint paint = null;
     public float downX;
     public float downY;
+    public float downViewY;
     public int[] s = new int[0];
     public ArrayList<CheckArrayTest> list = new ArrayList<CheckArrayTest>();
     public int clickw;
     public int clickh;
     public boolean isAdd = false;
+    //移动时的坐标
+    private int leftP;
+    private int topP;
+    private int rightP;
+    private int bottomP;
+    //按下时删除list的位置
+    private int pressListpositon;
 
     public DrawCanvasViewgroupTest(Context context) {
         super(context);
@@ -59,8 +66,11 @@ public class DrawCanvasViewgroupTest extends ViewGroup implements View.OnLongCli
         screenHeight = getResources().getDisplayMetrics().heightPixels - 40;
         screenWidth = getResources().getDisplayMetrics().widthPixels;
         drawCanvasTest = new DrawCanvasTest(getContext());
+//        drawCanvasTest.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         addView(drawCanvasTest);
         dragScaleView = new DragScaleView(getContext());
+        //关闭view的硬件加速   并不好用。。。
+//        dragScaleView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         dragScaleView.setVisibility(View.INVISIBLE);
         addView(dragScaleView);
     }
@@ -161,7 +171,6 @@ public class DrawCanvasViewgroupTest extends ViewGroup implements View.OnLongCli
 
 
         public DrawCanvasTest(Context context) {
-
             super(context);
             setOnTouchListener(DrawCanvasTest.this);
             setOnClickListener(DrawCanvasTest.this);
@@ -196,6 +205,12 @@ public class DrawCanvasViewgroupTest extends ViewGroup implements View.OnLongCli
             paint = new Paint();
         }
 
+        public void initOnDraw() {
+            invalidate();
+            forceLayout();
+            requestLayout();
+        }
+
         @Override
         protected void onDraw(Canvas canvas) {
             super.onDraw(canvas);
@@ -224,9 +239,16 @@ public class DrawCanvasViewgroupTest extends ViewGroup implements View.OnLongCli
                 p.setStrokeWidth(1);
                 p.setStyle(Paint.Style.FILL);
                 for (int i = 0; i < list.size(); i++) {
-                    int wCount = list.get(i).h;
-                    int hCount = list.get(i).w;
-                    canvas.drawRect(wCount * screenWidth / 7, hCount * screenHeight / 23, (wCount + 1) * screenWidth / 7, (hCount + 1) * screenHeight / 23, p);
+                    if (list.get(i).isMoveorClick == 0) {
+                        int wCount = list.get(i).h;
+                        int hCount = list.get(i).w;
+                        canvas.drawRect(wCount * screenWidth / 7, hCount * screenHeight / 23, (wCount + 1) * screenWidth / 7, (hCount + 1) * screenHeight / 23, p);
+                    } else {
+                        int wCount = list.get(i).w;
+                        int top = list.get(i).top;
+                        int bottom = list.get(i).bottom;
+                        canvas.drawRect(wCount * screenWidth / 7, top, (wCount + 1) * screenWidth / 7, bottom, p);
+                    }
                 }
             }
 
@@ -247,6 +269,7 @@ public class DrawCanvasViewgroupTest extends ViewGroup implements View.OnLongCli
                     Toast.makeText(getContext(), "wangge", Toast.LENGTH_SHORT).show();
                     downX = event.getRawX();
                     downY = event.getRawY() - 60;
+                    downViewY = event.getY();
                     break;
             }
             return false;
@@ -255,12 +278,9 @@ public class DrawCanvasViewgroupTest extends ViewGroup implements View.OnLongCli
         @Override
         public boolean onLongClick(View v) {
             if (list.size() != 0) {
-
-
                 Toast.makeText(getContext(), "changan", Toast.LENGTH_SHORT).show();
                 isLongClick = true;
                 for (int i = 0; i < 7; i++) {
-
                     float widLeft = screenWidth / 7 * i;
                     float widRight = screenWidth / 7 * (i + 1);
                     if (widLeft < downX && downX < widRight) {
@@ -277,17 +297,25 @@ public class DrawCanvasViewgroupTest extends ViewGroup implements View.OnLongCli
                 }
 
                 for (int k = 0; k < list.size(); k++) {
-                    if (list.get(k).w == clickh && list.get(k).h == clickw) {
-
-//                        ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) dragScaleView.getLayoutParams();
-//                        params.setMargins(clickw * screenWidth / 7, clickh * screenHeight / 23, (clickw + 1) * screenWidth / 7, (clickw + 1) * screenHeight / 23);// 通过自定义坐标来放置你的控件
-//                        dragScaleView.setLayoutParams(params);
-                        int wCount = list.get(k).h;
-                        int hCount = list.get(k).w;
-                        dragScaleView.layout(wCount * screenWidth / 7, hCount * screenHeight / 23, (wCount + 1) * screenWidth / 7, (hCount + 1) * screenHeight / 23);
-                        dragScaleView.setVisibility(View.VISIBLE);
-//                        list.remove(k);
-                        break;
+                    if (list.get(k).isMoveorClick == 0) {
+                        if (list.get(k).w == clickh && list.get(k).h == clickw) {
+                            int wCount = list.get(k).h;
+                            int hCount = list.get(k).w;
+                            pressListpositon = k;
+                            dragScaleView.layout(wCount * screenWidth / 7, hCount * screenHeight / 23, (wCount + 1) * screenWidth / 7, (hCount + 1) * screenHeight / 23);
+                            dragScaleView.setVisibility(View.VISIBLE);
+                            break;
+                        }
+                    } else {
+                        if (list.get(k).w == clickw && list.get(k).top - downY < 30) {
+                            Toast.makeText(getContext(), "是我要的方块区域", Toast.LENGTH_SHORT).show();
+                            int wCount = list.get(k).w;
+                            pressListpositon = k;
+                            dragScaleView.layout(wCount * screenWidth / 7, list.get(k).top, (wCount + 1) * screenWidth / 7, list.get(k).bottom);
+                            dragScaleView.setVisibility(View.VISIBLE);
+                        } else {
+                            Toast.makeText(getContext(), "此处为空白区域", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 }
             }
@@ -321,8 +349,9 @@ public class DrawCanvasViewgroupTest extends ViewGroup implements View.OnLongCli
 
                 if (list.size() == 0) {
                     CheckArrayTest catest = new CheckArrayTest();
-                    catest.h = clickh;
-                    catest.w = clickw;
+                    catest.h = clickw;
+                    catest.w = clickh;
+                    catest.isMoveorClick = 0;
                     list.add(catest);
                     invalidate();
                 } else {
@@ -338,6 +367,7 @@ public class DrawCanvasViewgroupTest extends ViewGroup implements View.OnLongCli
                         CheckArrayTest catest = new CheckArrayTest();
                         catest.h = clickw;
                         catest.w = clickh;
+                        catest.isMoveorClick = 0;
                         list.add(catest);
                         invalidate();
                         isAdd = false;
@@ -371,12 +401,15 @@ public class DrawCanvasViewgroupTest extends ViewGroup implements View.OnLongCli
         private int hCount;
         protected Paint paint = new Paint();
 
+
         /**
          * 初始化获取屏幕宽高
          */
         protected void initScreenW_H() {
             screenHeight = getResources().getDisplayMetrics().heightPixels - 40;
             screenWidth = getResources().getDisplayMetrics().widthPixels;
+//            topEnd = screenHeight / 23;
+//            bottomEnd = 2 * screenHeight / 23;
         }
 
         public DragScaleView(Context context, AttributeSet attrs, int defStyle) {
@@ -422,6 +455,8 @@ public class DrawCanvasViewgroupTest extends ViewGroup implements View.OnLongCli
                 downY = event.getRawY() - 60;
                 dragDirection = getDirection(v, (int) event.getX(),
                         (int) event.getY());
+                list.remove(pressListpositon);
+                dragScaleView.invalidate();
             }
             // 处理拖动事件
             delDrag(v, event, action);
@@ -457,23 +492,10 @@ public class DrawCanvasViewgroupTest extends ViewGroup implements View.OnLongCli
                 bottom = screenHeight + offset;
                 top = bottom - v.getHeight();
             }
-            int leftP = left % (screenWidth / 7);
-            int topP = left % (screenHeight / 23);
-            int rightP = left % (screenWidth / 7) + 1;
-            int bottomP = left % (screenHeight / 23) + 1;
-
-            Log.e("left", "" + left);
-            Log.e("top", "" + top);
-            Log.e("right", "" + right);
-            Log.e("bottom", "" + bottom);
-
-
-            Log.e("leftP", "" + leftP);
-            Log.e("topP", "" + topP);
-            Log.e("rightP", "" + rightP);
-            Log.e("bottomP", "" + bottomP);
-
-
+            leftP = left % (screenWidth / 7);
+            topP = top;
+            rightP = right % (screenWidth / 7) + 1;
+            bottomP = bottom;
             v.layout(left, top, right, bottom);
         }
 
@@ -487,6 +509,8 @@ public class DrawCanvasViewgroupTest extends ViewGroup implements View.OnLongCli
         protected void delDrag(View v, MotionEvent event, int action) {
             switch (action) {
                 case MotionEvent.ACTION_MOVE:
+                    //移动后的dx dy
+
                     int dx = (int) event.getRawX() - lastX;
                     int dy = (int) event.getRawY() - lastY;
                     switch (dragDirection) {
@@ -529,8 +553,38 @@ public class DrawCanvasViewgroupTest extends ViewGroup implements View.OnLongCli
                     lastY = (int) event.getRawY();
                     break;
                 case MotionEvent.ACTION_UP:
+                    int upX = (int) event.getRawX();
+                    int upY = (int) event.getRawY();
+                    for (int i = 0; i < 7; i++) {
+                        float widLeft = screenWidth / 7 * i;
+                        float widRight = screenWidth / 7 * (i + 1);
+                        if (widLeft < upX && upX < widRight) {
+                            for (int j = 0; j < 23; j++) {
+                                float heiUp = screenHeight / 23 * j;
+                                float heiDown = screenHeight / 23 * (j + 1);
+                                if (heiUp < upY && upY < heiDown) {
+                                    //控制在哪一个格子
+                                    clickh = j - 1;
+                                    clickw = i;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (dragDirection == CENTER) {
+//                        v.layout(oriLeft, oriTop, oriRight, oriBottom);
+//                    } else {
+                        v.layout(clickw * screenWidth / 7, topP, (clickw + 1) * screenWidth / 7, bottomP);
+                    }
                     dragDirection = 0;
-
+                    CheckArrayTest checkArrayTest = new CheckArrayTest();
+                    checkArrayTest.top = topP;
+                    checkArrayTest.bottom = bottomP;
+                    checkArrayTest.isMoveorClick = 1;
+                    checkArrayTest.w = clickw;
+                    list.add(pressListpositon, checkArrayTest);
+//                    new DrawCanvasTest(getContext()).initOnDraw();
+                    dragScaleView.invalidate();
                     break;
             }
         }
@@ -613,28 +667,28 @@ public class DrawCanvasViewgroupTest extends ViewGroup implements View.OnLongCli
             int right = v.getRight();
             int bottom = v.getBottom();
             int top = v.getTop();
-            if (x < 40 && y < 40) {
-                return LEFT_TOP;
-            }
-            if (y < 40 && right - left - x < 40) {
-                return RIGHT_TOP;
-            }
-            if (x < 40 && bottom - top - y < 40) {
-                return LEFT_BOTTOM;
-            }
-            if (right - left - x < 40 && bottom - top - y < 40) {
-                return RIGHT_BOTTOM;
-            }
-            if (x < 40) {
-                return LEFT;
-            }
-            if (y < 33) {
+//            if (x < 40 && y < 40) {
+//                return LEFT_TOP;
+//            }
+//            if (y < 40 && right - left - x < 40) {
+//                return RIGHT_TOP;
+//            }
+//            if (x < 40 && bottom - top - y < 40) {
+//                return LEFT_BOTTOM;
+//            }
+//            if (right - left - x < 40 && bottom - top - y < 40) {
+//                return RIGHT_BOTTOM;
+//            }
+//            if (x < 40) {
+//                return LEFT;
+//            }
+            if (y < 10) {
                 return TOP;
             }
-            if (right - left - x < 40) {
-                return RIGHT;
-            }
-            if (bottom - top - y < 33) {
+//            if (right - left - x < 40) {
+//                return RIGHT;
+//            }
+            if (bottom - top - y < 10) {
                 return BOTTOM;
             }
             return CENTER;
