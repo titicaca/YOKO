@@ -9,12 +9,12 @@ public class DBHelper extends SQLiteOpenHelper {
     private final static String DATABASE_NAME = "YOKO_DB";
     private final static int DATABASE_VERSION = 1;
 
-    public final static String TABLE_FRIEND = "friend";
-    public final static String FRIEND_ID = "_id";
-    public final static String FRIEND_UID = "uid";
-    public final static String FRIEND_FUID = "fuid";
-    public final static String FRIEND_TAGID = "tagId";
-    public final static String FRIEND_TAGNAME = "tagName";
+    public final static String TABLE_FRIEND_TAG = "friend_tag";
+    public final static String COLUMN_FRIEND_TAG_RID = "_id";
+    public final static String COLUMN_FRIEND_TAG_UID = "uid";
+    public final static String COLUMN_FRIEND_TAG_FUID = "fuid";
+    public final static String COLUMN_FRIEND_TAG_TAGID = "tagId";
+    public final static String COLUMN_FRIEND_TAG_TAGNAME = "tagName";
 
     public DBHelper(Context context) {
         //CursorFactory设置为null,使用默认值
@@ -32,12 +32,12 @@ public class DBHelper extends SQLiteOpenHelper {
          * 第四列是tagId，为朋友标签所属tag的id
          * 第五列是tagName，为该标签的名称
          */
-        db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_FRIEND +
-                "(" + FRIEND_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                FRIEND_UID + " CHAR(20), " +
-                FRIEND_FUID + " CHAR(20), " +
-                FRIEND_TAGID + " CHAR(20)," +
-                FRIEND_TAGNAME + " CHAR(255)" +
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_FRIEND_TAG +
+                "(" + COLUMN_FRIEND_TAG_RID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_FRIEND_TAG_UID + " INT8, " +
+                COLUMN_FRIEND_TAG_FUID + " INT8, " +
+                COLUMN_FRIEND_TAG_TAGID + " INT8," +
+                COLUMN_FRIEND_TAG_TAGNAME + " CHAR(255)" +
                 ")");
     }
 

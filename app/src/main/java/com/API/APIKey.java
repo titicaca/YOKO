@@ -26,5 +26,8 @@ public class APIKey {
 
     public final static String KEY_PHONE = "phone";
 
+    public final static String KEY_BAIDUPUSH_USERID = "userId";
+    public final static String KEY_BAIDUPUSH_CHANNELID = "channelId";
+
     public final static String VALUE_AES_SEED_PASSWORD = "YW5kxcm9TpSZC15w2b2tvOrjEyMzQ1Ng3";
 }

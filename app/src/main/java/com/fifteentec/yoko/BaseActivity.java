@@ -17,7 +17,7 @@ import com.Service.DataSyncService.DataSyncServiceBinder;
 public abstract class BaseActivity extends Activity {
     protected RequestQueue requestQueue;
     protected DBManager dbManager;
-    private static BaseActivity curActivity = null;
+    private static BaseActivity curActivity;
     private DataSyncServiceBinder dataSyncServiceBinder = null;
 
     private ServiceConnection dataSyncServiceConnection = new ServiceConnection() {

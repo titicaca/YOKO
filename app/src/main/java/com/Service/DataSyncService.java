@@ -10,17 +10,18 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.API.APIJsonCallbackResponse;
 import com.API.APIServer;
+import com.API.APIUrl;
 import com.Common.NetworkState;
 import com.Database.DBManager;
-import com.Database.FriendRecord;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import com.fifteentec.Component.User.UserServer;
 
-import java.util.List;
+import org.json.JSONObject;
 
 public class DataSyncService extends Service {
-    private APIServer apiServer;
     private RequestQueue requestQueue;
     private DBManager dbManager;
 
@@ -44,8 +45,6 @@ public class DataSyncService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        //获取API服务器对象
-        apiServer = APIServer.getInstance();
         //获取Volley发送队列
         requestQueue = Volley.newRequestQueue(this);
         //获取数据库对象
@@ -83,11 +82,22 @@ public class DataSyncService extends Service {
     }
 
     public class DataSyncServiceBinder extends Binder {
-        public void syncFriend(List<FriendRecord> friendRecords) {
+        public void uploadBaiduPushIdentification() {
+            //todo
+        }
+
+        public void syncFriends() {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    //todo
+                    JSONObject param = new JSONObject();
+                    new APIServer.JsonPost(APIUrl.URL_SYNC_FRIENDS, param, null, new APIJsonCallbackResponse(){
+                        @Override
+                        public void run() {
+                            //todo
+                            dbManager.getTableFriendTag().syncUser(0, null);
+                        }
+                    }, requestQueue, null).send();
                 }
             }).start();
         }

@@ -15,6 +15,10 @@ public class APIUrl {
 
     public final static String URL_REQUEST_TOKEN = URL_BASE + "/" + "oauth/token";
 
+    public final static String URL_UPLOAD_BAIDUPUSH_USER_INFO = URL_BASE + "/" + "";
+
+    public final static String URL_SYNC_FRIENDS = URL_BASE + "/" + "";
+
     private final static String URL_DOWNLOAD_BASE = "";
 
     public final static String URL_AUDIO_DOWNLOAD = URL_DOWNLOAD_BASE + "/" + "";
