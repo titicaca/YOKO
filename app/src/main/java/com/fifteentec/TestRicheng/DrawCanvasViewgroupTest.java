@@ -206,6 +206,7 @@ public class DrawCanvasViewgroupTest extends ViewGroup implements View.OnLongCli
         }
 
         public void initOnDraw() {
+            //在view外invalidate时，需要禁用硬件加速
             invalidate();
             forceLayout();
             requestLayout();
@@ -313,6 +314,7 @@ public class DrawCanvasViewgroupTest extends ViewGroup implements View.OnLongCli
                             pressListpositon = k;
                             dragScaleView.layout(wCount * screenWidth / 7, list.get(k).top, (wCount + 1) * screenWidth / 7, list.get(k).bottom);
                             dragScaleView.setVisibility(View.VISIBLE);
+                            break;
                         } else {
                             Toast.makeText(getContext(), "此处为空白区域", Toast.LENGTH_SHORT).show();
                         }

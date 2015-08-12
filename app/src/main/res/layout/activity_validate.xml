@@ -24,7 +24,7 @@
             android:checked="true"
             android:text="@string/string_register" />
 
-        <EditText
+        <AutoCompleteTextView
             android:id="@+id/validate_input_phone_et"
             android:layout_width="280dp"
             android:layout_height="wrap_content"

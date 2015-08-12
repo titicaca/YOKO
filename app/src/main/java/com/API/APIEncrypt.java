@@ -1,7 +1,6 @@
 package com.API;
 
 import java.security.InvalidKeyException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
@@ -45,6 +44,8 @@ public class APIEncrypt {
 
     public static class MD5 {
         public static String encode(String origin) throws Exception {
+            return  origin;
+            /*
             String resultString = null;
 
             try {
@@ -56,6 +57,7 @@ public class APIEncrypt {
                 e.printStackTrace();
             }
             return resultString;
+            /**/
         }
     }
 

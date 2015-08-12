@@ -33,7 +33,7 @@ public class JsonParsing implements Serializable {
         if (null == jsonObject) {
             return;
         }
-        JSONArray jsonArray = jsonObject.getJSONArray("allfriends");
+        JSONArray jsonArray = jsonObject.getJSONArray("list");
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject json = jsonArray.optJSONObject(i);
             JsonParsing jp = new JsonParsing();
