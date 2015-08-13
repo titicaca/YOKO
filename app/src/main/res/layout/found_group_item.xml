@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <ImageView
+        android:id="@+id/group_logo"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/me_head_bg"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="8dp"
+        />
+    <com.fifteentec.item.CircularImage
+        android:id="@+id/cover_group_logo"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="8dp"
+        android:visibility="visible"
+        />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_toRightOf="@id/group_logo"
+        android:orientation="vertical">>
+
+        <TextView
+            android:text="default_name"
+            android:id="@+id/group_name"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:gravity="center_vertical"
+            android:textSize="18sp"
+            android:layout_gravity="center_vertical"
+            />
+
+        <TextView
+            android:text="default_intro"
+            android:id="@+id/group_intro"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:textSize="12dip"
+            android:textColor="@color/gray"
+            android:gravity="bottom"
+            android:layout_gravity="top"
+            />
+    </LinearLayout>
+
+</RelativeLayout>

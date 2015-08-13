@@ -17,4 +17,18 @@
     <string name="updated_at">上次更新于%1$s前</string>
     <string name="updated_just_now">刚刚更新</string>
     <string name="time_error">时间有问题</string>
+    <string name="joined">已关注</string>
+    <string name="recommended">推荐</string>
+    <string name="join">关注</string>
+    <string name="intro">内容简介：</string>
+    <string name="time">时间：</string>
+    <string name="location">地点：</string>
+    <string name="takepart">参加</string>
+    <string name="sendtimelabel">发送于</string>
+    <string name="refuse">拒绝</string>
+    <string name="accept">接受</string>
+    <string name="argue">再议</string>
+    <string name="cancel">取消</string>
+    <string name="check">查看回执</string>
+    <string name="briefIntro">简介</string>
 </resources>

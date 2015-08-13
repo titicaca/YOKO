@@ -1,4 +1,4 @@
-package com.fifteentec.item;
+package com.fifteentec.Adapter.commonAdapter;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -126,4 +126,5 @@ public abstract class FragmentPagerAdapter extends PagerAdapter {
     private static String makeFragmentName(int viewId, long id) {
         return "android:switcher:" + viewId + ":" + id;
     }
+
 }

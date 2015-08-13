@@ -5,8 +5,7 @@ package com.fifteentec.Adapter.commonAdapter;
  */
 import android.app.Fragment;
 import android.app.FragmentManager;
-
-import com.fifteentec.item.FragmentPagerAdapter;
+import android.support.v4.view.PagerAdapter;
 
 import java.util.ArrayList;
 
@@ -26,17 +25,21 @@ public class MyFragmentPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
+
         return fragmentsList.size();
     }
 
     @Override
     public Fragment getItem(int arg0) {
+
         return fragmentsList.get(arg0);
     }
 
     @Override
     public int getItemPosition(Object object) {
-        return super.getItemPosition(object);
+
+       // return super.getItemPosition(object);
+        return PagerAdapter.POSITION_NONE;
     }
 
 }

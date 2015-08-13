@@ -72,15 +72,13 @@ public class FoundFragment extends Fragment {
                 msg_box.setChecked(false);
                 mFragmentManager = FoundFragment.this.getFragmentManager();
                 FragmentTransaction mFmTrans= mFragmentManager.beginTransaction();
-                if(mMsgBoxFragment == null) {
-                    mMsgBoxFragment = new FoundMsgBoxFragment();
-                    mFmTrans.add(R.id.id_content, mMsgBoxFragment,"msg");
-                }else if(mFragmentManager.findFragmentByTag("msg")==null){
-                    mFmTrans.add(R.id.id_content, mMsgBoxFragment,"msg");
+
+                mMsgBoxFragment = new FoundMsgBoxFragment();
+                if(mFragmentManager.findFragmentByTag("msg")!=null){
+                    mFmTrans.remove(mFragmentManager.findFragmentByTag("msg"));
                 }
-                else{
-                    mFmTrans.show(mMsgBoxFragment);
-                }
+                    mFmTrans.add(R.id.id_content, mMsgBoxFragment,"msg");
+
                 mFmTrans.addToBackStack("msg");
                 mFmTrans.commit();
                 mFmTrans.hide(FoundFragment.this);
@@ -94,6 +92,9 @@ public class FoundFragment extends Fragment {
         tabActivity = (TextView) parentView.findViewById(R.id.tab_activity);
         tabFavorite = (TextView) parentView.findViewById(R.id.tab_favorite);
 
+        tabGroup.setOnClickListener(new MyOnClickListener(0));
+        tabActivity.setOnClickListener(new MyOnClickListener(1));
+        tabFavorite.setOnClickListener(new MyOnClickListener(2));
         bottomLine = (ImageView) parentView.findViewById(R.id.bottom_line);
         bottomLineWidth = bottomLine.getLayoutParams().width;
         DisplayMetrics dm = new DisplayMetrics();
@@ -151,7 +152,7 @@ public class FoundFragment extends Fragment {
                         tabActivity.setTextColor(resources.getColor(R.color.gray));
                     }
                     if (currIndex == 2) {
-                        animation = new TranslateAnimation(position_two,0, 0, 0);
+                        animation = new TranslateAnimation(position_two,offset, 0, 0);
                         tabFavorite.setTextColor(resources.getColor(R.color.gray));
                     }
                     tabGroup.setTextColor(resources.getColor(R.color.black));
@@ -175,8 +176,8 @@ public class FoundFragment extends Fragment {
                         tabActivity.setTextColor(resources.getColor(R.color.gray));
                     }
                     if (currIndex == 0) {
-                        animation = new TranslateAnimation(offset, position_two, 0, 0);
-                        tabGroup.setTextColor(resources.getColor(R.color.black));
+                        animation = new TranslateAnimation(offset,position_two, 0, 0);
+                        tabGroup.setTextColor(resources.getColor(R.color.gray));
                     }
                     tabFavorite.setTextColor(resources.getColor(R.color.black));
                     group_list.setText(resources.getString(R.string.button_favorite));
