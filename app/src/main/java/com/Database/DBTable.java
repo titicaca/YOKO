@@ -20,8 +20,6 @@ public abstract class DBTable {
 
     public abstract void createUniqueIndex();
 
-    public abstract void remoteSync();
-
     public void clear() {
         try {
             db.delete(tableName, null, null);
@@ -30,4 +28,5 @@ public abstract class DBTable {
         }
     }
 
+    public abstract void deleteUser(long uid);
 }

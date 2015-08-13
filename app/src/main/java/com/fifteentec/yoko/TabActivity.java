@@ -27,7 +27,7 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
         mbuttonfg = (TabButtonFragment) mFragmentManager.findFragmentById(R.id.tab_main_botton);
         mbuttonfg.setButton(this);
         TabSelector(R.integer.SelectorCal);
-
+        this.getDataSyncServiceBinder().syncFriends();
     }
 
 

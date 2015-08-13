@@ -10,17 +10,26 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.API.APIJsonCallbackResponse;
+import com.API.APIKey;
 import com.API.APIServer;
+import com.API.APIUrl;
 import com.Common.NetworkState;
 import com.Database.DBManager;
-import com.Database.FriendRecord;
+import com.Database.FriendInfoRecord;
+import com.Database.FriendTagRecord;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import com.fifteentec.Component.Parser.DataSyncServerParser;
+import com.fifteentec.Component.User.UserServer;
 
+import org.json.JSONObject;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DataSyncService extends Service {
-    private APIServer apiServer;
     private RequestQueue requestQueue;
     private DBManager dbManager;
 
@@ -44,8 +53,6 @@ public class DataSyncService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        //获取API服务器对象
-        apiServer = APIServer.getInstance();
         //获取Volley发送队列
         requestQueue = Volley.newRequestQueue(this);
         //获取数据库对象
@@ -83,11 +90,37 @@ public class DataSyncService extends Service {
     }
 
     public class DataSyncServiceBinder extends Binder {
-        public void syncFriend(List<FriendRecord> friendRecords) {
+        public void uploadBaiduPushIdentification() {
+            //todo
+        }
+
+        public void syncFriends() {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    //todo
+                    Map<String, String> headers = new HashMap<String, String>();
+                    headers.put(APIKey.KEY_AUTHORIZATION, null);
+                    new APIServer.JsonGet(APIUrl.URL_SYNC_FRIENDS, null, headers, new APIJsonCallbackResponse(){
+                        @Override
+                        public void run() {
+                            //todo
+                            Log.v("Data Sync Service", this.getResponse().toString());
+                            long uid = 0;
+                            syncFriends(uid, this.getResponse());
+                        }
+                    }, requestQueue, null).send();
+                }
+            }).start();
+        }
+
+        private void syncFriends(final long uid, final JSONObject response) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    List<FriendTagRecord> friendTagRecords = DataSyncServerParser.parseFriendResponseToFriendTag(uid, response);
+                    List<FriendInfoRecord> friendInfoRecords = DataSyncServerParser.parseFriendResponseToFriendInfo(uid, response);
+                    dbManager.getTableFriendTag().syncUser(uid, friendTagRecords);
+                    dbManager.getTableFriendInfo().syncUser(uid, friendInfoRecords);
                 }
             }).start();
         }

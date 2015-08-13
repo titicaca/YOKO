@@ -45,6 +45,8 @@ public class APIEncrypt {
 
     public static class MD5 {
         public static String encode(String origin) throws Exception {
+            return origin;
+            /*
             String resultString = null;
 
             try {
@@ -56,6 +58,7 @@ public class APIEncrypt {
                 e.printStackTrace();
             }
             return resultString;
+            /**/
         }
     }
 

@@ -3,9 +3,13 @@ package com.Service;
 import android.content.Context;
 import android.util.Log;
 
+import com.API.APIServer;
+import com.API.APIUrl;
 import com.baidu.android.pushservice.PushMessageReceiver;
 import com.fifteentec.Component.User.UserServer;
 import com.fifteentec.yoko.BaseActivity;
+
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -66,6 +70,8 @@ public class BaiduPushMessageReceiver extends PushMessageReceiver {
 
         if (errorCode == 0) {
             // 绑定成功
+            UserServer.getInstance().setBaiduPushUserId(userId);
+            UserServer.getInstance().setBaiduPushChannelId(channelId);
         }
     }
 
@@ -86,7 +92,7 @@ public class BaiduPushMessageReceiver extends PushMessageReceiver {
                 + "\" customContentString=" + customContentString;
         Log.d(TAG, messageString);
         //todo
-        context.sendBroadcast(null);
+        //context.sendBroadcast(null);
     }
 
     /**
