@@ -1,7 +1,10 @@
 package com.fifteentec.Fragment;
 
 
+import android.annotation.SuppressLint;
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -23,9 +26,12 @@ import java.util.List;
  * Created by cj on 2015/8/7.
  */
 public class FoundEvent extends Fragment {
-        private List<EventBrief> eventList = new ArrayList<EventBrief>();
-        private ListView events;
-        private EventAdapter eventAdapter;
+    private List<EventBrief> eventList = new ArrayList<EventBrief>();
+    private ListView events;
+    private EventAdapter eventAdapter;
+    private FoundEventItem eventItem;
+
+    private FragmentManager mFragmentManager;
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
@@ -42,8 +48,33 @@ public class FoundEvent extends Fragment {
             events.setAdapter(eventAdapter);
 
             events.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @SuppressLint("NewApi")
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    mFragmentManager = FoundEvent.this.getParentFragment().getFragmentManager();
+                    FragmentTransaction mFmTrans= mFragmentManager.beginTransaction();
+
+                    if(eventItem==null){
+                        eventItem = new FoundEventItem();
+                    }
+                    if(mFragmentManager.findFragmentByTag("eventItem")!=null){
+                        mFmTrans.remove(mFragmentManager.findFragmentByTag("eventItem"));
+                    }
+
+                    Bundle args = new Bundle();
+                    args.putString("name", eventList.get(position).getGroupName());
+                    args.putString("intro", eventList.get(position).getEventIntro());
+                    args.putString("uri", eventList.get(position).getLogoUri());
+                    args.putString("time", eventList.get(position).getTime());
+                    args.putString("location", eventList.get(position).getLocation());
+                    args.putString("tags", eventList.get(position).getTags());
+                    eventItem.setArguments(args);
+
+                    mFmTrans.add(R.id.id_content, eventItem, "eventItem");
+
+                    mFmTrans.addToBackStack("eventItem");
+                    mFmTrans.commit();
+                    mFmTrans.hide(FoundEvent.this.getParentFragment());
 
                 }
             });

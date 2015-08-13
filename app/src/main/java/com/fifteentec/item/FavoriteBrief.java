@@ -10,6 +10,7 @@ public class FavoriteBrief {
     private String eventUri="";
     private String time="";
     private String location="";
+    private String tags="";
 
     public String getGroupName(){
         return groupName;
@@ -26,6 +27,9 @@ public class FavoriteBrief {
     }
     public String getEventUri(){
         return eventUri;
+    }
+    public String getTags(){
+        return tags;
     }
 
     public void setGroupName(String name){
@@ -44,6 +48,9 @@ public class FavoriteBrief {
     }
     public void setEventUri(String uri){
         this.eventUri = uri;
+    }
+    public void setTags(String tags){
+        this.tags = tags;
     }
 
 }

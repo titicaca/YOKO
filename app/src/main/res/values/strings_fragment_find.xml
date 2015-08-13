@@ -27,8 +27,11 @@
     <string name="sendtimelabel">发送于</string>
     <string name="refuse">拒绝</string>
     <string name="accept">接受</string>
+    <string name="send">发送</string>
     <string name="argue">再议</string>
     <string name="cancel">取消</string>
     <string name="check">查看回执</string>
     <string name="briefIntro">简介</string>
+    <string name="eventDetail">内容详情:</string>
+    <string name="tags">标签1，标签2...</string>
 </resources>

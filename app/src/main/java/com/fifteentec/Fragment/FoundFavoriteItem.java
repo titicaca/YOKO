@@ -18,7 +18,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 /**
  * Created by cj on 2015/8/7.
  */
-public class FoundEventItem extends Fragment {
+public class FoundFavoriteItem extends Fragment {
     private ImageView logo;
     private TextView name;
     private TextView time;
@@ -32,12 +32,12 @@ public class FoundEventItem extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
         // TODO Auto-generated method stub
-        View view = inflater.inflate(R.layout.found_event_item_detail, null);
-        logo = (ImageView)view.findViewById(R.id.group_detail_event_logo);
-        intro = (TextView)view.findViewById(R.id.event_detail_content);
-        name = (TextView)view.findViewById(R.id.group_detail_event_name);
-        time = (TextView)view.findViewById(R.id.event_set_time);
-        location = (TextView)view.findViewById(R.id.event_set_location);
+        View view = inflater.inflate(R.layout.found_favorite_item_detail, null);
+        logo = (ImageView)view.findViewById(R.id.group_detail_event_logo2);
+        intro = (TextView)view.findViewById(R.id.event_detail_content2);
+        name = (TextView)view.findViewById(R.id.group_detail_event_name2);
+        time = (TextView)view.findViewById(R.id.event_set_time2);
+        location = (TextView)view.findViewById(R.id.event_set_location2);
 
         name.setText(getArguments().getString("name"));
         intro.setText(getArguments().getString("intro"));

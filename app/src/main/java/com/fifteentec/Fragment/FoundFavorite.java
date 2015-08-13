@@ -1,7 +1,10 @@
 package com.fifteentec.Fragment;
 
 
+import android.annotation.SuppressLint;
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -31,6 +34,9 @@ public class FoundFavorite extends Fragment {
     private FavoriteAdapter favoriteAdapter;
     private ImageView ivDeleteText;
     private EditText etSearch;
+    private FragmentManager mFragmentManager;
+    private FoundFavoriteItem favoriteItem;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -81,8 +87,33 @@ public class FoundFavorite extends Fragment {
         favorites.setAdapter(favoriteAdapter);
 
         favorites.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @SuppressLint("NewApi")
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                mFragmentManager = FoundFavorite.this.getParentFragment().getFragmentManager();
+                FragmentTransaction mFmTrans= mFragmentManager.beginTransaction();
+
+                if(favoriteItem==null){
+                    favoriteItem = new FoundFavoriteItem();
+                }
+                if(mFragmentManager.findFragmentByTag("favoriteItem")!=null){
+                    mFmTrans.remove(mFragmentManager.findFragmentByTag("favoriteItem"));
+                }
+
+                Bundle args = new Bundle();
+                args.putString("name", eventList.get(position).getGroupName());
+                args.putString("intro", eventList.get(position).getEventIntro());
+                args.putString("uri", eventList.get(position).getLogoUri());
+                args.putString("time", eventList.get(position).getTime());
+                args.putString("location", eventList.get(position).getLocation());
+                args.putString("tags", eventList.get(position).getTags());
+                favoriteItem.setArguments(args);
+
+                mFmTrans.add(R.id.id_content, favoriteItem, "eventItem");
+
+                mFmTrans.addToBackStack("eventItem");
+                mFmTrans.commit();
+                mFmTrans.hide(FoundFavorite.this.getParentFragment());
 
             }
         });
