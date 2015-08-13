@@ -1,12 +1,16 @@
 package com.fifteentec.yoko;
 
 import android.app.Application;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.os.IBinder;
 
 import com.Service.DataSyncService;
+import com.Service.DataSyncService.DataSyncServiceBinder;
 import com.baidu.android.pushservice.PushConstants;
 import com.baidu.android.pushservice.PushManager;
 import com.fifteentec.Component.User.UserServer;
@@ -18,8 +22,22 @@ public class YOKOApplication extends Application {
     public final static String applicationName = "YOKO";
     private final static String baiduPushApiKey = "DktSnpqB2wljcjOeIYW4f2BI";
 
-    public Intent getDataSyncServiceIntent() {
-        return this.dataSyncServiceIntent;
+    private DataSyncServiceBinder dataSyncServiceBinder;
+
+    private ServiceConnection dataSyncServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            dataSyncServiceBinder = (DataSyncServiceBinder)service;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            dataSyncServiceBinder = null;
+        }
+    };
+
+    public DataSyncServiceBinder getDataSyncServiceBinder() {
+        return this.dataSyncServiceBinder;
     }
 
     @Override
@@ -51,10 +69,14 @@ public class YOKOApplication extends Application {
          * 开启百度云推送服务器
          */
         PushManager.startWork(this, PushConstants.LOGIN_TYPE_API_KEY, baiduPushApiKey);
+
+        bindService(dataSyncServiceIntent, dataSyncServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
     public void onTerminate() {
+        unbindService(dataSyncServiceConnection);
+
         /**
          * 关闭百度云推送服务器
          */

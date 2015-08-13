@@ -11,15 +11,23 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.API.APIJsonCallbackResponse;
+import com.API.APIKey;
 import com.API.APIServer;
 import com.API.APIUrl;
 import com.Common.NetworkState;
 import com.Database.DBManager;
+import com.Database.FriendInfoRecord;
+import com.Database.FriendTagRecord;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import com.fifteentec.Component.Parser.DataSyncServerParser;
 import com.fifteentec.Component.User.UserServer;
 
 import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DataSyncService extends Service {
     private RequestQueue requestQueue;
@@ -90,14 +98,29 @@ public class DataSyncService extends Service {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    JSONObject param = new JSONObject();
-                    new APIServer.JsonPost(APIUrl.URL_SYNC_FRIENDS, param, null, new APIJsonCallbackResponse(){
+                    Map<String, String> headers = new HashMap<String, String>();
+                    headers.put(APIKey.KEY_AUTHORIZATION, null);
+                    new APIServer.JsonGet(APIUrl.URL_SYNC_FRIENDS, null, headers, new APIJsonCallbackResponse(){
                         @Override
                         public void run() {
                             //todo
-                            dbManager.getTableFriendTag().syncUser(0, null);
+                            Log.v("Data Sync Service", this.getResponse().toString());
+                            long uid = 0;
+                            syncFriends(uid, this.getResponse());
                         }
                     }, requestQueue, null).send();
+                }
+            }).start();
+        }
+
+        private void syncFriends(final long uid, final JSONObject response) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    List<FriendTagRecord> friendTagRecords = DataSyncServerParser.parseFriendResponseToFriendTag(uid, response);
+                    List<FriendInfoRecord> friendInfoRecords = DataSyncServerParser.parseFriendResponseToFriendInfo(uid, response);
+                    dbManager.getTableFriendTag().syncUser(uid, friendTagRecords);
+                    dbManager.getTableFriendInfo().syncUser(uid, friendInfoRecords);
                 }
             }).start();
         }

@@ -7,6 +7,7 @@ public class DBManager {
     private DBHelper dbHelper;
     private SQLiteDatabase db;
     private TableFriendTag tableFriendTag;
+    private TableFriendInfo tableFriendInfo;
 
     public DBManager(Context context) {
         dbHelper = new DBHelper(context);
@@ -14,6 +15,7 @@ public class DBManager {
         //所以要确保context已初始化,我们可以把实例化DBManager的步骤放在Activity的onCreate里
         db = dbHelper.getWritableDatabase();
         tableFriendTag = new TableFriendTag(db);
+        tableFriendInfo = new TableFriendInfo(db);
     }
 
     public void closeDB() {
@@ -22,5 +24,9 @@ public class DBManager {
 
     public TableFriendTag getTableFriendTag(){
         return this.tableFriendTag;
+    }
+
+    public TableFriendInfo getTableFriendInfo() {
+        return this.tableFriendInfo;
     }
 }

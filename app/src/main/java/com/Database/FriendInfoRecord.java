@@ -1,0 +1,64 @@
+package com.Database;
+
+/**
+ * Created by benbush on 15/8/13.
+ */
+public class FriendInfoRecord {
+    public int rid;
+    public long uid;
+    public long fuid;
+    public String email;
+    public String location;
+    public String mobile;
+    public String nickname;
+    public String picturelink;
+    public String qq;
+    public int sex;
+    public String wechat;
+    public String weibo;
+    public int collectionnumber;
+    public int enrollnumber;
+    public int friendnumber;
+
+    public FriendInfoRecord() {
+
+    }
+
+    public FriendInfoRecord(FriendInfoRecord friendInfoRecord) {
+        this.rid = friendInfoRecord.rid;
+        this.uid = friendInfoRecord.uid;
+        this.fuid = friendInfoRecord.fuid;
+        this.email = friendInfoRecord.email;
+        this.location = friendInfoRecord.location;
+        this.mobile = friendInfoRecord.mobile;
+        this.nickname = friendInfoRecord.nickname;
+        this.picturelink = friendInfoRecord.picturelink;
+        this.qq = friendInfoRecord.qq;
+        this.sex = friendInfoRecord.sex;
+        this.wechat = friendInfoRecord.wechat;
+        this.weibo = friendInfoRecord.weibo;
+        this.collectionnumber = friendInfoRecord.collectionnumber;
+        this.enrollnumber = friendInfoRecord.enrollnumber;
+        this.friendnumber = friendInfoRecord.friendnumber;
+    }
+
+    public FriendInfoRecord(long uid, long fuid, String email, String location,
+                            String mobile, String nickname, String picturelink,
+                            String qq, int sex, String wechat, String weibo,
+                            int collectionnumber, int enrollnumber, int friendnumber) {
+        this.uid = uid;
+        this.fuid = fuid;
+        this.email = email;
+        this.location = location;
+        this.mobile = mobile;
+        this.nickname = nickname;
+        this.picturelink = picturelink;
+        this.qq = qq;
+        this.sex = sex;
+        this.wechat = wechat;
+        this.weibo = weibo;
+        this.collectionnumber = collectionnumber;
+        this.enrollnumber = enrollnumber;
+        this.friendnumber = friendnumber;
+    }
+}

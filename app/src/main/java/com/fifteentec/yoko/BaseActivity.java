@@ -18,19 +18,6 @@ public abstract class BaseActivity extends Activity {
     protected RequestQueue requestQueue;
     protected DBManager dbManager;
     private static BaseActivity curActivity;
-    private DataSyncServiceBinder dataSyncServiceBinder = null;
-
-    private ServiceConnection dataSyncServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            dataSyncServiceBinder = (DataSyncServiceBinder)service;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            dataSyncServiceBinder = null;
-        }
-    };
 
     public RequestQueue getRequestQueue() {
         return this.requestQueue;
@@ -41,7 +28,7 @@ public abstract class BaseActivity extends Activity {
     }
 
     public DataSyncServiceBinder getDataSyncServiceBinder() {
-        return this.dataSyncServiceBinder;
+        return ((YOKOApplication)this.getApplication()).getDataSyncServiceBinder();
     }
 
     @Override
@@ -74,15 +61,10 @@ public abstract class BaseActivity extends Activity {
     protected void onResume() {
         super.onResume();
         setCurrentActivity(this);
-
-        Intent intent = ((YOKOApplication)this.getApplication()).getDataSyncServiceIntent();
-        bindService(intent, dataSyncServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
     protected void onPause() {
-        unbindService(dataSyncServiceConnection);
-
         setCurrentActivity(null);
         super.onPause();
     }
