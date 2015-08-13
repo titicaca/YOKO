@@ -104,6 +104,7 @@ public class DataSyncService extends Service {
                         @Override
                         public void run() {
                             //todo
+                            if (this.getResponse() == null) return;
                             Log.v("Data Sync Service", this.getResponse().toString());
                             long uid = 0;
                             syncFriends(uid, this.getResponse());
