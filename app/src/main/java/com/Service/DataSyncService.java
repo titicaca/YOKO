@@ -103,7 +103,6 @@ public class DataSyncService extends Service {
                     new APIServer.JsonGet(APIUrl.URL_SYNC_FRIENDS, null, headers, new APIJsonCallbackResponse(){
                         @Override
                         public void run() {
-                            //todo
                             if (this.getResponse() == null) return;
                             Log.v("Data Sync Service", this.getResponse().toString());
                             long uid = 0;
@@ -120,6 +119,31 @@ public class DataSyncService extends Service {
                 public void run() {
                     List<FriendTagRecord> friendTagRecords = DataSyncServerParser.parseFriendResponseToFriendTag(uid, response);
                     List<FriendInfoRecord> friendInfoRecords = DataSyncServerParser.parseFriendResponseToFriendInfo(uid, response);
+                    for (FriendTagRecord friendTagRecord : friendTagRecords) {
+                        Log.v("Data Sync Server", "friend tags: " + " rid = " + friendTagRecord.rid +
+                                                                    " uid = " + friendTagRecord.uid +
+                                                                    " fuid = " + friendTagRecord.fuid +
+                                                                    " tagid = " + friendTagRecord.tagId +
+                                                                    " tagname = " + friendTagRecord.tagName);
+                    }
+
+                    for (FriendInfoRecord friendInfoRecord : friendInfoRecords) {
+                        Log.v("Data Sync Server", "friends info: " + " rid = " + friendInfoRecord.rid +
+                                                                    " uid = " + friendInfoRecord.uid +
+                                                                    " fuid = " + friendInfoRecord.fuid +
+                                                                    " email = " + friendInfoRecord.email +
+                                                                    " location = " + friendInfoRecord.location +
+                                                                    " mobile = " + friendInfoRecord.mobile +
+                                                                    " nickname = " + friendInfoRecord.nickname +
+                                                                    " picturelink = " + friendInfoRecord.picturelink +
+                                                                    " qq = " + friendInfoRecord.qq +
+                                                                    " sex = " + friendInfoRecord.sex +
+                                                                    " wechat = " + friendInfoRecord.wechat +
+                                                                    " weibo = " + friendInfoRecord.weibo +
+                                                                    " collectnumber = " + friendInfoRecord.collectnumber +
+                                                                    " enrollnumber = " + friendInfoRecord.enrollnumber +
+                                                                    " friendnumber = " + friendInfoRecord.friendnumber);
+                    }
                     dbManager.getTableFriendTag().syncUser(uid, friendTagRecords);
                     dbManager.getTableFriendInfo().syncUser(uid, friendInfoRecords);
                 }

@@ -22,7 +22,12 @@ public class DataSyncServerParser {
             JSONArray friends = response.getJSONArray("list");
             for (int i = 0; i < friends.length(); ++i) {
                 JSONObject friend = (JSONObject)friends.get(i);
-                long fuid = friend.getLong("id");
+                long fuid;
+                if (friend.isNull("friend")) {
+                    fuid = 0;
+                } else {
+                    fuid = friend.getJSONObject("friend").getLong("id");
+                }
 
                 JSONArray tags = friend.getJSONArray("tags");
                 for (int j = 0; j < tags.length(); ++j) {
@@ -48,9 +53,10 @@ public class DataSyncServerParser {
             JSONArray friends = response.getJSONArray("list");
             for (int i = 0; i < friends.length(); ++i) {
                 JSONObject friend = (JSONObject)friends.get(i);
-                long fuid = friend.getLong("id");
 
-                JSONObject friendInfo = (JSONObject)friend.getJSONObject("friend");
+                if (friend.isNull("friend")) continue;
+                JSONObject friendInfo = friend.getJSONObject("friend");
+                long fuid = friendInfo.getLong("id");
                 String email = friendInfo.getString("email");
                 String location = friendInfo.getString("location");
                 String mobile = friendInfo.getString("mobile");
@@ -60,11 +66,11 @@ public class DataSyncServerParser {
                 int sex = friendInfo.getInt("sex");
                 String wechat = friendInfo.getString("wechat");
                 String weibo = friendInfo.getString("weibo");
-                int collectionnumber = friendInfo.getInt("collectionnumber");
+                int collectnumber = friendInfo.getInt("collectnumber");
                 int enrollnumber = friendInfo.getInt("enrollnumber");
                 int friendnumber = friendInfo.getInt("friendnumber");
 
-                FriendInfoRecord friendInfoRecord = new FriendInfoRecord(uid, fuid, email, location, mobile, nickname, picturelink, qq, sex, wechat, weibo, collectionnumber, enrollnumber, friendnumber);
+                FriendInfoRecord friendInfoRecord = new FriendInfoRecord(uid, fuid, email, location, mobile, nickname, picturelink, qq, sex, wechat, weibo, collectnumber, enrollnumber, friendnumber);
                 friendInfoRecords.add(friendInfoRecord);
             }
         } catch (JSONException e) {

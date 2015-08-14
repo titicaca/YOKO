@@ -80,7 +80,7 @@ public class TableFriendInfo extends DBTable {
             cv.put(DBConstants.COLUMN_FRIEND_INFO_SEX, friendInfoRecord.sex);
             cv.put(DBConstants.COLUMN_FRIEND_INFO_WECHAT, friendInfoRecord.wechat);
             cv.put(DBConstants.COLUMN_FRIEND_INFO_WEIBO, friendInfoRecord.weibo);
-            cv.put(DBConstants.COLUMN_FRIEND_INFO_COLLECTIONNUMBER, friendInfoRecord.collectionnumber);
+            cv.put(DBConstants.COLUMN_FRIEND_INFO_COLLECTNUMBER, friendInfoRecord.collectnumber);
             cv.put(DBConstants.COLUMN_FRIEND_INFO_ENROLLNUMBER, friendInfoRecord.enrollnumber);
             cv.put(DBConstants.COLUMN_FRIEND_INFO_FRIENDNUMBER, friendInfoRecord.friendnumber);
 
@@ -103,7 +103,7 @@ public class TableFriendInfo extends DBTable {
             db.execSQL("INSERT OR IGNORE INTO " + DBConstants.TABLE_FRIEND_INFO + "VALUES(NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     new Object[]{friendInfoRecord.uid, friendInfoRecord.fuid, friendInfoRecord.email, friendInfoRecord.location,
                                 friendInfoRecord.mobile, friendInfoRecord.nickname, friendInfoRecord.picturelink, friendInfoRecord.qq,
-                                friendInfoRecord.sex, friendInfoRecord.wechat, friendInfoRecord.weibo, friendInfoRecord.collectionnumber,
+                                friendInfoRecord.sex, friendInfoRecord.wechat, friendInfoRecord.weibo, friendInfoRecord.collectnumber,
                                 friendInfoRecord.enrollnumber, friendInfoRecord.friendnumber}
             );
 
@@ -170,7 +170,7 @@ public class TableFriendInfo extends DBTable {
         int column_index_sex = cs.getColumnIndex(DBConstants.COLUMN_FRIEND_INFO_SEX);
         int column_index_wechat = cs.getColumnIndex(DBConstants.COLUMN_FRIEND_INFO_WECHAT);
         int column_index_weibo = cs.getColumnIndex(DBConstants.COLUMN_FRIEND_INFO_WEIBO);
-        int column_index_collectionnumber = cs.getColumnIndex(DBConstants.COLUMN_FRIEND_INFO_COLLECTIONNUMBER);
+        int column_index_collectnumber = cs.getColumnIndex(DBConstants.COLUMN_FRIEND_INFO_COLLECTNUMBER);
         int column_index_enrollnumber = cs.getColumnIndex(DBConstants.COLUMN_FRIEND_INFO_ENROLLNUMBER);
         int column_index_friendnumber = cs.getColumnIndex(DBConstants.COLUMN_FRIEND_INFO_FRIENDNUMBER);
 
@@ -189,7 +189,7 @@ public class TableFriendInfo extends DBTable {
                 friendInfoRecord.sex = cs.getInt(column_index_sex);
                 friendInfoRecord.wechat = cs.getString(column_index_wechat);
                 friendInfoRecord.weibo = cs.getString(column_index_weibo);
-                friendInfoRecord.collectionnumber = cs.getInt(column_index_collectionnumber);
+                friendInfoRecord.collectnumber = cs.getInt(column_index_collectnumber);
                 friendInfoRecord.enrollnumber = cs.getInt(column_index_enrollnumber);
                 friendInfoRecord.friendnumber = cs.getInt(column_index_friendnumber);
                 friendInfoRecords.add(friendInfoRecord);
@@ -210,10 +210,10 @@ public class TableFriendInfo extends DBTable {
                     new String[]{String.valueOf(uid)});
 
             for (FriendInfoRecord friendInfoRecord : friendInfoRecords) {
-                db.execSQL("INSERT OR IGNORE INTO " + DBConstants.TABLE_FRIEND_INFO + "VALUES(NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                db.execSQL("INSERT OR IGNORE INTO " + DBConstants.TABLE_FRIEND_INFO + " VALUES(NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                         new Object[]{friendInfoRecord.uid, friendInfoRecord.fuid, friendInfoRecord.email, friendInfoRecord.location,
                                 friendInfoRecord.mobile, friendInfoRecord.nickname, friendInfoRecord.picturelink, friendInfoRecord.qq,
-                                friendInfoRecord.sex, friendInfoRecord.wechat, friendInfoRecord.weibo, friendInfoRecord.collectionnumber,
+                                friendInfoRecord.sex, friendInfoRecord.wechat, friendInfoRecord.weibo, friendInfoRecord.collectnumber,
                                 friendInfoRecord.enrollnumber, friendInfoRecord.friendnumber}
                 );
             }
