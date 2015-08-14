@@ -2,6 +2,7 @@ package com.Database;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +11,10 @@ import java.util.List;
  * Created by benbush on 15/8/14.
  */
 public class TableEvent extends DBTable {
+
+    public TableEvent(SQLiteDatabase db) {
+        super(db);
+    }
 
     @Override
     public void setTableName() {
