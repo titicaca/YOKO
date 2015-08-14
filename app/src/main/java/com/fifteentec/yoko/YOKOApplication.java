@@ -18,27 +18,9 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 public class YOKOApplication extends Application {
-    Intent dataSyncServiceIntent;
+    private static Intent dataSyncServiceIntent;
     public final static String applicationName = "YOKO";
     private final static String baiduPushApiKey = "DktSnpqB2wljcjOeIYW4f2BI";
-
-    private DataSyncServiceBinder dataSyncServiceBinder;
-
-    private ServiceConnection dataSyncServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            dataSyncServiceBinder = (DataSyncServiceBinder)service;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            dataSyncServiceBinder = null;
-        }
-    };
-
-    public DataSyncServiceBinder getDataSyncServiceBinder() {
-        return this.dataSyncServiceBinder;
-    }
 
     @Override
     public void onCreate() {
@@ -54,29 +36,25 @@ public class YOKOApplication extends Application {
         UserServer.getInstance().setApplication(this);
 
         /**
-         * 开启数据上传服务器
-         */
-        dataSyncServiceIntent = new Intent(this, DataSyncService.class);
-        startService(dataSyncServiceIntent);
-
-        /**
          * 初始化universalImageLoader
          * todo 请自定义初始化设置
          */
         ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(this));
 
         /**
+         * 开启数据上传服务器
+         */
+        dataSyncServiceIntent = new Intent(this, DataSyncService.class);
+        startService(dataSyncServiceIntent);
+
+        /**
          * 开启百度云推送服务器
          */
         PushManager.startWork(this, PushConstants.LOGIN_TYPE_API_KEY, baiduPushApiKey);
-
-        bindService(dataSyncServiceIntent, dataSyncServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
     public void onTerminate() {
-        unbindService(dataSyncServiceConnection);
-
         /**
          * 关闭百度云推送服务器
          */

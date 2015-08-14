@@ -26,7 +26,7 @@ public class DBConstants {
     public final static String COLUMN_FRIEND_INFO_SEX = "sex";
     public final static String COLUMN_FRIEND_INFO_WECHAT = "wechat";
     public final static String COLUMN_FRIEND_INFO_WEIBO = "weibo";
-    public final static String COLUMN_FRIEND_INFO_COLLECTIONNUMBER = "collectnumber";
+    public final static String COLUMN_FRIEND_INFO_COLLECTNUMBER = "collectnumber";
     public final static String COLUMN_FRIEND_INFO_ENROLLNUMBER = "enrollnumber";
     public final static String COLUMN_FRIEND_INFO_FRIENDNUMBER = "friendnumber";
 }
