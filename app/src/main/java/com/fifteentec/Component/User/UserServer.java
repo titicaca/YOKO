@@ -128,6 +128,18 @@ public class UserServer {
         return edit.commit();
     }
 
+    public boolean setBaiduPushUserId(final String userId) {
+        Editor edit = sp.edit();
+        edit.putString(APIKey.KEY_BAIDUPUSH_USERID, userId);
+        return edit.commit();
+    }
+
+    public boolean setBaiduPushChannelId(final String channelId) {
+        Editor edit = sp.edit();
+        edit.putString(APIKey.KEY_BAIDUPUSH_USERID, channelId);
+        return edit.commit();
+    }
+
     public void autoLogin(final BaseActivity activity) {
         if (access_token == null || refresh_token == null) {
             Intent intent = new Intent(activity, LoginActivity.class);

@@ -22,7 +22,6 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
 
     private TestFragment tf;
 
-
     @SuppressLint("NewApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,9 +31,13 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
         mbuttonfg = (TabButtonFragment) mFragmentManager.findFragmentById(R.id.tab_main_botton);
         mbuttonfg.setButton(this);
         TabSelector(R.integer.SelectorCal);
-
+        BaseActivity.getDataSyncServiceBinder().syncFriends();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
 
     @Override
     public void TabSelector(int id) {

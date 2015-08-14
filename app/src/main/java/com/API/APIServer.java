@@ -51,8 +51,8 @@ public class APIServer {
 
         @Override
         public void onErrorResponse(VolleyError error) {
-            Log.e("VolleyError", (error.networkResponse == null)
-                    ? "error.networkResponse = null"
+            Log.v("VolleyError", (error.networkResponse == null)
+                    ? "error.networkResponse = null " + error.getLocalizedMessage()
                     : new String(error.networkResponse.data));
 
             if (error.networkResponse != null) {
@@ -73,18 +73,15 @@ public class APIServer {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                this.callbackResponse.setResponse(null);
-                this.callbackResponse.run();
+                if (this.callbackResponse != null) {
+                    this.callbackResponse.setResponse(null);
+                    this.callbackResponse.run();
+                }
             }
         }
 
         public void send() {
-            Log.e("APIServer", "url = "+ request.getUrl());
-            try {
-                Log.e("APIServer", "headers = "+ request.getHeaders().toString());
-            } catch (AuthFailureError authFailureError) {
-                authFailureError.printStackTrace();
-            }
+            Log.v("APIServer", "url = " + request.getUrl());
             this.queue.add(this.request);
         }
 
@@ -146,8 +143,10 @@ public class APIServer {
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
-                            callbackResponse.setResponse(response);
-                            callbackResponse.run();
+                            if (callbackResponse != null) {
+                                callbackResponse.setResponse(response);
+                                callbackResponse.run();
+                            }
                         }
                     }, this) {
                 @Override
@@ -259,8 +258,10 @@ public class APIServer {
                     new Response.Listener<JSONArray>() {
                         @Override
                         public void onResponse(JSONArray response) {
-                            callbackResponse.setResponse(response);
-                            callbackResponse.run();
+                            if (callbackResponse != null) {
+                                callbackResponse.setResponse(response);
+                                callbackResponse.run();
+                            }
                         }
                     }, this) {
                 @Override
