@@ -12,6 +12,7 @@ import android.graphics.Rect;
 
 import android.util.AttributeSet;
 
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 
@@ -242,7 +243,7 @@ public class CalView extends View implements GestureDetector.OnGestureListener{
                 if(Math.abs(year-mCurDateList.get(0))<2) {
 
                     for (int month = 0; month < MONTH_OF_YEAR; month++) {
-                        if(Math.abs((month + (year - mCurDateList.get(0)) * MONTH_OF_YEAR-mCurDateList.get(1)))<2) {
+                        if(Math.abs((month + (year - mCurDateList.get(0)) * MONTH_OF_YEAR - mCurDateList.get(1)))<2) {
 
                             mDate = CalculateDate(year, month);
 
@@ -268,6 +269,11 @@ public class CalView extends View implements GestureDetector.OnGestureListener{
                             }
                         }else{
                             WidthCount += CalUtil.LENTH_OF_MONTH.get(month);
+                            if(month==1 && temp.isLeapYear(temp.get(Calendar.YEAR)))
+                            {
+                                WidthCount ++;
+                            }
+
                         }
                     }
                 }else{
@@ -278,8 +284,9 @@ public class CalView extends View implements GestureDetector.OnGestureListener{
                     {
                         WidthCount+=365;
                     }
-                    temp.add(Calendar.YEAR,1);
+
                 }
+                temp.add(Calendar.YEAR,1);
             }
 
         }
@@ -432,7 +439,7 @@ public class CalView extends View implements GestureDetector.OnGestureListener{
     public void UpdateTime(GregorianCalendar temp){
         mCurDateList.clear();
         int fisrtDay = CalUtil.FindFirstDayofMonthInWeek(temp)-1;
-        mCurDateList.add(mTodayDate.get(Calendar.YEAR)-temp.get(Calendar.YEAR)+(YEAR_RANGE-1)/2);
+        mCurDateList.add(-mTodayDate.get(Calendar.YEAR)+temp.get(Calendar.YEAR)+(YEAR_RANGE-1)/2);
         mCurDateList.add(temp.get(Calendar.MONTH));
         mCurDateList.add((temp.get(Calendar.DAY_OF_MONTH) + fisrtDay - 1) / COLUM_NUM);
         mCurDateList.add((temp.get(Calendar.DAY_OF_MONTH) + fisrtDay - 1) % COLUM_NUM);

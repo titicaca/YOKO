@@ -3,20 +3,16 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
+    <DatePicker
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Large Text"
-        android:id="@+id/id_event_list_day_text"
+        android:id="@+id/id_new_event_datePicker"
         android:layout_gravity="center_horizontal" />
 
-    <TextView
+    <TimePicker
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Small Text"
-        android:id="@+id/id_event_list_week_text"
-        android:layout_gravity="center_horizontal" />
-
+        android:id="@+id/id_new_event_timePicker"
+        android:layout_gravity="center_horizontal"
+        android:longClickable="true" />
 </LinearLayout>

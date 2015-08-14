@@ -17,8 +17,7 @@ import com.fifteentec.Component.calendar.EventListView;
 import com.fifteentec.yoko.R;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+
 
 
 public class EventListViewFragment extends Fragment{

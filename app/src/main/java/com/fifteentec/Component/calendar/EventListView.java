@@ -325,6 +325,7 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
             GregorianCalendar temp = new GregorianCalendar(mCurDate.get(0),mCurDate.get(1),mCurDate.get(2));
             temp.add(Calendar.DAY_OF_MONTH, offset);
             mCurDate = CalUtil.CalToArray(temp);
+
             mBottonIndex -=offset;
             mTopIndex -=offset;
             mEventListListener.DateChange(mCurDate);
