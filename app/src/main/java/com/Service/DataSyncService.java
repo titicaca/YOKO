@@ -150,7 +150,8 @@ public class DataSyncService extends Service {
                                                                     " weibo = " + friendInfoRecord.weibo +
                                                                     " collectnumber = " + friendInfoRecord.collectnumber +
                                                                     " enrollnumber = " + friendInfoRecord.enrollnumber +
-                                                                    " friendnumber = " + friendInfoRecord.friendnumber);
+                                                                    " friendnumber = " + friendInfoRecord.friendnumber +
+                                                                    " logintime = " + friendInfoRecord.logintime);
                     }
                     dbManager.getTableFriendTag().syncUser(uid, friendTagRecords);
                     dbManager.getTableFriendInfo().syncUser(uid, friendInfoRecords);

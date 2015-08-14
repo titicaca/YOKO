@@ -69,8 +69,9 @@ public class DataSyncServerParser {
                 int collectnumber = friendInfo.getInt("collectnumber");
                 int enrollnumber = friendInfo.getInt("enrollnumber");
                 int friendnumber = friendInfo.getInt("friendnumber");
+                long logintime = friendInfo.getLong("logintime");
 
-                FriendInfoRecord friendInfoRecord = new FriendInfoRecord(uid, fuid, email, location, mobile, nickname, picturelink, qq, sex, wechat, weibo, collectnumber, enrollnumber, friendnumber);
+                FriendInfoRecord friendInfoRecord = new FriendInfoRecord(uid, fuid, email, location, mobile, nickname, picturelink, qq, sex, wechat, weibo, collectnumber, enrollnumber, friendnumber, logintime);
                 friendInfoRecords.add(friendInfoRecord);
             }
         } catch (JSONException e) {
