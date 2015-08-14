@@ -86,7 +86,15 @@ public class DataSyncService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
+        Log.v("Data Sync Service", "bind");
         return new DataSyncServiceBinder();
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        Log.v("Data Sync Service", "unbind");
+        return super.onUnbind(intent);
+        //return true;
     }
 
     public class DataSyncServiceBinder extends Binder {

@@ -81,6 +81,7 @@ public class APIServer {
         }
 
         public void send() {
+            Log.v("APIServer", "url = " + request.getUrl());
             this.queue.add(this.request);
         }
 
