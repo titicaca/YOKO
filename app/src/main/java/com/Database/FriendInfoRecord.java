@@ -19,6 +19,7 @@ public class FriendInfoRecord {
     public int collectnumber;
     public int enrollnumber;
     public int friendnumber;
+    public long logintime;
 
     public FriendInfoRecord() {
 
@@ -40,12 +41,14 @@ public class FriendInfoRecord {
         this.collectnumber = friendInfoRecord.collectnumber;
         this.enrollnumber = friendInfoRecord.enrollnumber;
         this.friendnumber = friendInfoRecord.friendnumber;
+        this.logintime = friendInfoRecord.logintime;
     }
 
     public FriendInfoRecord(long uid, long fuid, String email, String location,
                             String mobile, String nickname, String picturelink,
                             String qq, int sex, String wechat, String weibo,
-                            int collectnumber, int enrollnumber, int friendnumber) {
+                            int collectnumber, int enrollnumber, int friendnumber,
+                            long logintime) {
         this.uid = uid;
         this.fuid = fuid;
         this.email = email;
@@ -60,5 +63,6 @@ public class FriendInfoRecord {
         this.collectnumber = collectnumber;
         this.enrollnumber = enrollnumber;
         this.friendnumber = friendnumber;
+        this.logintime = logintime;
     }
 }

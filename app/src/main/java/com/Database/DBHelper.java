@@ -66,7 +66,8 @@ public class DBHelper extends SQLiteOpenHelper {
                 DBConstants.COLUMN_FRIEND_INFO_WEIBO + " CHAR(255), " +
                 DBConstants.COLUMN_FRIEND_INFO_COLLECTNUMBER + " INTEGER, " +
                 DBConstants.COLUMN_FRIEND_INFO_ENROLLNUMBER + " INTEGER, " +
-                DBConstants.COLUMN_FRIEND_INFO_FRIENDNUMBER + " INTEGER" +
+                DBConstants.COLUMN_FRIEND_INFO_FRIENDNUMBER + " INTEGER, " +
+                DBConstants.COLUMN_FRIEND_INFO_LOGINTIME + " INT8" +
                 ")");
     }
 

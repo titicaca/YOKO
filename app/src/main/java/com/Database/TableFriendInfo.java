@@ -83,6 +83,7 @@ public class TableFriendInfo extends DBTable {
             cv.put(DBConstants.COLUMN_FRIEND_INFO_COLLECTNUMBER, friendInfoRecord.collectnumber);
             cv.put(DBConstants.COLUMN_FRIEND_INFO_ENROLLNUMBER, friendInfoRecord.enrollnumber);
             cv.put(DBConstants.COLUMN_FRIEND_INFO_FRIENDNUMBER, friendInfoRecord.friendnumber);
+            cv.put(DBConstants.COLUMN_FRIEND_INFO_LOGINTIME, friendInfoRecord.logintime);
 
             db.update(DBConstants.TABLE_FRIEND_TAG, cv,
                     DBConstants.COLUMN_FRIEND_INFO_UID + " = ?" + " AND " +
@@ -100,11 +101,11 @@ public class TableFriendInfo extends DBTable {
         db.beginTransaction();
 
         try {
-            db.execSQL("INSERT OR IGNORE INTO " + DBConstants.TABLE_FRIEND_INFO + "VALUES(NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            db.execSQL("INSERT OR IGNORE INTO " + DBConstants.TABLE_FRIEND_INFO + "VALUES(NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     new Object[]{friendInfoRecord.uid, friendInfoRecord.fuid, friendInfoRecord.email, friendInfoRecord.location,
                                 friendInfoRecord.mobile, friendInfoRecord.nickname, friendInfoRecord.picturelink, friendInfoRecord.qq,
                                 friendInfoRecord.sex, friendInfoRecord.wechat, friendInfoRecord.weibo, friendInfoRecord.collectnumber,
-                                friendInfoRecord.enrollnumber, friendInfoRecord.friendnumber}
+                                friendInfoRecord.enrollnumber, friendInfoRecord.friendnumber, friendInfoRecord.logintime}
             );
 
             db.setTransactionSuccessful();
@@ -144,7 +145,7 @@ public class TableFriendInfo extends DBTable {
             cs = db.query(DBConstants.TABLE_FRIEND_INFO, null,
                     DBConstants.COLUMN_FRIEND_INFO_UID + " = ?",
                     new String[]{String.valueOf(uid)},
-                    null, null, DBConstants.COLUMN_FRIEND_INFO_FUID);
+                    null, null, DBConstants.COLUMN_FRIEND_INFO_LOGINTIME + " DESC");
             friendInfoRecords = cursorToList(cs);
         } catch (Exception e) {
             e.printStackTrace();
@@ -173,6 +174,7 @@ public class TableFriendInfo extends DBTable {
         int column_index_collectnumber = cs.getColumnIndex(DBConstants.COLUMN_FRIEND_INFO_COLLECTNUMBER);
         int column_index_enrollnumber = cs.getColumnIndex(DBConstants.COLUMN_FRIEND_INFO_ENROLLNUMBER);
         int column_index_friendnumber = cs.getColumnIndex(DBConstants.COLUMN_FRIEND_INFO_FRIENDNUMBER);
+        int column_index_logintime = cs.getColumnIndex(DBConstants.COLUMN_FRIEND_INFO_LOGINTIME);
 
         try {
             while (cs.moveToNext()) {
@@ -192,6 +194,7 @@ public class TableFriendInfo extends DBTable {
                 friendInfoRecord.collectnumber = cs.getInt(column_index_collectnumber);
                 friendInfoRecord.enrollnumber = cs.getInt(column_index_enrollnumber);
                 friendInfoRecord.friendnumber = cs.getInt(column_index_friendnumber);
+                friendInfoRecord.logintime = cs.getLong(column_index_logintime);
                 friendInfoRecords.add(friendInfoRecord);
             }
         } catch (Exception e) {
@@ -210,11 +213,11 @@ public class TableFriendInfo extends DBTable {
                     new String[]{String.valueOf(uid)});
 
             for (FriendInfoRecord friendInfoRecord : friendInfoRecords) {
-                db.execSQL("INSERT OR IGNORE INTO " + DBConstants.TABLE_FRIEND_INFO + " VALUES(NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                db.execSQL("INSERT OR IGNORE INTO " + DBConstants.TABLE_FRIEND_INFO + " VALUES(NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                         new Object[]{friendInfoRecord.uid, friendInfoRecord.fuid, friendInfoRecord.email, friendInfoRecord.location,
                                 friendInfoRecord.mobile, friendInfoRecord.nickname, friendInfoRecord.picturelink, friendInfoRecord.qq,
                                 friendInfoRecord.sex, friendInfoRecord.wechat, friendInfoRecord.weibo, friendInfoRecord.collectnumber,
-                                friendInfoRecord.enrollnumber, friendInfoRecord.friendnumber}
+                                friendInfoRecord.enrollnumber, friendInfoRecord.friendnumber, friendInfoRecord.logintime}
                 );
             }
 

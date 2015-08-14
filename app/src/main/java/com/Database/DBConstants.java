@@ -29,4 +29,5 @@ public class DBConstants {
     public final static String COLUMN_FRIEND_INFO_COLLECTNUMBER = "collectnumber";
     public final static String COLUMN_FRIEND_INFO_ENROLLNUMBER = "enrollnumber";
     public final static String COLUMN_FRIEND_INFO_FRIENDNUMBER = "friendnumber";
+    public final static String COLUMN_FRIEND_INFO_LOGINTIME = "logintime";
 }
