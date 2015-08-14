@@ -16,7 +16,7 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 public class YOKOApplication extends Application {
     Intent dataSyncServiceIntent;
     public final static String applicationName = "YOKO";
-    private final static String baiduPushApiKey = "api_key";
+    private final static String baiduPushApiKey = "DktSnpqB2wljcjOeIYW4f2BI";
 
     public Intent getDataSyncServiceIntent() {
         return this.dataSyncServiceIntent;

@@ -43,6 +43,7 @@ public class DrawCanvasViewgroupTest extends ViewGroup implements View.OnLongCli
     private int bottomP;
     //按下时删除list的位置
     private int pressListpositon;
+    private ArrayList<Integer> listChongdie = new ArrayList<Integer>();
 
     public DrawCanvasViewgroupTest(Context context) {
         super(context);
@@ -73,6 +74,9 @@ public class DrawCanvasViewgroupTest extends ViewGroup implements View.OnLongCli
 //        dragScaleView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         dragScaleView.setVisibility(View.INVISIBLE);
         addView(dragScaleView);
+        for (int i = 0; i < 7; i++) {
+            listChongdie.add(0);
+        }
     }
 
     @Override
@@ -245,7 +249,7 @@ public class DrawCanvasViewgroupTest extends ViewGroup implements View.OnLongCli
                         int hCount = list.get(i).w;
                         canvas.drawRect(wCount * screenWidth / 7, hCount * screenHeight / 23, (wCount + 1) * screenWidth / 7, (hCount + 1) * screenHeight / 23, p);
                     } else {
-                        int wCount = list.get(i).w;
+                        int wCount = list.get(i).h;
                         int top = list.get(i).top;
                         int bottom = list.get(i).bottom;
                         canvas.drawRect(wCount * screenWidth / 7, top, (wCount + 1) * screenWidth / 7, bottom, p);
@@ -308,15 +312,17 @@ public class DrawCanvasViewgroupTest extends ViewGroup implements View.OnLongCli
                             break;
                         }
                     } else {
-                        if (list.get(k).w == clickw && list.get(k).top - downY < 30) {
+                        if (list.get(k).h == clickw && (list.get(k).top < downY && list.get(k).bottom > downY)) {
                             Toast.makeText(getContext(), "是我要的方块区域", Toast.LENGTH_SHORT).show();
-                            int wCount = list.get(k).w;
+                            int wCount = list.get(k).h;
                             pressListpositon = k;
                             dragScaleView.layout(wCount * screenWidth / 7, list.get(k).top, (wCount + 1) * screenWidth / 7, list.get(k).bottom);
                             dragScaleView.setVisibility(View.VISIBLE);
                             break;
                         } else {
                             Toast.makeText(getContext(), "此处为空白区域", Toast.LENGTH_SHORT).show();
+                            isLongClick = false;
+                            break;
                         }
                     }
                 }
@@ -359,10 +365,20 @@ public class DrawCanvasViewgroupTest extends ViewGroup implements View.OnLongCli
                 } else {
                     isAdd = false;
                     for (int k = 0; k < list.size(); k++) {
-                        if (list.get(k).w == clickh && list.get(k).h == clickw) {
-                            Toast.makeText(getContext(), "重复点击", Toast.LENGTH_SHORT).show();
-                            isAdd = true;
-                            break;
+
+                        if (list.get(k).isMoveorClick == 0) {
+
+                            if (list.get(k).w == clickh && list.get(k).h == clickw) {
+                                Toast.makeText(getContext(), "重复点击", Toast.LENGTH_SHORT).show();
+                                isAdd = true;
+                                break;
+                            }
+                        } else {
+                            if (list.get(k).top < clickh * screenHeight / 23 && list.get(k).bottom > clickw * screenWidth / 7) {
+                                Toast.makeText(getContext(), "重复点击", Toast.LENGTH_SHORT).show();
+                                isAdd = true;
+                                break;
+                            }
                         }
                     }
                     if (!isAdd) {
@@ -512,7 +528,6 @@ public class DrawCanvasViewgroupTest extends ViewGroup implements View.OnLongCli
             switch (action) {
                 case MotionEvent.ACTION_MOVE:
                     //移动后的dx dy
-
                     int dx = (int) event.getRawX() - lastX;
                     int dy = (int) event.getRawY() - lastY;
                     switch (dragDirection) {
@@ -550,6 +565,7 @@ public class DrawCanvasViewgroupTest extends ViewGroup implements View.OnLongCli
                     }
                     if (dragDirection != CENTER) {
                         v.layout(oriLeft, oriTop, oriRight, oriBottom);
+
                     }
                     lastX = (int) event.getRawX();
                     lastY = (int) event.getRawY();
@@ -577,14 +593,74 @@ public class DrawCanvasViewgroupTest extends ViewGroup implements View.OnLongCli
 //                        v.layout(oriLeft, oriTop, oriRight, oriBottom);
 //                    } else {
                         v.layout(clickw * screenWidth / 7, topP, (clickw + 1) * screenWidth / 7, bottomP);
+                        CheckArrayTest checkArrayTest = new CheckArrayTest();
+                        checkArrayTest.top = topP;
+                        checkArrayTest.bottom = bottomP;
+                        checkArrayTest.isMoveorClick = 1;
+                        checkArrayTest.h = clickw;
+                        checkArrayTest.w = clickh;
+                        list.add(pressListpositon, checkArrayTest);
+                    } else {
+                        CheckArrayTest checkArrayTest = new CheckArrayTest();
+                        checkArrayTest.top = oriTop;
+                        checkArrayTest.bottom = oriBottom;
+                        checkArrayTest.isMoveorClick = 1;
+                        checkArrayTest.h = clickw;
+                        checkArrayTest.w = clickh;
+                        list.add(pressListpositon, checkArrayTest);
                     }
+
                     dragDirection = 0;
-                    CheckArrayTest checkArrayTest = new CheckArrayTest();
-                    checkArrayTest.top = topP;
-                    checkArrayTest.bottom = bottomP;
-                    checkArrayTest.isMoveorClick = 1;
-                    checkArrayTest.w = clickw;
-                    list.add(pressListpositon, checkArrayTest);
+
+                    //处理重叠的操作
+//                    /**
+                    if (list.size() > 1) {
+                        for (int i = 0; i < list.size(); i++) {
+                            if (i != pressListpositon && list.get(i).h == list.get(pressListpositon).h) {
+
+                                if (list.get(i).isMoveorClick == 0) {
+
+                                    if (list.get(list.size() - 1).isMoveorClick == 0) {
+                                        //判断是否重叠，根据上下坐标是否重叠来判断
+                                        if ((list.get(list.size() - 1).w * screenHeight / 23 < list.get(i).w * screenHeight / 23 && list.get(i).w * screenHeight / 23 < list.get(list.size() - 1).w * screenHeight) || (list.get(i).w * screenHeight / 23 < list.get(list.size() - 1).w * screenHeight / 23 && list.get(list.size() - 1).w * screenHeight / 23 < list.get(i).w * screenHeight)) {
+                                            int iswhichone = list.get(i).h;
+                                            int chongdiejici = listChongdie.get(iswhichone);
+                                            chongdiejici = chongdiejici + 1;
+                                            listChongdie.add(iswhichone, chongdiejici);
+                                            CheckArrayTest checktest = new CheckArrayTest();
+                                        }
+                                    } else {
+                                        if ((list.get(list.size() - 1).w * screenHeight / 23 < list.get(i).w * screenHeight / 23 && list.get(i).w * screenHeight / 23 < list.get(list.size() - 1).w * screenHeight) || (list.get(i).w * screenHeight / 23 < list.get(list.size() - 1).w * screenHeight / 23 && list.get(list.size() - 1).w * screenHeight / 23 < list.get(i).w * screenHeight)) {
+                                            int iswhichone = list.get(i).h;
+                                            int chongdiejici = listChongdie.get(iswhichone);
+                                            chongdiejici = chongdiejici + 1;
+                                            listChongdie.add(iswhichone, chongdiejici);
+                                        }
+                                    }
+
+                                } else {
+                                    if (list.get(list.size() - 1).isMoveorClick == 1) {
+                                        if ((list.get(list.size() - 1).w * screenHeight / 23 < list.get(i).w * screenHeight / 23 && list.get(i).w * screenHeight / 23 < list.get(list.size() - 1).w * screenHeight) || (list.get(i).w * screenHeight / 23 < list.get(list.size() - 1).w * screenHeight / 23 && list.get(list.size() - 1).w * screenHeight / 23 < list.get(i).w * screenHeight)) {
+                                            int iswhichone = list.get(i).h;
+                                            int chongdiejici = listChongdie.get(iswhichone);
+                                            chongdiejici = chongdiejici + 1;
+                                            listChongdie.add(iswhichone, chongdiejici);
+                                        }
+                                    } else {
+                                        if ((list.get(list.size() - 1).w * screenHeight / 23 < list.get(i).w * screenHeight / 23 && list.get(i).w * screenHeight / 23 < list.get(list.size() - 1).w * screenHeight) || (list.get(i).w * screenHeight / 23 < list.get(list.size() - 1).w * screenHeight / 23 && list.get(list.size() - 1).w * screenHeight / 23 < list.get(i).w * screenHeight)) {
+                                            int iswhichone = list.get(i).h;
+                                            int chongdiejici = listChongdie.get(iswhichone);
+                                            chongdiejici = chongdiejici + 1;
+                                            listChongdie.add(iswhichone, chongdiejici);
+                                        }
+                                    }
+                                }
+
+
+                            }
+                        }
+                    }
+//                     */
 //                    new DrawCanvasTest(getContext()).initOnDraw();
                     dragScaleView.invalidate();
                     break;
@@ -606,6 +682,7 @@ public class DrawCanvasViewgroupTest extends ViewGroup implements View.OnLongCli
             if (oriBottom - oriTop - 2 * offset < screenHeight / 23) {
                 oriTop = oriBottom - 2 * offset - screenHeight / 23;
             }
+            topP = oriTop;
         }
 
         /**
@@ -622,6 +699,7 @@ public class DrawCanvasViewgroupTest extends ViewGroup implements View.OnLongCli
             if (oriBottom - oriTop - 2 * offset < screenHeight / 23) {
                 oriBottom = screenHeight / 23 + oriTop + 2 * offset;
             }
+            bottomP = oriBottom;
         }
 
         /**

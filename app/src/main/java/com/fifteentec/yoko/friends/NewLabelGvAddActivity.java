@@ -7,8 +7,6 @@ package com.fifteentec.yoko.friends;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
@@ -23,9 +21,6 @@ import com.fifteentec.Component.calendar.KeyboardLayout;
 import com.fifteentec.yoko.R;
 
 import org.apache.http.util.EncodingUtils;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -158,32 +153,38 @@ public class NewLabelGvAddActivity extends Activity implements OnClickListener {
     // }
 
     private void readDatas() {
-        String str = Environment.getExternalStorageDirectory() + File.separator
-                + "mldndata" + File.separator + "json.txt";
-        String json = "";
-        try {
-            json = readSDFile(str);
-        } catch (IOException e) {
-            e.printStackTrace();
+//        String str = Environment.getExternalStorageDirectory() + File.separator
+//                + "mldndata" + File.separator + "json.txt";
+//        String json = "";
+//        try {
+//            json = readSDFile(str);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        Log.e("json", json);
+//        try {
+//            JSONArray jsonArray = new JSONObject(json).getJSONArray("urldata");
+//            for (int i = 0; i < jsonArray.length(); i++) {
+//                JSONObject jsonObjs = (JSONObject) jsonArray.opt(i);
+//                // 自定义json的bean文件
+//                JsonParsing jp = new JsonParsing();
+//                try {
+//                    jp.parsingJson(jsonObjs);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//                jsonData.add(jp);
+//            }
+//
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+        for (int i = 0; i < 12; i++) {
+            JsonParsing j = new JsonParsing();
+            j.id = i;
+            jsonData.add(j);
         }
-        Log.e("json", json);
-        try {
-            JSONArray jsonArray = new JSONObject(json).getJSONArray("urldata");
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonObjs = (JSONObject) jsonArray.opt(i);
-                // 自定义json的bean文件
-                JsonParsing jp = new JsonParsing();
-                try {
-                    jp.parsingJson(jsonObjs);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                jsonData.add(jp);
-            }
 
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
     }
 
     // 读文件

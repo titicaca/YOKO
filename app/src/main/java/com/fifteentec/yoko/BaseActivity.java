@@ -9,14 +9,14 @@ import android.os.Bundle;
 import android.os.IBinder;
 
 import com.Database.DBManager;
+import com.Service.DataSyncService.DataSyncServiceBinder;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
-import com.Service.DataSyncService.DataSyncServiceBinder;
 
 public abstract class BaseActivity extends Activity {
     protected RequestQueue requestQueue;
     protected DBManager dbManager;
-    private static Activity curActivity = null;
+    private static BaseActivity curActivity = null;
     private DataSyncServiceBinder dataSyncServiceBinder = null;
 
     private ServiceConnection dataSyncServiceConnection = new ServiceConnection() {
@@ -62,7 +62,8 @@ public abstract class BaseActivity extends Activity {
     public void onBackPressed() {
         super.onBackPressed();
 
-        if ((this instanceof LoginActivity) || (this instanceof TestActivity)) {
+        if ((this instanceof LoginActivity) || (this instanceof TestActivity)||
+                (this instanceof TabActivity)) {
             Intent intent = new Intent(getCurrentActivity(), BlankActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
@@ -100,11 +101,11 @@ public abstract class BaseActivity extends Activity {
         super.onDestroy();
     }
 
-    public static Activity getCurrentActivity() {
+    public static BaseActivity getCurrentActivity() {
         return curActivity;
     }
 
-    public static void setCurrentActivity(Activity activity) {
+    public static void setCurrentActivity(BaseActivity activity) {
         curActivity = activity;
     }
 }

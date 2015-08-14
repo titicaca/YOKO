@@ -1,26 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.fifteentec.Component.calendar.KeyboardLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.fifteentec.Component.calendar.KeyboardLayout
     android:id="@+id/keyboardLayout_new_friends"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:focusable="true"
-    android:focusableInTouchMode="true" >
+    android:focusableInTouchMode="true">
 
     <ScrollView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:fillViewport="true" >
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical" >
+            android:background="#fff"
+            android:orientation="vertical">
 
             <RelativeLayout
+                android:id="@+id/new_friedns_rl"
                 android:layout_width="fill_parent"
-                android:layout_height="60dp" >
+                android:layout_height="60dp"
+                android:background="#EEEEEE">
+
+                <ImageView
+                    android:id="@+id/new_friedns_back_iv"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:src="@drawable/ic_keyboard_arrow_left_black"/>
 
                 <TextView
                     android:id="@+id/new_friedns_back"
@@ -28,7 +40,17 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="10dp"
-                    android:text="添加朋友" />
+                    android:layout_toRightOf="@id/new_friedns_back_iv"
+                    android:text="添加朋友"
+                    android:textSize="20sp"/>
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="10dp"
+                    android:src="@drawable/settings_friends_add"/>
             </RelativeLayout>
 
             <RelativeLayout
@@ -36,28 +58,31 @@
                 android:layout_width="fill_parent"
                 android:layout_height="40dp"
                 android:layout_marginBottom="5dip"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
                 android:layout_marginTop="5dip"
-                android:background="#ff0" >
+                android:background="@drawable/add_friends_background_search">
 
                 <EditText
                     android:id="@+id/new_friedns_et_search"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
-                    android:layout_toLeftOf="@+id/new_friedns_tv_search"
-                    android:background="#00f"
-                    android:gravity="center_vertical"
-                    android:hint="搜索"
+                    android:layout_toLeftOf="@+id/new_friends_iv_search"
+                    android:background="@null"
+                    android:gravity="center"
+                    android:hint="手机号"
                     android:paddingLeft="10dp"
                     android:singleLine="true"
-                    android:textSize="16sp" />
+                    android:textSize="16sp"/>
 
-                <TextView
-                    android:id="@+id/new_friedns_tv_search"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                <ImageView
+                    android:id="@+id/new_friends_iv_search"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
                     android:layout_gravity="center_vertical"
-                    android:background="@drawable/ic_launcher" />
+                    android:src="@drawable/search"/>
             </RelativeLayout>
 
             <ListView
@@ -66,16 +91,17 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
-                android:visibility="gone" >
+                android:visibility="gone">
             </ListView>
 
             <RelativeLayout
                 android:id="@+id/new_friends_rl_check"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="230dp"
+                android:background="@drawable/square"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
-                android:visibility="gone" >
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/new_friends_tv_title"
@@ -83,7 +109,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="30dp"
                     android:layout_marginTop="30dp"
-                    android:text="验证信息" />
+                    android:text="验证信息"/>
 
                 <EditText
                     android:id="@+id/new_friends_et_check"
@@ -92,17 +118,21 @@
                     android:layout_alignLeft="@id/new_friends_tv_title"
                     android:layout_below="@id/new_friends_tv_title"
                     android:layout_marginRight="30dp"
-                    android:layout_marginTop="30dp"
-                    android:background="#ff0" />
+                    android:layout_marginTop="20dp"
+                    android:background="#EEEEEE"
+                    android:gravity="center_vertical"/>
 
                 <TextView
                     android:id="@+id/new_friends_tv_send"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="50dp"
+                    android:layout_height="30dp"
                     android:layout_alignRight="@id/new_friends_et_check"
                     android:layout_below="@id/new_friends_et_check"
-                    android:layout_marginTop="20dp"
-                    android:text="发送" />
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/add_friends_info_send_background"
+                    android:gravity="center"
+                    android:text="发送"
+                    android:textColor="#fff"/>
             </RelativeLayout>
         </LinearLayout>
     </ScrollView>

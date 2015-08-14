@@ -75,6 +75,7 @@ public class FriendDetailsAdapter extends PagerAdapter {
                     false);
             viewHolder.tvName = (TextView) userLayout
                     .findViewById(R.id.hlist_tv_label);
+            viewHolder.hlist_rL_information_tv_address = (TextView) userLayout.findViewById(R.id.hlist_rL_information_tv_address);
             viewHolder.gv = (GridView) userLayout
                     .findViewById(R.id.hlist_gv_images);
             viewHolder.hlist_rL_information_tv_name = (TextView) userLayout
@@ -93,6 +94,7 @@ public class FriendDetailsAdapter extends PagerAdapter {
         // viewHolder.tvName.setText(position + 1 + "");
         viewHolder.hlist_rL_information_tv_name
                 .setText(jsonData.get(position).nickname);
+        viewHolder.hlist_rL_information_tv_address.setText(jsonData.get(position).location);
         fdgvadapter = new FriendDetailsGridViewAdapter(context);
         viewHolder.gv.setAdapter(fdgvadapter);
         ((ViewPager) view).addView(userLayout, 0);
@@ -103,6 +105,7 @@ public class FriendDetailsAdapter extends PagerAdapter {
         public TextView tvName;
         public GridView gv;
         public TextView hlist_rL_information_tv_name;
+        public TextView hlist_rL_information_tv_address;
     }
 
     @Override

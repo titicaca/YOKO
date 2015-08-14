@@ -5,15 +5,21 @@ public class APIUrl {
 
     public final static String URL_FRIENDLIST = URL_BASE + "/user/myfriend/friends";
 
+    public final static String URL_MYTAG = URL_BASE + "/user/mytag/friendlist";
+
+    public final static String URL_SEARCHFRIENDS = URL_BASE + "/user/myfriend/search";
+
+    public final static String URL_FRIENDSADDCHECKINFO = URL_BASE + "/user/myfriend/request/";
+
     public final static String URL_HOME = URL_BASE + "/" + "home";
-    
+
     public final static String URL_LOGIN = URL_BASE + "/" + "oauth/token";
 
     public final static String URL_REGISTER = URL_BASE + "/" + "signup/user";
 
     public final static String URL_CHANGE_PASSWORD = URL_BASE + "/" + "signup/user";
 
-    public final static String URL_REQUEST_USER_INFO = URL_BASE + "/" + "user";
+    public final static String URL_REQUEST_USER_INFO = URL_BASE + "/" + "user" + "/" + "userinfo";
 
     public final static String URL_DELETE_USER_INFO = URL_BASE + "/" + "home";
 

@@ -27,6 +27,7 @@ public class JsonParsing implements Serializable {
     public String picturelink;
     public int createdtime;
     public int status;
+    public String location;
     public ArrayList<JsonParsing> list = new ArrayList<JsonParsing>();
 
     public void parsingJson(JSONObject jsonObject) throws Exception {
@@ -48,6 +49,7 @@ public class JsonParsing implements Serializable {
             jp.sex = json.optInt("sex");
             jp.createdtime = json.optInt("createdtime");
             jp.status = json.optInt("status");
+            jp.location = json.optString("location");
             list.add(jp);
         }
 

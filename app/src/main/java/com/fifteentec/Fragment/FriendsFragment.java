@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -23,13 +22,15 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.API.APIJsonCallbackResponse;
+import com.API.APIKey;
 import com.API.APIServer;
 import com.API.APIUrl;
 import com.fifteentec.Adapter.commonAdapter.FriendsAdapter;
-import com.fifteentec.Adapter.commonAdapter.FriendsTwoAdapter;
+import com.fifteentec.Component.User.UserServer;
 import com.fifteentec.Component.calendar.KeyboardLayout;
 import com.fifteentec.yoko.BaseActivity;
 import com.fifteentec.yoko.R;
@@ -52,6 +53,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class FriendsFragment extends Fragment implements OnItemClickListener,
         OnClickListener, OnItemLongClickListener {
@@ -66,58 +69,31 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
     private BaseActivity activity;
     private ArrayList<JsonParsing> list = new ArrayList<JsonParsing>();
     private JsonParsing jp;
+    private RelativeLayout friends_rl_newfriend_button;
+    private RelativeLayout friends_rl_label_button;
+    private RelativeLayout friends_rl_add_button;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.friends, container, false);
-        lv1 = (ListView) view.findViewById(R.id.friends_lv1);
+        friends_rl_add_button = (RelativeLayout) view.findViewById(R.id.friends_rl_add_button);
+        friends_rl_label_button = (RelativeLayout) view.findViewById(R.id.friends_rl_label_button);
+        friends_rl_newfriend_button = (RelativeLayout) view.findViewById(R.id.friends_rl_newfriend_button);
         lv2 = (ListView) view.findViewById(R.id.friends_lv2);
         search = (EditText) view.findViewById(R.id.friends_search_et);
-        friends_tv_addfriends = (TextView) view
-                .findViewById(R.id.friends_tv_addfriends);
-
         this.activity = (BaseActivity) this.getActivity();
         jp = new JsonParsing();
-
-
-        // 判断软键盘弹出收起
-        // friends_search_ll.getViewTreeObserver().addOnGlobalLayoutListener(
-        // new OnGlobalLayoutListener() {
-        // @Override
-        // public void onGlobalLayout() {
-        //
-        // int heightDiff = friends_search_ll.getRootView()
-        // .getHeight() - friends_search_ll.getHeight();
-        //
-        // }
-        // });
-//        initDatas();
-        mainView = (KeyboardLayout) view.findViewById(R.id.keyboardLayout1);
+        mainView = (KeyboardLayout) view.findViewById(R.id.keyboardLayout_friends);
         mainView.setOnkbdStateListener(new KeyboardLayout.onKybdsChangeListener() {
 
             public void onKeyBoardStateChange(int state) {
                 switch (state) {
                     // 软键盘隐藏
                     case KeyboardLayout.KEYBOARD_STATE_HIDE:
-
                         mainView.setFocusable(true);
                         mainView.setFocusableInTouchMode(true);
                         mainView.requestFocus();
-
-                        // 点击空白处软键盘关闭
-                        // InputMethodManager imm = (InputMethodManager)
-                        // getActivity()
-                        // .getSystemService(Context.INPUT_METHOD_SERVICE);
-                        // if (getActivity().getCurrentFocus() != null) {
-                        // if (getActivity().getCurrentFocus().getWindowToken() !=
-                        // null) {
-                        // imm.hideSoftInputFromWindow(getActivity()
-                        // .getCurrentFocus().getWindowToken(),
-                        // InputMethodManager.HIDE_NOT_ALWAYS);
-                        // }
-                        // }
-
                         break;
                     // 软键盘弹起
                     case KeyboardLayout.KEYBOARD_STATE_SHOW:
@@ -125,29 +101,14 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
                 }
             }
         });
-        // 好友标签适配器
-        FriendsTwoAdapter ftapterAdapter = new FriendsTwoAdapter(getActivity());
-        lv1.setAdapter(ftapterAdapter);
-
-        // 设置listview定高
-        setListViewHeightBasedOnChildren(lv1);
-
-        friends_tv_addfriends.setOnClickListener(this);
-        search.setOnFocusChangeListener(onFocusAutoClearHintListener);
-        // lv1.setOnItemClickListener(this);
         lv2.setOnItemClickListener(this);
-        lv1.setOnItemClickListener(this);
         lv2.setOnItemLongClickListener(this);
+        friends_rl_add_button.setOnClickListener(this);
+        friends_rl_label_button.setOnClickListener(this);
+        friends_rl_newfriend_button.setOnClickListener(this);
         //加载好友列表
         LoadFriendsList();
-        // lv2.setOnItemClickListener(new OnItemClickListener() {
-        //
-        // @Override
-        // public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-        // long arg3) {
-        //
-        // }
-        // });
+        search.setOnFocusChangeListener(onFocusAutoClearHintListener);
         return view;
     }
 
@@ -187,15 +148,9 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
                 hint = textView.getHint().toString();
                 textView.setTag(hint);
                 textView.setHint("");
-                textView.setGravity(Gravity.LEFT);
             } else {
                 hint = textView.getTag().toString();
                 textView.setHint(hint);
-                if (textView.getText().toString().equals("")) {
-                    textView.setGravity(Gravity.CENTER);
-                } else {
-                    textView.setGravity(Gravity.LEFT);
-                }
             }
         }
     };
@@ -310,17 +265,6 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
     @Override
     public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
         switch (arg0.getId()) {
-            case R.id.friends_lv1:
-                if (arg2 == 1) {
-                    Intent in = new Intent();
-                    in.setClass(getActivity(), LabelActivity.class);
-                    startActivity(in);
-                } else {
-                    Intent in = new Intent();
-                    in.setClass(getActivity(), NewFriendsListActivity.class);
-                    startActivity(in);
-                }
-                break;
             case R.id.friends_lv2:
                 Intent intent = new Intent();
                 intent.setClass(getActivity(), FriendDetailsActivity.class);
@@ -337,10 +281,20 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
     @Override
     public void onClick(View arg0) {
         switch (arg0.getId()) {
-            case R.id.friends_tv_addfriends:
+            case R.id.friends_rl_newfriend_button:
                 Intent in = new Intent();
                 in.setClass(getActivity(), NewFriendActivity.class);
                 startActivity(in);
+                break;
+            case R.id.friends_rl_label_button:
+                Intent inn = new Intent();
+                inn.setClass(getActivity(), LabelActivity.class);
+                startActivity(inn);
+                break;
+            case R.id.friends_rl_add_button:
+                Intent ine = new Intent();
+                ine.setClass(getActivity(), NewFriendsListActivity.class);
+                startActivity(ine);
                 break;
 
             default:
@@ -389,10 +343,16 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
     }
 
     private void LoadFriendsList() {
+        Map<String, String> headers = new HashMap<String, String>();
+        try {
+            headers.put(APIKey.KEY_AUTHORIZATION, UserServer.getInstance().getAccessToken());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         new APIServer.JsonGet(
                 APIUrl.URL_FRIENDLIST,
                 null,
-                null,
+                headers,
                 new APIJsonCallbackResponse() {
 
                     @Override

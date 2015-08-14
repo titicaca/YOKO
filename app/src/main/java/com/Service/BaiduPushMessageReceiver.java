@@ -4,6 +4,8 @@ import android.content.Context;
 import android.util.Log;
 
 import com.baidu.android.pushservice.PushMessageReceiver;
+import com.fifteentec.Component.User.UserServer;
+import com.fifteentec.yoko.BaseActivity;
 
 import java.util.List;
 
@@ -65,7 +67,6 @@ public class BaiduPushMessageReceiver extends PushMessageReceiver {
         if (errorCode == 0) {
             // 绑定成功
         }
-
     }
 
     /**
@@ -84,6 +85,8 @@ public class BaiduPushMessageReceiver extends PushMessageReceiver {
         String messageString = "透传消息 message=\"" + message
                 + "\" customContentString=" + customContentString;
         Log.d(TAG, messageString);
+        //todo
+        context.sendBroadcast(null);
     }
 
     /**

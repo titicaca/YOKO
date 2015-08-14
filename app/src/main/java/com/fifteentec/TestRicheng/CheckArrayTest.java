@@ -10,5 +10,8 @@ public class CheckArrayTest {
     public int isMoveorClick;
     public int top;
     public int bottom;
+    public int chongdiewhichhang;
+    public int chongdiejici;
+
 
 }

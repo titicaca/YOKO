@@ -47,7 +47,7 @@
 
     <RelativeLayout
         android:id="@+id/hlist_rL_information"
-        android:layout_width="80dp"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_below="@id/hlist_iv_icon"
         android:layout_marginLeft="10dp"
