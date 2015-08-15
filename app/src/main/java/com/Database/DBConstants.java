@@ -30,4 +30,29 @@ public class DBConstants {
     public final static String COLUMN_FRIEND_INFO_ENROLLNUMBER = "enrollnumber";
     public final static String COLUMN_FRIEND_INFO_FRIENDNUMBER = "friendnumber";
     public final static String COLUMN_FRIEND_INFO_LOGINTIME = "logintime";
+
+    //for table friend_invitation
+    public final static String TABLE_FRIEND_INVITATION = "friend_invitation";
+    public final static String COLUMN_FRIEND_INVITATION_RID = "_id";
+    public final static String COLUMN_FRIEND_INVITATION_UID = "uid";
+    public final static String COLUMN_FRIEND_INVITATION_FUID = "fuid";
+    public final static String COLUMN_FRIEND_INVITATION_MSG = "msg";
+    public final static String COLUMN_FRIEND_INVITATION_CREATETIME = "createtime";
+
+    //for table event
+    public final static String TABLE_EVENT = "event";
+    public final static String COLUMN_EVENT_RID = "_id";
+    public final static String COLUMN_EVENT_UID = "uid";
+    public final static String COLUMN_EVENT_SEVERID = "serverid";
+    public final static String COLUMN_EVENT_INTRODUCTION = "introduciton";
+    public final static String COLUMN_EVENT_LOCALPICTURELINK = "localpicturelink";
+    public final static String COLUMN_EVENT_REMOTEPICTURELINK = "remotepitcurelink";
+    public final static String COLUMN_EVENT_REMIND = "remind";
+    public final static String COLUMN_EVENT_TIMEBEGIN = "timebegin";
+    public final static String COLUMN_EVENT_TIMEEND = "timeend";
+    public final static String COLUMN_EVENT_TYPE = "type";
+    public final static String COLUMN_EVENT_PROPERTY = "property";
+    public final static String COLUMN_EVENT_DETAILLINK = "detaillink";
+    public final static String COLUMN_EVENT_STATUS = "status";
+    public final static String COLUMN_EVENT_UPDATETIME = "updatetime";
 }

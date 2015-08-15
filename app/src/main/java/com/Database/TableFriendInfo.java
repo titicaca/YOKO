@@ -56,7 +56,7 @@ public class TableFriendInfo extends DBTable {
         try {
             db.delete(DBConstants.TABLE_FRIEND_INFO,
                     DBConstants.COLUMN_FRIEND_INFO_UID + " = ?" + " AND  " +
-                    DBConstants.COLUMN_FRIEND_INFO_FUID + " = ?" + " AND ",
+                    DBConstants.COLUMN_FRIEND_INFO_FUID + " = ?",
                     new String[]{String.valueOf(uid), String.valueOf(fuid)});
             db.setTransactionSuccessful();
         } catch (Exception e) {
@@ -128,6 +128,40 @@ public class TableFriendInfo extends DBTable {
             if (cs.getCount() == 1) {
                 cs.moveToFirst();
                 friendInfoRecord = new FriendInfoRecord();
+
+                int column_index_rid = cs.getColumnIndex(DBConstants.COLUMN_FRIEND_INFO_RID);
+                int column_index_uid = cs.getColumnIndex(DBConstants.COLUMN_FRIEND_INFO_UID);
+                int column_index_fuid = cs.getColumnIndex(DBConstants.COLUMN_FRIEND_INFO_FUID);
+                int column_index_email = cs.getColumnIndex(DBConstants.COLUMN_FRIEND_INFO_EMAIL);
+                int column_index_location = cs.getColumnIndex(DBConstants.COLUMN_FRIEND_INFO_LOCATION);
+                int column_index_mobile = cs.getColumnIndex(DBConstants.COLUMN_FRIEND_INFO_MOBILE);
+                int column_index_nickname = cs.getColumnIndex(DBConstants.COLUMN_FRIEND_INFO_NICKNAME);
+                int column_index_picturelink = cs.getColumnIndex(DBConstants.COLUMN_FRIEND_INFO_PICTURELINK);
+                int column_index_qq = cs.getColumnIndex(DBConstants.COLUMN_FRIEND_INFO_QQ);
+                int column_index_sex = cs.getColumnIndex(DBConstants.COLUMN_FRIEND_INFO_SEX);
+                int column_index_wechat = cs.getColumnIndex(DBConstants.COLUMN_FRIEND_INFO_WECHAT);
+                int column_index_weibo = cs.getColumnIndex(DBConstants.COLUMN_FRIEND_INFO_WEIBO);
+                int column_index_collectnumber = cs.getColumnIndex(DBConstants.COLUMN_FRIEND_INFO_COLLECTNUMBER);
+                int column_index_enrollnumber = cs.getColumnIndex(DBConstants.COLUMN_FRIEND_INFO_ENROLLNUMBER);
+                int column_index_friendnumber = cs.getColumnIndex(DBConstants.COLUMN_FRIEND_INFO_FRIENDNUMBER);
+                int column_index_logintime = cs.getColumnIndex(DBConstants.COLUMN_FRIEND_INFO_LOGINTIME);
+
+                friendInfoRecord.rid = cs.getInt(column_index_rid);
+                friendInfoRecord.uid = cs.getLong(column_index_uid);
+                friendInfoRecord.fuid = cs.getLong(column_index_fuid);
+                friendInfoRecord.email = cs.getString(column_index_email);
+                friendInfoRecord.location = cs.getString(column_index_location);
+                friendInfoRecord.mobile = cs.getString(column_index_mobile);
+                friendInfoRecord.nickname = cs.getString(column_index_nickname);
+                friendInfoRecord.picturelink = cs.getString(column_index_picturelink);
+                friendInfoRecord.qq = cs.getString(column_index_qq);
+                friendInfoRecord.sex = cs.getInt(column_index_sex);
+                friendInfoRecord.wechat = cs.getString(column_index_wechat);
+                friendInfoRecord.weibo = cs.getString(column_index_weibo);
+                friendInfoRecord.collectnumber = cs.getInt(column_index_collectnumber);
+                friendInfoRecord.enrollnumber = cs.getInt(column_index_enrollnumber);
+                friendInfoRecord.friendnumber = cs.getInt(column_index_friendnumber);
+                friendInfoRecord.logintime = cs.getLong(column_index_logintime);
             }
         } catch (Exception e) {
             e.printStackTrace();
