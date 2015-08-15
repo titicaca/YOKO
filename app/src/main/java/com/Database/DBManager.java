@@ -8,6 +8,7 @@ public class DBManager {
     private SQLiteDatabase db;
     private TableFriendTag tableFriendTag;
     private TableFriendInfo tableFriendInfo;
+    private TableFriendInvitation tableFriendInvitation;
     private TableEvent tableEvent;
 
     public DBManager(Context context) {
@@ -17,6 +18,7 @@ public class DBManager {
         db = dbHelper.getWritableDatabase();
         tableFriendTag = new TableFriendTag(db);
         tableFriendInfo = new TableFriendInfo(db);
+        tableFriendInvitation = new TableFriendInvitation(db);
         tableEvent = new TableEvent(db);
     }
 
@@ -30,6 +32,10 @@ public class DBManager {
 
     public TableFriendInfo getTableFriendInfo() {
         return this.tableFriendInfo;
+    }
+
+    public TableFriendInvitation getTableFriendInvitation() {
+        return this.tableFriendInvitation;
     }
 
     public TableEvent getTableEvent() {

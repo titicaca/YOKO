@@ -23,15 +23,7 @@ public class TableEvent extends DBTable {
 
     @Override
     public void createUniqueIndex() {
-        try {
-            db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS " + tableName + "_unique_index" + " ON " +
-                    tableName + " (" +
-                    DBConstants.COLUMN_EVENT_RID + ", " +
-                    DBConstants.COLUMN_EVENT_UID +
-                    ")");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
     }
 
     @Override

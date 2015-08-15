@@ -72,6 +72,22 @@ public class DBHelper extends SQLiteOpenHelper {
                 ")");
 
         /**
+         * 这张表存储用户好友邀请
+         * 第一列是_id，为record的id
+         * 第二列是uid，为发起邀请的用户id
+         * 第三列是fuid，为被邀请的用户id
+         * 第四列是msg，为邀请的留言信息
+         * 第五列是createtime，为邀请创建时间
+         */
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + DBConstants.TABLE_FRIEND_INVITATION +
+                "(" + DBConstants.COLUMN_FRIEND_INVITATION_RID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                DBConstants.COLUMN_FRIEND_INVITATION_UID + " INT8, " +
+                DBConstants.COLUMN_FRIEND_INVITATION_FUID + " INT8, " +
+                DBConstants.COLUMN_FRIEND_INVITATION_MSG + " CHAR(255), " +
+                DBConstants.COLUMN_FRIEND_INVITATION_CREATETIME + " INT8" +
+                ")");
+
+        /**
          * 这张表存储用户的自定义事件
          * 第一列是_id，为record的id
          * 第二列是uid，为用户id
