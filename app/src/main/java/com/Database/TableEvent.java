@@ -73,7 +73,7 @@ public class TableEvent extends DBTable {
         return rid;
     }
 
-    public void deleteEvent(int rid) {
+    public void deleteEvent(long rid) {
         db.beginTransaction();
 
         try {
