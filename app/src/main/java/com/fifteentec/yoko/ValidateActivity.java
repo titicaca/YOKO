@@ -1,7 +1,5 @@
 package com.fifteentec.yoko;
 
-import cn.smssdk.EventHandler;
-import cn.smssdk.SMSSDK;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,44 +13,35 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.FrameLayout.LayoutParams;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.Toast;
-import android.widget.FrameLayout.LayoutParams;
 
 import com.fifteentec.Component.User.UserServer;
 
+import cn.smssdk.EventHandler;
+import cn.smssdk.SMSSDK;
+
 public class ValidateActivity extends LoaderActivity implements OnClickListener {
 
-    // 手机号输入框
+    public final static String SMSSDK_APP_KEY = "93ca809b9373";
+    public final static String SMSSDK_APP_SECRET = "5b30e106b61eb8638e4a5ba6d1374289";
+
     private AutoCompleteTextView mInputPhoneEt;
-
-    // 验证码输入框
     private EditText mInputCodeEt;
-
-    // 获取验证码按钮
     private Button mRequestCodeBtn;
-
-    // 注册按钮
     private Button mRegisterBtn;
-
-    // 登录按钮
     private Button mLoginBtn;
-
-    // 再次请求验证码等待时间
-    int resendWaitSecond = 30;
-
-    boolean isChangePassword = false;
+    private int resendWaitSecond = 30;
+    private boolean isChangePassword = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_validate);
 
-        UserServer.getInstance().autoLogin(this, TestActivity.class);
-
         init();
-
     }
 
     @Override
@@ -65,7 +54,7 @@ public class ValidateActivity extends LoaderActivity implements OnClickListener 
      */
     private void init() {
         String message = getIntent().getStringExtra("FROM_WHERE");
-        if(message != null)
+        if (message != null)
             isChangePassword = message.equals("LOGIN_ACTIVITY");
 
         mInputPhoneEt = (AutoCompleteTextView) findViewById(R.id.validate_input_phone_et);
@@ -77,9 +66,8 @@ public class ValidateActivity extends LoaderActivity implements OnClickListener 
         mRegisterBtn.setOnClickListener(this);
         mLoginBtn.setOnClickListener(this);
 
-        if(isChangePassword)
-        {
-            ((RadioButton)findViewById(R.id.register_rbtn)).setText("修改密码");
+        if (isChangePassword) {
+            ((RadioButton) findViewById(R.id.register_rbtn)).setText("修改密码");
             findViewById(R.id.have_an_account_tv).setVisibility(View.INVISIBLE);
             mLoginBtn.setVisibility(View.INVISIBLE);
             findViewById(R.id.try_app_tv).setVisibility(View.INVISIBLE);
@@ -87,8 +75,8 @@ public class ValidateActivity extends LoaderActivity implements OnClickListener 
         }
 
         // 启动短信验证sdk
-        SMSSDK.initSDK(this, "93ca809b9373", "5b30e106b61eb8638e4a5ba6d1374289");
-        EventHandler eventHandler = new EventHandler(){
+        SMSSDK.initSDK(this, SMSSDK_APP_KEY, SMSSDK_APP_SECRET);
+        EventHandler eventHandler = new EventHandler() {
             /**
              * 在操作之后被触发
              *
@@ -123,7 +111,8 @@ public class ValidateActivity extends LoaderActivity implements OnClickListener 
         switch (v.getId()) {
             case R.id.validate_request_code_btn:
                 // 1. 通过规则判断手机号
-                if (!judgePhoneNums(phoneNums)) {
+                if (!InfoValidate.isPhoneValid(phoneNums)) {
+                    Toast.makeText(this, "手机号码输入有误！", Toast.LENGTH_SHORT).show();
                     return;
                 } // 2. 通过sdk发送短信验证
                 SMSSDK.getVerificationCode("86", phoneNums);
@@ -203,30 +192,13 @@ public class ValidateActivity extends LoaderActivity implements OnClickListener 
                     } else {
                         ((Throwable) data).printStackTrace();
                     }
-                }
-                else
-                {
+                } else {
                     Toast.makeText(getApplicationContext(), "验证码错误",
                             Toast.LENGTH_SHORT).show();
                 }
             }
         }
     };
-
-
-    /**
-     * 判断手机号码是否合理
-     *
-     * @param phoneNums
-     */
-    private boolean judgePhoneNums(String phoneNums) {
-        if (InfoValidate.isMatchLength(phoneNums, 11)
-                && InfoValidate.isPhoneValid(phoneNums)) {
-            return true;
-        }
-        Toast.makeText(this, "手机号码输入有误！",Toast.LENGTH_SHORT).show();
-        return false;
-    }
 
     /**
      * progressbar

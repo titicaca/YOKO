@@ -1,26 +1,26 @@
 package com.fifteentec.yoko;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
+import android.widget.EditText;
 
-import com.API.APIJsonCallbackResponse;
-import com.API.APIKey;
-import com.API.APIServer;
-import com.API.APIUrl;
 import com.fifteentec.Component.User.UserServer;
 
-import java.util.HashMap;
-import java.util.Map;
+public class TestActivity extends BaseActivity {
+    private Button mTestBtn;
+    private EditText mTokenTv;
+    private EditText mTestJsonTv;
 
-public class TestActivity extends BaseActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
 
-        Button mTestBtn = (Button) findViewById(R.id.test_btn);
+        mTestBtn = (Button) findViewById(R.id.test_btn);
+        mTokenTv = (EditText) findViewById(R.id.token_tv);
+        mTestJsonTv = (EditText) findViewById(R.id.json_test_tv);
         mTestBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -29,19 +29,10 @@ public class TestActivity extends BaseActivity{
         });
     }
 
-    public void test(){
-        Map<String, String> headers = new HashMap<String, String>();
-        headers.put(APIKey.KEY_AUTHORIZATION, UserServer.getInstance().getAccess_token());
+    public void test() {
+        UserServer.getInstance().userGetUserInfo(TestActivity.this);
+        mTokenTv.setText("access_token: " + UserServer.getInstance().getAccessToken() + "\n" +
+                "refresh_token: " + UserServer.getInstance().getRefreshToken());
 
-        APIServer.JsonGet jsonGet = new APIServer.JsonGet(APIUrl.URL_REQUEST_USER_INFO,
-                null, headers, new APIJsonCallbackResponse() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getApplicationContext(), ((this.getResponse() == null)
-                                        ? "测试Token!失败!\n"
-                                        : "测试Token!成功!\n" + this.getResponse().toString()),
-                                Toast.LENGTH_LONG).show();
-                    }
-                }, getRequestQueue(), null);
     }
 }

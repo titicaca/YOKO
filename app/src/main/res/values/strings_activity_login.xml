@@ -13,4 +13,5 @@
     <string name="error_field_required">This field is required</string>
 
     <string name="string_forget_code">忘记密码？</string>
+    <string name="string_user_register">新用户注册</string>
 </resources>
