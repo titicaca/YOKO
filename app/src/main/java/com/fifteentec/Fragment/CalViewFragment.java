@@ -24,6 +24,7 @@ import android.widget.TextView;
 
 import com.fifteentec.Component.calendar.CalView;
 import com.fifteentec.Component.calendar.CalendarController;
+import com.fifteentec.Component.calendar.DayEventView;
 import com.fifteentec.Component.calendar.EventListView;
 import com.fifteentec.Component.calendar.NewEventView;
 import com.fifteentec.yoko.R;
@@ -121,7 +122,7 @@ public class CalViewFragment extends Fragment {
             }
         });
         mTrans.add(R.id.id_event_content,mListView).commit();
-
+        showDayEventView();
         return view;
     }
 
@@ -182,7 +183,15 @@ public class CalViewFragment extends Fragment {
                     if (mNewEventView != null) {
                         mNewEventView.addNewPic(fileName);
                     }
-*/
+
+                    Uri aim = data.getData();
+                    String[] proj = { MediaStore.Images.Media.DATA };
+                    Cursor actualimagecursor = getActivity().managedQuery(aim,proj,null,null,null);
+                    int actual_image_column_index = actualimagecursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                    actualimagecursor.moveToFirst();
+                    String img_path = actualimagecursor.getString(actual_image_column_index);
+                    Log.d("Test",img_path);
+                    */
                     if(RECENT_FILE_NAME != null&&mNewEventView != null) mNewEventView.addNewPic(CAMERA_PATH+RECENT_FILE_NAME);
                 }
         }
@@ -234,5 +243,10 @@ public class CalViewFragment extends Fragment {
                 GregorianCalendar temp =mDate.getCurCalendar();
                 mCalView.UpdateTime(temp);
         }
+    }
+
+    private void showDayEventView(){
+        DayEventView dayEventView = DayEventView.newInstance(getActivity(),mDate.getCurCalendar());
+        mMainView.addView(dayEventView);
     }
 }

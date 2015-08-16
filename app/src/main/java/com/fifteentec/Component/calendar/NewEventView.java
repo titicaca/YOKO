@@ -12,6 +12,7 @@ import android.graphics.PathEffect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -123,7 +124,6 @@ public class NewEventView extends ViewGroup{
         super(context, attrs, defStyleAttr);
         this.mContext = context;
     }
-
 
 
 
