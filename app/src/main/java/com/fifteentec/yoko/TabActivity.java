@@ -7,11 +7,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-<<<<<<< HEAD
-import com.fifteentec.Component.User.UserServer;
-import com.fifteentec.Fragment.CalViewFragment;
-=======
->>>>>>> f0a43054d35ee1b1c80f1cab51992254f831dbf4
 import com.fifteentec.Fragment.TabButtonFragment;
 
 public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutton {
