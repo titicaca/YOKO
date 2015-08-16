@@ -54,5 +54,6 @@ public class DBConstants {
     public final static String COLUMN_EVENT_PROPERTY = "property";
     public final static String COLUMN_EVENT_DETAILLINK = "detaillink";
     public final static String COLUMN_EVENT_STATUS = "status";
+    public final static String COLUMN_EVENT_MODIFIED = "modified";
     public final static String COLUMN_EVENT_UPDATETIME = "updatetime";
 }

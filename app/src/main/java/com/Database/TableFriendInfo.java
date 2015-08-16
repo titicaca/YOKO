@@ -101,7 +101,7 @@ public class TableFriendInfo extends DBTable {
         db.beginTransaction();
 
         try {
-            db.execSQL("INSERT OR IGNORE INTO " + DBConstants.TABLE_FRIEND_INFO + "VALUES(NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            db.execSQL("INSERT OR IGNORE INTO " + DBConstants.TABLE_FRIEND_INFO + " VALUES(NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     new Object[]{friendInfoRecord.uid, friendInfoRecord.fuid, friendInfoRecord.email, friendInfoRecord.location,
                                 friendInfoRecord.mobile, friendInfoRecord.nickname, friendInfoRecord.picturelink, friendInfoRecord.qq,
                                 friendInfoRecord.sex, friendInfoRecord.wechat, friendInfoRecord.weibo, friendInfoRecord.collectnumber,

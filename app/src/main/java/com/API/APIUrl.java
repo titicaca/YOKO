@@ -21,6 +21,10 @@ public class APIUrl {
 
     public final static String URL_REQUEST_USER_INFO = URL_BASE_USER + "/" + "userinfo";
 
+    public final static String URL_EVENT_UPDATE = URL_BASE_USER + "/" + "myschedule";
+
+    public final static String URL_EVENT_GET = URL_BASE_USER + "/" + "myschedule" + "/" + "schedules";
+
     private final static String URL_DOWNLOAD_BASE = "";
 
     public final static String URL_AUDIO_DOWNLOAD = URL_DOWNLOAD_BASE + "/" + "";

@@ -46,7 +46,7 @@ public class TableEvent extends DBTable {
         db.beginTransaction();
 
         try {
-            db.execSQL("INSERT OR IGNORE INTO " + tableName + "VALUES(NULL, ?, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            db.execSQL("INSERT OR IGNORE INTO " + tableName + "VALUES(NULL, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)",
                     new Object[]{eventRecord.uid, eventRecord.introduciton, eventRecord.localpicturelink,
                             eventRecord.remotepitcurelink, eventRecord.remind, eventRecord.timebegin,
                             eventRecord.timeend, eventRecord.type, eventRecord.property,
@@ -65,7 +65,12 @@ public class TableEvent extends DBTable {
         db.beginTransaction();
 
         try {
-            db.delete(tableName,
+            ContentValues cv = new ContentValues();
+            cv.put(DBConstants.COLUMN_EVENT_STATUS, 1);
+            cv.put(DBConstants.COLUMN_EVENT_MODIFIED, 1);
+            cv.put(DBConstants.COLUMN_EVENT_UPDATETIME, System.currentTimeMillis());
+
+            db.update(tableName, cv,
                     DBConstants.COLUMN_EVENT_RID + " = ?",
                     new String[]{String.valueOf(rid)});
             db.setTransactionSuccessful();
@@ -77,6 +82,10 @@ public class TableEvent extends DBTable {
     }
 
     public void updateEvent(EventRecord eventRecord) {
+        updateEvent(eventRecord, 1);
+    }
+
+    public void updateEvent(EventRecord eventRecord, int modified) {
         db.beginTransaction();
 
         try {
@@ -91,6 +100,7 @@ public class TableEvent extends DBTable {
             cv.put(DBConstants.COLUMN_EVENT_PROPERTY, eventRecord.property);
             cv.put(DBConstants.COLUMN_EVENT_DETAILLINK, eventRecord.detaillink);
             cv.put(DBConstants.COLUMN_EVENT_STATUS, eventRecord.status);
+            cv.put(DBConstants.COLUMN_EVENT_MODIFIED, modified);
             cv.put(DBConstants.COLUMN_EVENT_UPDATETIME, System.currentTimeMillis());
 
             db.update(tableName, cv,
@@ -104,13 +114,13 @@ public class TableEvent extends DBTable {
         }
     }
 
-    public EventRecord queryEvent(int rid) {
+    public EventRecord queryEventByServerId(long serverId) {
         EventRecord eventRecord = null;
         Cursor cs = null;
         try {
             cs = db.query(tableName, null,
-                    DBConstants.COLUMN_EVENT_RID + " = ?",
-                    new String[]{String.valueOf(rid)},
+                    DBConstants.COLUMN_EVENT_SEVERID + " = ?",
+                    new String[]{String.valueOf(serverId)},
                     null, null, null);
             if (cs.getCount() == 1) {
                 cs.moveToFirst();
@@ -156,14 +166,19 @@ public class TableEvent extends DBTable {
     }
 
     public List<EventRecord> queryEvent(long uid, long startTime, long endTime) {
+        return queryEvent(uid, startTime, endTime, 0);
+    }
+
+    public List<EventRecord> queryEvent(long uid, long startTime, long endTime, int status) {
         List<EventRecord> eventRecords = null;
         Cursor cs = null;
         try {
             cs = db.query(tableName, null,
                     DBConstants.COLUMN_EVENT_UID + " = ?" + " AND " +
-                    DBConstants.COLUMN_EVENT_TIMEBEGIN + " >= ?" + " AND " +
-                    DBConstants.COLUMN_EVENT_TIMEBEGIN + " <= ?",
-                    new String[]{String.valueOf(uid), String.valueOf(startTime), String.valueOf(endTime)},
+                            DBConstants.COLUMN_EVENT_TIMEBEGIN + " >= ?" + " AND " +
+                            DBConstants.COLUMN_EVENT_TIMEBEGIN + " <= ?" + " AND " +
+                            DBConstants.COLUMN_EVENT_MODIFIED + " <= ?",
+                    new String[]{String.valueOf(uid), String.valueOf(startTime), String.valueOf(endTime), String.valueOf(status)},
                     null, null, DBConstants.COLUMN_EVENT_TIMEBEGIN);
             eventRecords = cursorToList(cs);
         } catch (Exception e) {
@@ -176,12 +191,17 @@ public class TableEvent extends DBTable {
     }
 
     public List<EventRecord> queryEvent(long uid) {
+        return queryEvent(uid, 0);
+    }
+
+    public List<EventRecord> queryEvent(long uid, int status) {
         List<EventRecord> eventRecords = null;
         Cursor cs = null;
         try {
             cs = db.query(tableName, null,
-                    DBConstants.COLUMN_EVENT_UID + " = ?",
-                    new String[]{String.valueOf(uid)},
+                    DBConstants.COLUMN_EVENT_UID + " = ?" + " AND " +
+                    DBConstants.COLUMN_EVENT_MODIFIED + " <= ?",
+                    new String[]{String.valueOf(uid), String.valueOf(status)},
                     null, null, DBConstants.COLUMN_EVENT_TIMEBEGIN);
             eventRecords = cursorToList(cs);
         } catch (Exception e) {
@@ -235,32 +255,6 @@ public class TableEvent extends DBTable {
         }
 
         return eventRecords;
-    }
-
-    public void syncUser(long uid, List<EventRecord> eventRecords) {
-        db.beginTransaction();
-
-        try {
-            db.delete(tableName,
-                    DBConstants.COLUMN_EVENT_UID + " = ?",
-                    new String[]{String.valueOf(uid)});
-
-            for (EventRecord eventRecord : eventRecords) {
-                db.execSQL("INSERT OR IGNORE INTO " + tableName + "VALUES(NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                        new Object[]{eventRecord.uid, eventRecord.serverid, eventRecord.introduciton,
-                                eventRecord.localpicturelink, eventRecord.remotepitcurelink,
-                                eventRecord.remind, eventRecord.timebegin, eventRecord.timeend,
-                                eventRecord.type, eventRecord.property, eventRecord.detaillink,
-                                eventRecord.status, eventRecord.updatetime}
-                );
-            }
-
-            db.setTransactionSuccessful();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            db.endTransaction();
-        }
     }
 }
 

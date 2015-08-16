@@ -21,23 +21,26 @@ public abstract class BaseActivity extends Activity {
     private static BaseActivity curActivity;
 
     private static DataSyncServiceBinder dataSyncServiceBinder;
+    private static DataSyncService dataSyncService;
 
     private static ServiceConnection dataSyncServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.v("Base Activity", "Service Connect");
             dataSyncServiceBinder = (DataSyncServiceBinder)service;
+            dataSyncService = dataSyncServiceBinder.getService();
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
             Log.v("Base Activity", "Service Disconnect");
             dataSyncServiceBinder = null;
+            dataSyncService = null;
         }
     };
 
-    public static DataSyncServiceBinder getDataSyncServiceBinder() {
-        return dataSyncServiceBinder;
+    public static DataSyncService getDataSyncService() {
+        return dataSyncService;
     }
 
     public RequestQueue getRequestQueue() {
