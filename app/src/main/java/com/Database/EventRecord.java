@@ -1,7 +1,7 @@
 package com.Database;
 
 public class EventRecord {
-    public int rid;
+    public long rid;
     public long uid;
     public long serverid;
     public String introduction;
@@ -39,12 +39,11 @@ public class EventRecord {
         this.updatetime = eventRecord.updatetime;
     }
 
-    public EventRecord(int rid, long uid, long serverid, String introduction,
+    public EventRecord(long uid, long serverid, String introduction,
                        String localpicturelink, String remotepitcurelink,
                        long remind, long timebegin, long timeend, int type,
                        int property, String detaillink, int status, int modified,
                        long updatetime) {
-        this.rid = rid;
         this.uid = uid;
         this.serverid = serverid;
         this.introduction = introduction;

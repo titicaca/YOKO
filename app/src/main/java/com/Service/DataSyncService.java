@@ -196,7 +196,7 @@ public class DataSyncService extends Service {
                     try {
                         event.put(APIKey.KEY_EVENT_SERVERID, eventRecord.serverid);
                         event.put(APIKey.KEY_EVENT_UID, eventRecord.uid);
-                        event.put(APIKey.KEY_EVENT_INTRODUCTION,eventRecord.introduciton);
+                        event.put(APIKey.KEY_EVENT_INTRODUCTION,eventRecord.introduction);
                         event.put(APIKey.KEY_EVENT_LOCALPICTURELINK,eventRecord.localpicturelink);
                         event.put(APIKey.KEY_EVENT_REMOTEPICTURELINK,eventRecord.remotepitcurelink);
                         event.put(APIKey.KEY_EVENT_REMIND,eventRecord.remind);

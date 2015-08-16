@@ -1,7 +1,7 @@
 package com.Database;
 
 public class FriendTagRecord {
-    public int rid;
+    public long rid;
     public long uid;
     public long fuid;
     public long tagId;

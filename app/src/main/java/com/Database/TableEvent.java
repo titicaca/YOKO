@@ -39,23 +39,38 @@ public class TableEvent extends DBTable {
         }
     }
 
-    public void addEvent(EventRecord eventRecord) {
+    public long addEvent(EventRecord eventRecord) {
+        long rid;
+
         db.beginTransaction();
 
         try {
-            db.execSQL("INSERT OR IGNORE INTO " + tableName + "VALUES(NULL, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)",
-                    new Object[]{eventRecord.uid, eventRecord.introduction, eventRecord.localpicturelink,
-                            eventRecord.remotepitcurelink, eventRecord.remind, eventRecord.timebegin,
-                            eventRecord.timeend, eventRecord.type, eventRecord.property,
-                            eventRecord.detaillink, eventRecord.status, System.currentTimeMillis()}
-            );
+            ContentValues cv = new ContentValues();
+            cv.put(DBConstants.COLUMN_EVENT_UID, eventRecord.uid);
+            cv.put(DBConstants.COLUMN_EVENT_SEVERID, 0);
+            cv.put(DBConstants.COLUMN_EVENT_INTRODUCTION, eventRecord.introduction);
+            cv.put(DBConstants.COLUMN_EVENT_LOCALPICTURELINK, eventRecord.localpicturelink);
+            cv.put(DBConstants.COLUMN_EVENT_REMOTEPICTURELINK, eventRecord.remotepitcurelink);
+            cv.put(DBConstants.COLUMN_EVENT_REMIND, eventRecord.remind);
+            cv.put(DBConstants.COLUMN_EVENT_TIMEBEGIN, eventRecord.timebegin);
+            cv.put(DBConstants.COLUMN_EVENT_TIMEEND, eventRecord.timeend);
+            cv.put(DBConstants.COLUMN_EVENT_TYPE, eventRecord.type);
+            cv.put(DBConstants.COLUMN_EVENT_PROPERTY, eventRecord.property);
+            cv.put(DBConstants.COLUMN_EVENT_DETAILLINK, eventRecord.detaillink);
+            cv.put(DBConstants.COLUMN_EVENT_STATUS, eventRecord.status);
+            cv.put(DBConstants.COLUMN_EVENT_MODIFIED, 1);
+            cv.put(DBConstants.COLUMN_EVENT_UPDATETIME, System.currentTimeMillis());
+            rid = db.insert(tableName, null, cv);
 
             db.setTransactionSuccessful();
         } catch (Exception e) {
+            rid = -1;
             e.printStackTrace();
         } finally {
             db.endTransaction();
         }
+
+        return rid;
     }
 
     public void deleteEvent(int rid) {

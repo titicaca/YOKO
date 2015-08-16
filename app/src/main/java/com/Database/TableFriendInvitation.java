@@ -46,7 +46,7 @@ public class TableFriendInvitation extends DBTable {
         }
     }
 
-    public void deleteFriendInvitation(int rid) {
+    public void deleteFriendInvitation(long rid) {
         db.beginTransaction();
 
         try {
