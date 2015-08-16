@@ -1,8 +1,5 @@
 package com.Database;
 
-/**
- * Created by benbush on 15/8/14.
- */
 public class EventRecord {
     public int rid;
     public long uid;

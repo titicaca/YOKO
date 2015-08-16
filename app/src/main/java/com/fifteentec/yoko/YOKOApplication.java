@@ -1,16 +1,12 @@
 package com.fifteentec.yoko;
 
 import android.app.Application;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.os.IBinder;
 
 import com.Service.DataSyncService;
-import com.Service.DataSyncService.DataSyncServiceBinder;
 import com.baidu.android.pushservice.PushConstants;
 import com.baidu.android.pushservice.PushManager;
 import com.fifteentec.Component.User.UserServer;

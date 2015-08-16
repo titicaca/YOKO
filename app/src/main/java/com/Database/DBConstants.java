@@ -1,8 +1,5 @@
 package com.Database;
 
-/**
- * Created by benbush on 15/8/13.
- */
 public class DBConstants {
     //for table friend_tag
     public final static String TABLE_FRIEND_TAG = "friend_tag";

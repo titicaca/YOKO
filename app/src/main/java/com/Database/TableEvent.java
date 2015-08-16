@@ -7,9 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by benbush on 15/8/14.
- */
 public class TableEvent extends DBTable {
 
     public TableEvent(SQLiteDatabase db) {

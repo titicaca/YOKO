@@ -7,9 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by benbush on 15/8/13.
- */
 public class TableFriendInfo extends DBTable {
 
     public TableFriendInfo(SQLiteDatabase db) {

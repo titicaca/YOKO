@@ -1,8 +1,5 @@
 package com.Database;
 
-/**
- * Created by benbush on 15/8/15.
- */
 public class FriendInvitationRecord {
     public int rid;
     public long uid;

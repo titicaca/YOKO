@@ -12,10 +12,10 @@ import com.API.APIJsonCallbackResponse;
 import com.API.APIKey;
 import com.API.APIServer;
 import com.API.APIUrl;
+import com.API.APIUserServer;
 import com.fifteentec.yoko.BaseActivity;
 import com.fifteentec.yoko.LoginActivity;
 import com.fifteentec.yoko.TabActivity;
-import com.fifteentec.yoko.TestActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -148,23 +148,15 @@ public class UserServer {
             return;
         }
 
-        Map<String, String> headers = new HashMap<String, String>();
-        try {
-            headers.put(APIKey.KEY_AUTHORIZATION, UserServer.getInstance().getAccessToken());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        APIServer.JsonGet jsonGet = new APIServer.JsonGet(APIUrl.URL_REQUEST_USER_INFO,
-                null, headers, new APIJsonCallbackResponse() {
+        new APIUserServer.JsonGet(APIUrl.URL_REQUEST_USER_INFO,
+                null, null, new APIJsonCallbackResponse() {
             @Override
             public void run() {
                 Intent intent = new Intent(activity,
                         (this.getResponse() == null) ? LoginActivity.class : TabActivity.class);
                 activity.startActivity(intent);
             }
-        }, activity.getRequestQueue(), null);
-        jsonGet.send();
+        }, activity.getRequestQueue(), null).send();
     }
 
     public void userLogin(final LoginActivity activity, final String phone, final String password) {
@@ -181,7 +173,7 @@ public class UserServer {
         headers.put(APIKey.KEY_AUTHORIZATION, APIKey.VALUE_REQUEST_TOKEN);
         headers.put(APIKey.KEY_ACCEPT, APIKey.VALUE_ACCEPT);
 
-        APIServer.TokenPost tokenPost = new APIServer.TokenPost(APIUrl.URL_LOGIN,
+        new APIServer.TokenPost(APIUrl.URL_LOGIN,
                 params, headers, new APIJsonCallbackResponse() {
             @Override
             public void run() {
@@ -221,9 +213,7 @@ public class UserServer {
                     e.printStackTrace();
                 }
             }
-        }, activity.getRequestQueue(), null);
-
-        tokenPost.send();
+        }, activity.getRequestQueue(), null).send();
     }
 
     public void userLogout() {
@@ -240,7 +230,8 @@ public class UserServer {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        APIServer.JsonPost jsonPost = new APIServer.JsonPost(APIUrl.URL_REGISTER,
+
+        new APIServer.JsonPost(APIUrl.URL_REGISTER,
                 params, null, new APIJsonCallbackResponse() {
             @Override
             public void run() {
@@ -256,8 +247,7 @@ public class UserServer {
                     activity.startActivity(intent);
                 }
             }
-        }, activity.getRequestQueue(), null);
-        jsonPost.send();
+        }, activity.getRequestQueue(), null).send();
     }
 
     public void userChangePswd(final BaseActivity activity, final String phone, final String password) {
@@ -268,7 +258,7 @@ public class UserServer {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        APIServer.JsonPut jsonPut = new APIServer.JsonPut(APIUrl.URL_CHANGE_PASSWORD,
+        new APIServer.JsonPut(APIUrl.URL_CHANGE_PASSWORD,
                 params, null, new APIJsonCallbackResponse() {
             @Override
             public void run() {
@@ -283,16 +273,12 @@ public class UserServer {
                     activity.startActivity(intent);
                 }
             }
-        }, activity.getRequestQueue(), null);
-        jsonPut.send();
+        }, activity.getRequestQueue(), null).send();
     }
 
     public void userGetUserInfo(final BaseActivity activity) {
-        Map<String, String> headers = new HashMap<String, String>();
-        headers.put(APIKey.KEY_AUTHORIZATION, UserServer.getInstance().getAccessToken());
-
-        APIServer.JsonGet jsonGet = new APIServer.JsonGet(APIUrl.URL_REQUEST_USER_INFO,
-                null, headers, new APIJsonCallbackResponse() {
+        new APIUserServer.JsonGet(APIUrl.URL_REQUEST_USER_INFO,
+                null, null, new APIJsonCallbackResponse() {
             @Override
             public void run() {
                 Toast.makeText(activity.getApplicationContext(), ((this.getResponse() == null)
@@ -300,16 +286,12 @@ public class UserServer {
                                 : "获取用户信息成功!\n" + this.getResponse().toString()),
                         Toast.LENGTH_LONG).show();
             }
-        }, activity.getRequestQueue(), null);
-        jsonGet.send();
+        }, activity.getRequestQueue(), null).send();
     }
 
     public void userDelUserInfo(final BaseActivity activity) {
-        Map<String, String> headers = new HashMap<String, String>();
-        headers.put(APIKey.KEY_AUTHORIZATION, UserServer.getInstance().getAccessToken());
-
-        APIServer.JsonDel jsonDel = new APIServer.JsonDel(APIUrl.URL_REQUEST_USER_INFO,
-                null, headers, new APIJsonCallbackResponse() {
+        new APIUserServer.JsonDel(APIUrl.URL_REQUEST_USER_INFO,
+                null, null, new APIJsonCallbackResponse() {
             @Override
             public void run() {
                 Toast.makeText(activity.getApplicationContext(), ((this.getResponse() == null)
@@ -317,7 +299,6 @@ public class UserServer {
                                 : "获取用户信息成功!\n" + this.getResponse().toString()),
                         Toast.LENGTH_LONG).show();
             }
-        }, activity.getRequestQueue(), null);
-        jsonDel.send();
+        }, activity.getRequestQueue(), null).send();
     }
 }
