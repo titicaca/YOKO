@@ -15,6 +15,8 @@ public class APIUrl {
 
     public final static String URL_UPLOAD_BAIDUPUSH_USER_INFO = URL_BASE + "/" + "";
 
+    public final static String URL_PUSH_INFO = URL_BASE + "/" + "pushinfo";
+
     private final static String URL_BASE_USER = URL_BASE + "/" + "user";
 
     public final static String URL_SYNC_FRIENDS = URL_BASE_USER + "/" + "myfriend" + "/" + "allinfo";
