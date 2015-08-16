@@ -41,7 +41,7 @@ public class DBConstants {
     public final static String COLUMN_EVENT_RID = "_id";
     public final static String COLUMN_EVENT_UID = "uid";
     public final static String COLUMN_EVENT_SEVERID = "serverid";
-    public final static String COLUMN_EVENT_INTRODUCTION = "introduciton";
+    public final static String COLUMN_EVENT_INTRODUCTION = "introduction";
     public final static String COLUMN_EVENT_LOCALPICTURELINK = "localpicturelink";
     public final static String COLUMN_EVENT_REMOTEPICTURELINK = "remotepitcurelink";
     public final static String COLUMN_EVENT_REMIND = "remind";

@@ -4,7 +4,7 @@ public class EventRecord {
     public int rid;
     public long uid;
     public long serverid;
-    public String introduciton;
+    public String introduction;
     public String localpicturelink;
     public String remotepitcurelink;
     public long remind;
@@ -25,7 +25,7 @@ public class EventRecord {
         this.rid = eventRecord.rid;
         this.uid = eventRecord.uid;
         this.serverid = eventRecord.serverid;
-        this.introduciton = eventRecord.introduciton;
+        this.introduction = eventRecord.introduction;
         this.localpicturelink = eventRecord.localpicturelink;
         this.remotepitcurelink = eventRecord.remotepitcurelink;
         this.remind = eventRecord.remind;
@@ -39,7 +39,7 @@ public class EventRecord {
         this.updatetime = eventRecord.updatetime;
     }
 
-    public EventRecord(int rid, long uid, long serverid, String introduciton,
+    public EventRecord(int rid, long uid, long serverid, String introduction,
                        String localpicturelink, String remotepitcurelink,
                        long remind, long timebegin, long timeend, int type,
                        int property, String detaillink, int status, int modified,
@@ -47,7 +47,7 @@ public class EventRecord {
         this.rid = rid;
         this.uid = uid;
         this.serverid = serverid;
-        this.introduciton = introduciton;
+        this.introduction = introduction;
         this.localpicturelink = localpicturelink;
         this.remotepitcurelink = remotepitcurelink;
         this.remind = remind;
