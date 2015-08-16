@@ -11,6 +11,9 @@ import android.graphics.Paint;
 import android.graphics.PathEffect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
@@ -63,24 +66,29 @@ public class NewEventView extends ViewGroup{
     private  final int TEXT_INPUT = 0x00;
     private final int FUNCITON_MODE = 0x10;
 
+
     private final int NONFUNCTION =0x00;
     private final int REMINED = 0x01;
     private final int TAG =0x02;
     private final int TIME =0x03;
     private final int PIC =0x04;
 
+
     private NewEventListener mEventListener;
     private int Mode=TEXT_INPUT;
+
 
     private int RemindSelected =-1;
     private int TagSelected =-1;
     private GregorianCalendar StartDate;
     private GregorianCalendar EndDate;
+    private String introduction;
 
 
     public interface NewEventListener{
-        void CreateFinish();
+        void CreateFinish(Bundle bundle);
         void addNewBitMap(boolean open);
+
     }
 
 
@@ -111,6 +119,7 @@ public class NewEventView extends ViewGroup{
         EndDate = new GregorianCalendar();
         EndDate.add(Calendar.MINUTE, 1);
         SavedPic = new ArrayList<Bitmap>();
+
     }
     public NewEventView(Context context) {
         this(context, null);
@@ -165,7 +174,9 @@ public class NewEventView extends ViewGroup{
         mCancelButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                mEventListener.CreateFinish();
+                Bundle bundle = new Bundle();
+                bundle.putString("introduction",introduction);
+                mEventListener.CreateFinish(bundle);
             }
         });
 
@@ -448,7 +459,21 @@ public class NewEventView extends ViewGroup{
         private int LeftPadding =mSurface.InputPageTextPadding;
         private int RightPadding =mSurface.InputPageTextPadding;
 
+        private TextWatcher mtextWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                introduction = s.toString();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        };
 
         public InputPage(Context context) {
             super(context);
@@ -468,13 +493,15 @@ public class NewEventView extends ViewGroup{
             return super.onTouchEvent(event);
         }
 
+
         public void init(){
             BottonPadding = mSurface.FounctionBarPadding+TopPadding+mSurface.FounctionBarPadding;
             setBackgroundColor(mSurface.InputBackground);
             setTextSize(TypedValue.COMPLEX_UNIT_SP, TextSize);
             setGravity(Gravity.TOP);
             setHint(HintString);
-            setPadding(LeftPadding,TopPadding,RightPadding,BottonPadding);
+            setPadding(LeftPadding, TopPadding, RightPadding, BottonPadding);
+            addTextChangedListener(mtextWatcher);
         }
 
         public void HeightChange() {

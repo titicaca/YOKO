@@ -22,17 +22,22 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.Database.DBManager;
+import com.Database.EventRecord;
+import com.Database.TableEvent;
 import com.fifteentec.Component.calendar.CalView;
 import com.fifteentec.Component.calendar.CalendarController;
 import com.fifteentec.Component.calendar.DayEventView;
 import com.fifteentec.Component.calendar.EventListView;
 import com.fifteentec.Component.calendar.NewEventView;
+import com.fifteentec.yoko.BaseActivity;
 import com.fifteentec.yoko.R;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.Timestamp;
 import java.text.DateFormat;
 import java.text.FieldPosition;
 import java.text.ParsePosition;
@@ -65,6 +70,8 @@ public class CalViewFragment extends Fragment {
     private final int IMAGE_NEWEVENT_CODE = 0x00;
     private final int IMAGE_OPENCAMERA_CODE = 0x01;
 
+    private BaseActivity activity;
+    private DBManager dbManager;
 
 
 
@@ -77,6 +84,8 @@ public class CalViewFragment extends Fragment {
         mFragmentManager = getFragmentManager();
         super.onCreate(savedInstanceState);
 
+        this.activity = (BaseActivity)this.getActivity();
+        this.dbManager = (DBManager)this.activity.getDBManager();
     }
 
 
@@ -201,9 +210,13 @@ public class CalViewFragment extends Fragment {
         mNewEventView = NewEventView.newInstance(getActivity(),NewEventView.BLANK_EVENT);
         mNewEventView.setNewEventListtenr(new NewEventView.NewEventListener() {
             @Override
-            public void CreateFinish() {
+            public void CreateFinish(Bundle bundle) {
                 mMainView.removeView(mNewEventView);
                 mNewEventView =null;
+                EventRecord eventRecord = new EventRecord();
+                eventRecord.introduciton = bundle.getString("introduction");
+                dbManager.getTableEvent().addEvent(eventRecord);
+
             }
 
             @Override
