@@ -1,22 +1,23 @@
 package com.fifteentec.yoko;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+<<<<<<< HEAD
 import com.fifteentec.Component.User.UserServer;
 import com.fifteentec.Fragment.CalViewFragment;
+=======
+>>>>>>> f0a43054d35ee1b1c80f1cab51992254f831dbf4
 import com.fifteentec.Fragment.TabButtonFragment;
 
 public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutton {
     private FragmentManager mFragmentManager;
     private final int EnterPage = 0;
     private TabButtonFragment mbuttonfg;
-    private CalViewFragment mCalViewFragment;
 
     @SuppressLint("NewApi")
     @Override
@@ -46,13 +47,6 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
                         Toast.LENGTH_SHORT);
                 d.setDuration(Toast.LENGTH_SHORT);
                 d.show();
-                /*if(mCalViewFragment ==null){
-                    mCalViewFragment = new CalViewFragment();
-                    mFmTrans.add(R.id.id_content,mCalViewFragment,"cal");
-                }
-                else{
-                    mFmTrans.show(mCalViewFragment);
-                }*/
                 break;
             case R.integer.SelectorFrd:
                 Toast a = Toast.makeText(this, "Found",
@@ -83,9 +77,7 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
     }
 
     private void HideAllView(FragmentTransaction mFmTrans) {
-        if (mCalViewFragment != null) {
-            mFmTrans.hide(mCalViewFragment);
-        }
+
 
     }
 }

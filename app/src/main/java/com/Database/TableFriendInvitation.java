@@ -13,7 +13,7 @@ public class TableFriendInvitation extends DBTable {
     }
 
     @Override
-    public void setTableName() {
+    protected void setTableName() {
         this.tableName = DBConstants.TABLE_FRIEND_INVITATION;
     }
 
@@ -46,7 +46,7 @@ public class TableFriendInvitation extends DBTable {
         }
     }
 
-    public void deleteFriendInvitation(int rid) {
+    public void deleteFriendInvitation(long rid) {
         db.beginTransaction();
 
         try {
