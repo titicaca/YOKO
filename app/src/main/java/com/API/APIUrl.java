@@ -1,25 +1,29 @@
 package com.API;
 
 public class APIUrl {
-    private final static String URL_BASE = "http://192.168.0.110:8080";
-
-    public final static String URL_HOME = URL_BASE + "/" + "home";
+    private final static String URL_BASE = "http://139.196.16.75:8080";
 
     public final static String URL_LOGIN = URL_BASE + "/" + "oauth/token";
-
-    public final static String URL_RESET_PASSWORD = URL_BASE + "/" + "";
 
     public final static String URL_REGISTER = URL_BASE + "/" + "signup/user";
 
     public final static String URL_CHANGE_PASSWORD = URL_BASE + "/" + "signup/user";
 
-    public final static String URL_SEND_SMS = URL_BASE + "/" + "";
+    public final static String URL_DELETE_USER_INFO = URL_BASE + "/" + "home";
 
-    public final static String URL_USER_UPDATE = URL_BASE + "/" + "";
+    public final static String URL_REQUEST_TOKEN = URL_BASE + "/" + "oauth/token";
 
-    public final static String URL_GET_TOPICS_INFO = URL_BASE + "/" + "";
+    public final static String URL_UPLOAD_BAIDUPUSH_USER_INFO = URL_BASE + "/" + "";
 
-    public final static String URL_POST_USER_BEHAVIOR = URL_BASE + "/" + "";
+    private final static String URL_BASE_USER = URL_BASE + "/" + "user";
+
+    public final static String URL_SYNC_FRIENDS = URL_BASE_USER + "/" + "myfriend" + "/" + "allinfo";
+
+    public final static String URL_REQUEST_USER_INFO = URL_BASE_USER + "/" + "userinfo";
+
+    public final static String URL_EVENT_UPDATE = URL_BASE_USER + "/" + "myschedule";
+
+    public final static String URL_EVENT_GET = URL_BASE_USER + "/" + "myschedule" + "/" + "schedules";
 
     private final static String URL_DOWNLOAD_BASE = "";
 

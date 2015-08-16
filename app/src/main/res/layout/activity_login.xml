@@ -1,71 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:clickable="false">
+    android:clickable="false"
+    android:orientation="vertical">
 
     <!-- Login progress -->
-    <ProgressBar android:id="@+id/login_progress" style="?android:attr/progressBarStyleLarge"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:visibility="gone"
+    <ProgressBar
+        android:id="@+id/login_progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="107dp" />
+        android:layout_marginTop="107dp"
+        android:visibility="gone" />
 
-    <RelativeLayout android:id="@+id/user_login_form" android:layout_width="match_parent"
-        android:layout_height="match_parent" android:orientation="vertical">
+    <RelativeLayout
+        android:id="@+id/user_login_form"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <RadioButton
+            android:id="@+id/login_rbtn"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/string_login"
-            android:id="@+id/login_rbtn"
-            android:layout_alignParentTop="false"
             android:layout_alignParentLeft="false"
             android:layout_alignParentStart="false"
-            android:checked="true"
+            android:layout_alignParentTop="false"
             android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp" />
+            android:layout_marginTop="10dp"
+            android:checked="true"
+            android:text="@string/string_login" />
 
-        <AutoCompleteTextView android:id="@+id/phone_actv" android:layout_width="280dp"
-            android:layout_height="wrap_content" android:hint="@string/hint_phone"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:inputType="phone"
+        <AutoCompleteTextView
+            android:id="@+id/phone_actv"
+            android:layout_width="280dp"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
             android:layout_marginTop="107dp"
-            android:layout_centerHorizontal="true" />
+            android:hint="@string/hint_phone"
+            android:inputType="phone"
+            android:maxLines="1"
+            android:singleLine="true" />
 
-        <EditText android:id="@+id/password_et" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:hint="@string/hint_password"
+        <EditText
+            android:id="@+id/password_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/phone_actv"
+            android:layout_alignRight="@+id/phone_actv"
+            android:layout_below="@+id/phone_actv"
+            android:hint="@string/hint_password"
             android:imeActionId="@+id/login"
             android:imeActionLabel="@string/action_sign_in_short"
-            android:imeOptions="actionUnspecified" android:inputType="textPassword"
-            android:maxLines="1" android:singleLine="true"
-            android:layout_below="@+id/phone_actv"
-            android:layout_alignLeft="@+id/phone_actv"
-            android:layout_alignRight="@+id/phone_actv" />
+            android:imeOptions="actionUnspecified"
+            android:inputType="textPassword"
+            android:maxLines="1"
+            android:singleLine="true" />
 
         <TextView
+            android:id="@+id/forget_code_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/string_forget_code"
-            android:id="@+id/forget_code_tv"
             android:layout_alignLeft="@+id/password_et"
             android:layout_below="@+id/password_et"
             android:layout_marginLeft="5dp"
-            android:textSize="12sp"
             android:layout_marginTop="3dp"
-            android:clickable="true" />
+            android:clickable="true"
+            android:text="@string/string_forget_code"
+            android:textSize="12sp" />
 
-        <Button android:id="@+id/sign_in_btn" style="?android:textAppearanceSmall"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="@string/string_login"
-            android:textStyle="bold"
-            android:layout_alignLeft="@+id/password_et"
-            android:layout_below="@+id/forget_code_tv"
+        <TextView
+            android:id="@+id/register_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignRight="@+id/password_et"
-            android:layout_marginTop="3dp" />
+            android:layout_alignTop="@+id/forget_code_tv"
+            android:layout_marginRight="5dp"
+            android:clickable="true"
+            android:text="@string/string_user_register"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/sign_in_btn"
+            style="?android:textAppearanceSmall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/password_et"
+            android:layout_alignRight="@+id/password_et"
+            android:layout_below="@+id/forget_code_tv"
+            android:layout_marginTop="3dp"
+            android:text="@string/string_login"
+            android:textStyle="bold" />
 
     </RelativeLayout>
 
