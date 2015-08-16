@@ -214,7 +214,7 @@ public class CalViewFragment extends Fragment {
                 mMainView.removeView(mNewEventView);
                 mNewEventView =null;
                 EventRecord eventRecord = new EventRecord();
-                eventRecord.introduciton = bundle.getString("introduction");
+                eventRecord.introduction = bundle.getString("introduction");
                 dbManager.getTableEvent().addEvent(eventRecord);
 
             }

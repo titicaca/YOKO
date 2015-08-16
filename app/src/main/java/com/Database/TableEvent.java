@@ -14,7 +14,7 @@ public class TableEvent extends DBTable {
     }
 
     @Override
-    public void setTableName() {
+    protected void setTableName() {
         this.tableName = DBConstants.TABLE_EVENT;
     }
 
@@ -39,26 +39,41 @@ public class TableEvent extends DBTable {
         }
     }
 
-    public void addEvent(EventRecord eventRecord) {
+    public long addEvent(EventRecord eventRecord) {
+        long rid;
+
         db.beginTransaction();
 
         try {
-            db.execSQL("INSERT OR IGNORE INTO " + tableName + "VALUES(NULL, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)",
-                    new Object[]{eventRecord.uid, eventRecord.introduciton, eventRecord.localpicturelink,
-                            eventRecord.remotepitcurelink, eventRecord.remind, eventRecord.timebegin,
-                            eventRecord.timeend, eventRecord.type, eventRecord.property,
-                            eventRecord.detaillink, eventRecord.status, System.currentTimeMillis()}
-            );
+            ContentValues cv = new ContentValues();
+            cv.put(DBConstants.COLUMN_EVENT_UID, eventRecord.uid);
+            cv.put(DBConstants.COLUMN_EVENT_SEVERID, 0);
+            cv.put(DBConstants.COLUMN_EVENT_INTRODUCTION, eventRecord.introduction);
+            cv.put(DBConstants.COLUMN_EVENT_LOCALPICTURELINK, eventRecord.localpicturelink);
+            cv.put(DBConstants.COLUMN_EVENT_REMOTEPICTURELINK, eventRecord.remotepitcurelink);
+            cv.put(DBConstants.COLUMN_EVENT_REMIND, eventRecord.remind);
+            cv.put(DBConstants.COLUMN_EVENT_TIMEBEGIN, eventRecord.timebegin);
+            cv.put(DBConstants.COLUMN_EVENT_TIMEEND, eventRecord.timeend);
+            cv.put(DBConstants.COLUMN_EVENT_TYPE, eventRecord.type);
+            cv.put(DBConstants.COLUMN_EVENT_PROPERTY, eventRecord.property);
+            cv.put(DBConstants.COLUMN_EVENT_DETAILLINK, eventRecord.detaillink);
+            cv.put(DBConstants.COLUMN_EVENT_STATUS, eventRecord.status);
+            cv.put(DBConstants.COLUMN_EVENT_MODIFIED, 1);
+            cv.put(DBConstants.COLUMN_EVENT_UPDATETIME, System.currentTimeMillis());
+            rid = db.insert(tableName, null, cv);
 
             db.setTransactionSuccessful();
         } catch (Exception e) {
+            rid = -1;
             e.printStackTrace();
         } finally {
             db.endTransaction();
         }
+
+        return rid;
     }
 
-    public void deleteEvent(int rid) {
+    public void deleteEvent(long rid) {
         db.beginTransaction();
 
         try {
@@ -87,7 +102,7 @@ public class TableEvent extends DBTable {
 
         try {
             ContentValues cv = new ContentValues();
-            cv.put(DBConstants.COLUMN_EVENT_INTRODUCTION, eventRecord.introduciton);
+            cv.put(DBConstants.COLUMN_EVENT_INTRODUCTION, eventRecord.introduction);
             cv.put(DBConstants.COLUMN_EVENT_LOCALPICTURELINK, eventRecord.localpicturelink);
             cv.put(DBConstants.COLUMN_EVENT_REMOTEPICTURELINK, eventRecord.remotepitcurelink);
             cv.put(DBConstants.COLUMN_EVENT_REMIND, eventRecord.remind);
@@ -126,7 +141,7 @@ public class TableEvent extends DBTable {
                 int column_index_rid = cs.getColumnIndex(DBConstants.COLUMN_EVENT_RID);
                 int column_index_uid = cs.getColumnIndex(DBConstants.COLUMN_EVENT_UID);
                 int column_index_serverid = cs.getColumnIndex(DBConstants.COLUMN_EVENT_SEVERID);
-                int column_index_introduciton = cs.getColumnIndex(DBConstants.COLUMN_EVENT_INTRODUCTION);
+                int column_index_introduction = cs.getColumnIndex(DBConstants.COLUMN_EVENT_INTRODUCTION);
                 int column_index_localpicturelink = cs.getColumnIndex(DBConstants.COLUMN_EVENT_LOCALPICTURELINK);
                 int column_index_remotepitcurelink = cs.getColumnIndex(DBConstants.COLUMN_EVENT_REMOTEPICTURELINK);
                 int column_index_remind = cs.getColumnIndex(DBConstants.COLUMN_EVENT_REMIND);
@@ -141,7 +156,7 @@ public class TableEvent extends DBTable {
                 eventRecord.rid = cs.getInt(column_index_rid);
                 eventRecord.uid = cs.getLong(column_index_uid);
                 eventRecord.serverid = cs.getLong(column_index_serverid);
-                eventRecord.introduciton = cs.getString(column_index_introduciton);
+                eventRecord.introduction = cs.getString(column_index_introduction);
                 eventRecord.localpicturelink = cs.getString(column_index_localpicturelink);
                 eventRecord.remotepitcurelink = cs.getString(column_index_remotepitcurelink);
                 eventRecord.remind = cs.getLong(column_index_remind);
@@ -216,7 +231,7 @@ public class TableEvent extends DBTable {
         int column_index_rid = cs.getColumnIndex(DBConstants.COLUMN_EVENT_RID);
         int column_index_uid = cs.getColumnIndex(DBConstants.COLUMN_EVENT_UID);
         int column_index_serverid = cs.getColumnIndex(DBConstants.COLUMN_EVENT_SEVERID);
-        int column_index_introduciton = cs.getColumnIndex(DBConstants.COLUMN_EVENT_INTRODUCTION);
+        int column_index_introduction = cs.getColumnIndex(DBConstants.COLUMN_EVENT_INTRODUCTION);
         int column_index_localpicturelink = cs.getColumnIndex(DBConstants.COLUMN_EVENT_LOCALPICTURELINK);
         int column_index_remotepitcurelink = cs.getColumnIndex(DBConstants.COLUMN_EVENT_REMOTEPICTURELINK);
         int column_index_remind = cs.getColumnIndex(DBConstants.COLUMN_EVENT_REMIND);
@@ -234,7 +249,7 @@ public class TableEvent extends DBTable {
                 eventRecord.rid = cs.getInt(column_index_rid);
                 eventRecord.uid = cs.getLong(column_index_uid);
                 eventRecord.serverid = cs.getLong(column_index_serverid);
-                eventRecord.introduciton = cs.getString(column_index_introduciton);
+                eventRecord.introduction = cs.getString(column_index_introduction);
                 eventRecord.localpicturelink = cs.getString(column_index_localpicturelink);
                 eventRecord.remotepitcurelink = cs.getString(column_index_remotepitcurelink);
                 eventRecord.remind = cs.getLong(column_index_remind);

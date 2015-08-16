@@ -1,7 +1,7 @@
 package com.Database;
 
 public class FriendInfoRecord {
-    public int rid;
+    public long rid;
     public long uid;
     public long fuid;
     public String email;

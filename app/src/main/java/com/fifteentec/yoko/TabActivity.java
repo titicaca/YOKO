@@ -1,7 +1,6 @@
 package com.fifteentec.yoko;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
@@ -41,6 +40,7 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
         HideAllView(mFmTrans);
         switch (id) {
             case R.integer.SelectorCal:
+
                 if(mCalViewFragment ==null){
                     mCalViewFragment = new CalViewFragment();
                     mFmTrans.add(R.id.id_content,mCalViewFragment,"cal");
@@ -78,9 +78,7 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
     }
 
     private void HideAllView(FragmentTransaction mFmTrans) {
-        if (mCalViewFragment != null) {
-            mFmTrans.hide(mCalViewFragment);
-        }
+
 
     }
 }

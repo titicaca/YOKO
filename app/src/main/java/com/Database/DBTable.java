@@ -16,7 +16,7 @@ public abstract class DBTable {
         createUniqueIndex();
     }
 
-    public abstract void setTableName();
+    protected abstract void setTableName();
 
     public abstract void createUniqueIndex();
 
