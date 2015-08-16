@@ -13,7 +13,7 @@ public class TableFriendInvitation extends DBTable {
     }
 
     @Override
-    public void setTableName() {
+    protected void setTableName() {
         this.tableName = DBConstants.TABLE_FRIEND_INVITATION;
     }
 

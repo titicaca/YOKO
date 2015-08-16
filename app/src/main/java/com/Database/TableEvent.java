@@ -14,7 +14,7 @@ public class TableEvent extends DBTable {
     }
 
     @Override
-    public void setTableName() {
+    protected void setTableName() {
         this.tableName = DBConstants.TABLE_EVENT;
     }
 
