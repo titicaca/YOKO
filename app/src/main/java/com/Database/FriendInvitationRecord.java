@@ -22,10 +22,9 @@ public class FriendInvitationRecord {
         this.createtime = friendInvitationRecord.createtime;
     }
 
-    public FriendInvitationRecord(long uid, long fuid, String msg, long createtime) {
+    public FriendInvitationRecord(long uid, long fuid, String msg) {
         this.uid = uid;
         this.fuid = fuid;
         this.msg = msg;
-        this.createtime = createtime;
     }
 }

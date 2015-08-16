@@ -17,6 +17,7 @@ public class EventRecord {
     public int property;
     public String detaillink;
     public int status;
+    public int modified;
     public long updatetime;
 
     public EventRecord() {
@@ -37,13 +38,15 @@ public class EventRecord {
         this.property = eventRecord.property;
         this.detaillink = eventRecord.detaillink;
         this.status = eventRecord.status;
+        this.modified = eventRecord.modified;
         this.updatetime = eventRecord.updatetime;
     }
 
     public EventRecord(int rid, long uid, long serverid, String introduciton,
                        String localpicturelink, String remotepitcurelink,
                        long remind, long timebegin, long timeend, int type,
-                       int property, String detaillink, int status, long updatetime) {
+                       int property, String detaillink, int status, int modified,
+                       long updatetime) {
         this.rid = rid;
         this.uid = uid;
         this.serverid = serverid;
@@ -57,6 +60,7 @@ public class EventRecord {
         this.property = property;
         this.detaillink = detaillink;
         this.status = status;
+        this.modified = modified;
         this.updatetime = updatetime;
     }
 }

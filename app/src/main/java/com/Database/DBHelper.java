@@ -101,8 +101,9 @@ public class DBHelper extends SQLiteOpenHelper {
          * 第十列是type，为用户的type
          * 第十一列是property，为用户的property
          * 第十二列是detaillink，为用户的detaillink
-         * 第十三列是status，为用户的status
-         * 第十四列是updatetime，为记录的updatetime
+         * 第十三列是status，为用户的status 0表示有效，1表示被删除
+         * 第十四列是modified，标示该条event是否有修改 0表示未修改，1表示已修改
+         * 第十五列是updatetime，为记录的updatetime
          */
         db.execSQL("CREATE TABLE IF NOT EXISTS " + DBConstants.TABLE_EVENT +
                 "(" + DBConstants.COLUMN_EVENT_RID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -118,6 +119,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 DBConstants.COLUMN_EVENT_PROPERTY + " INT1, " +
                 DBConstants.COLUMN_EVENT_DETAILLINK + " CHAR(255), " +
                 DBConstants.COLUMN_EVENT_STATUS + " INT1, " +
+                DBConstants.COLUMN_EVENT_MODIFIED + " INT1, " +
                 DBConstants.COLUMN_EVENT_UPDATETIME + "INT8" +
                 ")");
     }

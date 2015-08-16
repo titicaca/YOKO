@@ -68,7 +68,7 @@ public class TableFriendInvitation extends DBTable {
         db.beginTransaction();
 
         try {
-            db.execSQL("INSERT OR IGNORE INTO " + tableName + "VALUES(NULL, ?, ?, ?, ?)",
+            db.execSQL("INSERT OR IGNORE INTO " + tableName + " VALUES(NULL, ?, ?, ?, ?)",
                     new Object[]{friendInvitationRecord.uid, friendInvitationRecord.fuid, friendInvitationRecord.msg, System.currentTimeMillis()}
             );
             db.setTransactionSuccessful();
