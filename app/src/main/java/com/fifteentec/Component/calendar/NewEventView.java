@@ -88,6 +88,7 @@ public class NewEventView extends ViewGroup{
     public interface NewEventListener{
         void CreateFinish(Bundle bundle);
         void addNewBitMap(boolean open);
+        void CancelCreate();
 
     }
 
@@ -174,9 +175,7 @@ public class NewEventView extends ViewGroup{
         mCancelButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bundle bundle = new Bundle();
-                bundle.putString("introduction",introduction);
-                mEventListener.CreateFinish(bundle);
+                mEventListener.CancelCreate();
             }
         });
 
@@ -187,7 +186,13 @@ public class NewEventView extends ViewGroup{
         mShareButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(mContext, "share", Toast.LENGTH_SHORT).show();
+                Bundle bundle = new Bundle();
+                bundle.putString("Introduction",introduction);
+                bundle.putLong("StartTime",StartDate.getTimeInMillis());
+                bundle.putLong("EndTime",EndDate.getTimeInMillis());
+                bundle.putLong("Reminder",RemindSelected);
+                bundle.putInt("Type",TagSelected);
+                mEventListener.CreateFinish(bundle);
             }
         });
         addView(mShareButton);

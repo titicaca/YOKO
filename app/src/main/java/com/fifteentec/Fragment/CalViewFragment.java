@@ -73,6 +73,12 @@ public class CalViewFragment extends Fragment {
     private BaseActivity activity;
     private DBManager dbManager;
 
+    private final String INTRODUCTION ="Introduction";
+    private final String TIMEBEGIN = "StartTime";
+    private final String TIMEEND ="EndTime";
+    private final String TYPE = "Type";
+    private final String REMIND ="Reminder";
+
 
 
     @Override
@@ -131,7 +137,8 @@ public class CalViewFragment extends Fragment {
             }
         });
         mTrans.add(R.id.id_event_content,mListView).commit();
-        showDayEventView();
+        //showDayEventView();
+        CreateNewEvent();
         return view;
     }
 
@@ -211,10 +218,13 @@ public class CalViewFragment extends Fragment {
         mNewEventView.setNewEventListtenr(new NewEventView.NewEventListener() {
             @Override
             public void CreateFinish(Bundle bundle) {
-                mMainView.removeView(mNewEventView);
-                mNewEventView =null;
+                CancelCreate();
                 EventRecord eventRecord = new EventRecord();
-                eventRecord.introduction = bundle.getString("introduction");
+                eventRecord.introduction = bundle.getString(INTRODUCTION);
+                eventRecord.timebegin = bundle.getLong(TIMEBEGIN);
+                eventRecord.timeend = bundle.getLong(TIMEEND);
+                eventRecord.type = bundle.getInt(TYPE);
+                eventRecord.remind = bundle.getLong(REMIND);
                 dbManager.getTableEvent().addEvent(eventRecord);
 
             }
@@ -238,6 +248,12 @@ public class CalViewFragment extends Fragment {
                     getAlbum.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,IMAGE_TYPE);
                     startActivityForResult(getAlbum, IMAGE_NEWEVENT_CODE);
                 }
+            }
+
+            @Override
+            public void CancelCreate() {
+                mMainView.removeView(mNewEventView);
+                mNewEventView =null;
             }
         });
         mMainView.addView(mNewEventView);
