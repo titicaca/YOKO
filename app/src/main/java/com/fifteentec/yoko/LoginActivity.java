@@ -54,8 +54,9 @@ public class LoginActivity extends LoaderActivity {
 
         // Set up the login form.
         mPhoneView = (AutoCompleteTextView) findViewById(R.id.phone_actv);
-        mPhoneView.setText(UserServer.getInstance().getPhone());
+        mPhoneView.setText(UserServer.getInstance().getMobile());
         mPasswordView = (EditText) findViewById(R.id.password_et);
+        mPasswordView.setText(UserServer.getInstance().getPassword());
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {

@@ -183,7 +183,7 @@ public class ValidateActivity extends LoaderActivity implements OnClickListener 
                         Intent intent = new Intent(ValidateActivity.this,
                                 isChangePassword ? ChangePswdActivity.class : RegisterActivity.class);
                         intent.putExtra("FROM_WHERE", "VALIDATE_ACTIVITY");
-                        UserServer.getInstance().setPhone(
+                        UserServer.getInstance().setMobile(
                                 mInputPhoneEt.getText().toString().replaceAll("[\\s\\-]+", ""));
                         startActivity(intent);
                     } else if (event == SMSSDK.EVENT_GET_VERIFICATION_CODE) {
