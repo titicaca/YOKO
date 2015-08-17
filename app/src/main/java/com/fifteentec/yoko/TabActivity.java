@@ -7,12 +7,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.fifteentec.Fragment.FoundFragment;
 import com.fifteentec.Fragment.TabButtonFragment;
 
 public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutton {
     private FragmentManager mFragmentManager;
     private final int EnterPage = 0;
     private TabButtonFragment mbuttonfg;
+    private FoundFragment mFoundFragment;
 
     @SuppressLint("NewApi")
     @Override
@@ -48,6 +50,13 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
                         Toast.LENGTH_SHORT);
                 a.setDuration(Toast.LENGTH_SHORT);
                 a.show();
+                if(mFoundFragment == null){
+                    mFoundFragment = new FoundFragment();
+                    mFmTrans.add(R.id.id_content, mFoundFragment,"found");
+                }
+                else{
+                    mFmTrans.show(mFoundFragment);
+                }
                 break;
             case R.integer.SelectorCir:
                 Toast b = Toast.makeText(this, "Friend",
