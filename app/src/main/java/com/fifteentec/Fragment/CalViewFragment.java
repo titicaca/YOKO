@@ -25,6 +25,8 @@ import android.widget.TextView;
 import com.Database.DBManager;
 import com.Database.EventRecord;
 import com.Database.TableEvent;
+import com.fifteentec.Component.User.UserServer;
+import com.fifteentec.Component.calendar.CalUtil;
 import com.fifteentec.Component.calendar.CalView;
 import com.fifteentec.Component.calendar.CalendarController;
 import com.fifteentec.Component.calendar.DayEventView;
@@ -125,6 +127,11 @@ public class CalViewFragment extends Fragment {
                 UpdateTime(CAL_VIEW_MONTH_TAP);
 
             }
+
+            @Override
+            public void ShowDayDetail(GregorianCalendar date) {
+                GregorianCalendar temp = new GregorianCalendar(date.get(Calendar.YEAR),date.get(Calendar.MONTH),date.get(Calendar.DAY_OF_MONTH),0,0,0);
+            }
         });
 
         FragmentTransaction mTrans = mFragmentManager.beginTransaction();
@@ -137,8 +144,6 @@ public class CalViewFragment extends Fragment {
             }
         });
         mTrans.add(R.id.id_event_content,mListView).commit();
-        //showDayEventView();
-        CreateNewEvent();
         return view;
     }
 

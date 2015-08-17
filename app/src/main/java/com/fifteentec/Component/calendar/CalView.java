@@ -55,6 +55,7 @@ public class CalView extends View implements GestureDetector.OnGestureListener{
     {
         public void DateChange(GregorianCalendar arry);
 
+        void ShowDayDetail(GregorianCalendar date);
     }
 
     public void setCalViewListner (CalViewListener a)
@@ -471,6 +472,11 @@ public class CalView extends View implements GestureDetector.OnGestureListener{
             int num = (int) posX/mSurface.mCellWidth;
             int nowDate = mCurDateList.get(3);
             DateChange(DAY,num-nowDate);
+            GregorianCalendar date = new GregorianCalendar((mTodayDate.get(Calendar.YEAR)+mCurDateList.get(0)-(YEAR_RANGE-1)/2),mCurDateList.get(1),1);
+            int firstday = CalUtil.FindFirstDayofMonthInWeek(date)-1;
+            int day = mCurDateList.get(2)*COLUM_NUM+mCurDateList.get(3)-firstday;
+            date.add(Calendar.DAY_OF_MONTH, day);
+            mCalViewListener.ShowDayDetail(date);
             invalidate();
         }
         UpdateCurTime();

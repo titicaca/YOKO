@@ -188,7 +188,7 @@ public class TableEvent extends DBTable {
             cs = db.query(tableName, null,
                     DBConstants.COLUMN_EVENT_UID + " = ?" + " AND " +
                             DBConstants.COLUMN_EVENT_TIMEBEGIN + " >= ?" + " AND " +
-                            DBConstants.COLUMN_EVENT_TIMEBEGIN + " <= ?" + " AND " +
+                            DBConstants.COLUMN_EVENT_TIMEBEGIN + " < ?" + " AND " +
                             DBConstants.COLUMN_EVENT_MODIFIED + " <= ?",
                     new String[]{String.valueOf(uid), String.valueOf(startTime), String.valueOf(endTime), String.valueOf(status)},
                     null, null, DBConstants.COLUMN_EVENT_TIMEBEGIN);
