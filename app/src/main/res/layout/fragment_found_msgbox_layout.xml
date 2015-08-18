@@ -3,92 +3,87 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/linearLayout_upper_tab"
+    <RelativeLayout
+        android:id="@+id/layout_invited"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="5dip"
-        android:paddingTop="10dip" >
-
-        <RadioButton
-            android:id="@+id/button_msg_box"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1.0"
-            android:gravity="center_vertical"
-            android:text="@string/button_msg"
-            android:checked="true"
-            android:textSize="14sp"
-            android:textColor="@color/black"
-            android:paddingLeft="5dp"
-            android:paddingTop="5dp"
-            android:paddingRight="5dp"
-            android:paddingBottom="5dp"/>
-
-        <RadioButton
-            android:id="@+id/button_clear"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_weight="1.0"
-            android:gravity="center_vertical"
-            android:text="@string/button_clear"
-            android:checked="false"
-            android:textSize="14sp"
-            android:textColor="@color/black"
-            android:paddingLeft="5dp"
-            android:paddingTop="5dp"
-            android:paddingRight="5dp"
-            android:paddingBottom="5dp"/>
-    </LinearLayout>
-    <LinearLayout
-        android:id="@+id/linearLayout1"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="5dip"
-        android:paddingTop="10dip" >
-
-        <TextView
-            android:id="@+id/tab_invited"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_weight="1.0"
-            android:gravity="center"
-            android:text="@string/button_invited"
-            android:textColor="@color/black"
-            android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/tab_inviting"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_weight="1.0"
-            android:gravity="center"
-            android:text="@string/button_inviting"
-            android:textColor="@color/gray"
-            android:textSize="18sp" />
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:orientation="vertical"
-        android:paddingBottom="3dip" >
-
+        android:layout_height="60dp"
+        android:clickable="true">
         <ImageView
-            android:id="@+id/bottom_line"
-            android:layout_width="90dip"
-            android:layout_height="2dip"
-            android:scaleType="matrix"
-            android:src="@color/black" />
-    </LinearLayout>
+            android:id="@+id/arrowLeft"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"
+            android:src="@drawable/arrowleft"
+            />
+        <TextView
+            android:id="@+id/text_invited"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="30dp"
+            android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@id/arrowLeft"
+            android:text="@string/button_invited" />
+        <ImageView
+            android:id="@+id/goto1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            />
+        <TextView
+            android:id="@+id/number_invited"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_toLeftOf="@id/goto1"/>
+    </RelativeLayout>
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:background="@color/gray"
+        android:layout_marginTop="30dp"
+        />
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/vPager"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_weight="1.0"
-        android:background="@color/white"
-        android:flipInterval="30"
-        android:persistentDrawingCache="animation" />
+    <RelativeLayout
+        android:id="@+id/layout_inviting"
+        android:layout_width="fill_parent"
+        android:layout_height="60dp"
+        android:clickable="true">
+        <ImageView
+            android:id="@+id/arrowRight"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"
+            android:src="@drawable/arrowright"
+            />
+        <TextView
+            android:id="@+id/text_inviting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="30dp"
+            android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@id/arrowRight"
+            android:text="@string/button_inviting" />
+        <ImageView
+            android:id="@+id/goto2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            />
+        <TextView
+            android:id="@+id/number_inviting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_toLeftOf="@id/goto2"/>
+    </RelativeLayout>
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:background="@color/gray"
+        android:layout_marginTop="30dp"
+        />
+
 </LinearLayout>
