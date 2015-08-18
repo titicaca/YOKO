@@ -56,8 +56,9 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
     private NewLabelGvAdapter nlgvadapter;
     private ArrayList<String> list = new ArrayList<String>();
     private Boolean isClickDelelte = false;
-    private ArrayList<JsonFriendList> jsonData;
+    private ArrayList<JsonFriendList> jsonData = new ArrayList<JsonFriendList>();
     private List<FriendTagRecord> jsonTrans;
+    private long id;
 
     public static int ADD_REQUEST = 1;
     public static int ADD_RESULT = 2;
@@ -92,7 +93,7 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
             nlgvadapter = new NewLabelGvAdapter(this, jsonData, "0");
             new_label_gv.setAdapter(nlgvadapter);
         } else {
-            long id = intent.getLongExtra("tagId", 0);
+            id = intent.getLongExtra("tagId", 0);
             String tagName = dbManager.getTableFriendTag().queryTagName(0, id);
             new_label_et_search.setText(tagName);
             jsonData = new ArrayList<JsonFriendList>();
@@ -200,7 +201,6 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
                                         NewLabelGvAddActivity.class);
                                 in.putExtra("jsonTransModified",
                                         (Serializable) jsonData);
-
                                 startActivityForResult(in, ADD_REQUEST);
                             } else {
                                 nlgvadapter = new NewLabelGvAdapter(this,
@@ -312,6 +312,12 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
         if (requestCode == ADD_REQUEST && resultCode == ADD_RESULT) {
 
             //以后可删掉的循环，测试接口用
+
+
+            jsonData = (ArrayList<JsonFriendList>) data
+                    .getSerializableExtra("jsonTrans");
+
+
             nlgvadapter = new NewLabelGvAdapter(this, jsonData, "0");
             new_label_gv.setAdapter(nlgvadapter);
         }
@@ -323,13 +329,7 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
             case R.id.new_label_tv:
                 if (!search.getText().toString().equals("")) {
                     try {
-                        if (flag.equals("0")) {
-                            PostTagInfor();
-                        } else {
-
-                        }
-
-
+                        PostTagInfor();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -640,7 +640,7 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
 
         final String tagName = search.getText().toString();
         JSONObject jsono = new JSONObject();
-        JSONArray jsonarray = new JSONArray();
+        final JSONArray jsonarray = new JSONArray();
         for (int i = 0; i < jsonData.size(); i++) {
             JSONObject ob = new JSONObject();
             try {
@@ -653,27 +653,53 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
         jsono.put("friendlist", jsonarray);
         jsono.put("tagname", tagName);
 
+        if (flag.equals("0")) {
 
-        new APIServer.JsonPost(APIUrl.URL_MYTAG, jsono, headers, new APIJsonCallbackResponse() {
-            @Override
-            public void run() {
-                JSONObject response = this.getResponse();
-                JsonFriendTagReturn jr = new JsonFriendTagReturn();
-                jr.JsonParsing(response);
-                if (jr.isAdd) {
-                    //需给本地数据库
-                    list_id = new ArrayList<Long>();
+            new APIServer.JsonPost(APIUrl.URL_MYTAG, jsono, headers, new APIJsonCallbackResponse() {
+                @Override
+                public void run() {
+                    JSONObject response = this.getResponse();
+                    JsonFriendTagReturn jr = new JsonFriendTagReturn();
+                    jr.JsonParsing(response);
+                    if (jr.isAdd) {
+                        //需给本地数据库
+                        list_id = new ArrayList<Long>();
 
-                    for (int i = 0; i < jsonData.size(); i++) {
-                        list_id.add(jsonData.get(i).id);
+                        for (int i = 0; i < jsonData.size(); i++) {
+                            list_id.add(jsonData.get(i).id);
+                        }
+                        dbManager.getTableFriendTag().addTag(0, jr.id, tagName, list_id);
+                        finish();
+                    } else {
+                        Toast.makeText(NewLabelActivity.this, "添加失败", Toast.LENGTH_SHORT).show();
                     }
-                    dbManager.getTableFriendTag().addTag(0, jr.id, tagName, list_id);
-                    finish();
-                } else {
-                    Toast.makeText(NewLabelActivity.this, "添加失败", Toast.LENGTH_SHORT).show();
                 }
-            }
-        }, this.getRequestQueue(), null).send();
+            }, this.getRequestQueue(), null).send();
+        } else {
+            new APIServer.JsonPut(APIUrl.URL_MYTAG_UPDATE + id + APIUrl.URL_MYTAG_UPDATE_END, jsono, headers, new APIJsonCallbackResponse() {
+                @Override
+                public void run() {
+                    JSONObject response = this.getResponse();
+                    JsonFriendTagReturn jr = new JsonFriendTagReturn();
+                    jr.JsonParsing(response);
+                    if (jr.isAdd) {
+                        //需给本地数据库
+                        List<FriendTagRecord> friendTagRecords = new ArrayList<FriendTagRecord>();
+                        for (int i = 0; i < jsonData.size(); i++) {
+                            FriendTagRecord ft = new FriendTagRecord();
+                            ft.fuid = jsonData.get(i).id;
+                            ft.tagId = jr.id;
+                            friendTagRecords.add(ft);
+                        }
+                        dbManager.getTableFriendTag().updateTagName(0, jr.id, tagName);
+                        dbManager.getTableFriendTag().updateFriendsInTag(0, jr.id, friendTagRecords);
+                        finish();
+                    } else {
+                        Toast.makeText(NewLabelActivity.this, "修改失败", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }, this.getRequestQueue(), null).send();
+        }
     }
 }
 

@@ -24,11 +24,16 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.API.APIJsonCallbackResponse;
+import com.API.APIUrl;
+import com.API.APIUserServer;
 import com.Database.DBManager;
 import com.Database.FriendInfoRecord;
 import com.fifteentec.Adapter.commonAdapter.FriendsAdapter;
 import com.fifteentec.Component.Parser.JsonFriendList;
+import com.fifteentec.Component.Parser.JsonFriendTagReturn;
 import com.fifteentec.Component.calendar.KeyboardLayout;
 import com.fifteentec.yoko.BaseActivity;
 import com.fifteentec.yoko.R;
@@ -69,6 +74,7 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
     private RelativeLayout friends_rl_newfriend_button;
     private RelativeLayout friends_rl_label_button;
     private RelativeLayout friends_rl_add_button;
+    private List<FriendInfoRecord> friendInfoRecords = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -270,7 +276,7 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
                 intent.setClass(getActivity(), FriendDetailsActivity.class);
                 intent.putExtra("position", arg2);
                 // 传递集合数据时，需要将bean文件实现Serializable接口才能正常传递
-                intent.putExtra("json", (Serializable) list);
+                intent.putExtra("json", (Serializable) friendInfoRecords);
                 startActivity(intent);
                 break;
             default:
@@ -320,10 +326,7 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 // showClickMessage("确定");
-                                list.remove(position);
-                                fAdapter.notifyDataSetChanged();
-                                // 因为之前listview已经固定高度，所以删除后，需重新定高
-                                setListViewHeightBasedOnChildren(lv2);
+                                deleteFriends(position);
                             }
                         });
                 normalDia.setNegativeButton("取消",
@@ -343,10 +346,30 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
     }
 
     private void LoadFriendsList() {
-        List<FriendInfoRecord> friendInfoRecords = this.dbManager.getTableFriendInfo().queryFriendsInfo(0);
+        friendInfoRecords = this.dbManager.getTableFriendInfo().queryFriendsInfo(0);
         fAdapter = new FriendsAdapter(activity, friendInfoRecords, "0", v);
         lv2.setAdapter(fAdapter);
         setListViewHeightBasedOnChildren(lv2);
+    }
+
+    private void deleteFriends(final int position) {
+        new APIUserServer.JsonDel(APIUrl.URL_DELETE_FRIENDS + friendInfoRecords.get(position).fuid, null, null, new APIJsonCallbackResponse() {
+            @Override
+            public void run() {
+                JSONObject response = this.getResponse();
+                JsonFriendTagReturn jr = new JsonFriendTagReturn();
+                jr.JsonParsing(response);
+                if (jr.isAdd) {
+                    dbManager.getTableFriendInfo().deleteFriendInfo(0, friendInfoRecords.get(position).fuid);
+                    friendInfoRecords.remove(position);
+                    fAdapter.notifyDataSetChanged();
+                    // 因为之前listview已经固定高度，所以删除后，需重新定高
+                    setListViewHeightBasedOnChildren(lv2);
+                } else {
+                    Toast.makeText(getActivity(), "删除失败", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }, this.activity.getRequestQueue(), null).send();
     }
 }
 

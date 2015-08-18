@@ -17,10 +17,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.API.APIJsonCallbackResponse;
+import com.API.APIUrl;
+import com.API.APIUserServer;
 import com.Database.DBManager;
 import com.Database.FriendTagRecord;
 import com.fifteentec.Adapter.commonAdapter.LabelItemAdapter;
 import com.fifteentec.Component.Parser.JsonFriendList;
+import com.fifteentec.Component.Parser.JsonFriendTagReturn;
 import com.fifteentec.yoko.BaseActivity;
 import com.fifteentec.yoko.R;
 
@@ -90,15 +94,13 @@ public class LabelActivity extends BaseActivity implements OnItemLongClickListen
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 // showClickMessage("确定");
-                                list.remove(position);
-                                liadapter.notifyDataSetChanged();
+                                deleteTagList(position);
                             }
                         });
                 normalDia.setNegativeButton("取消",
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                showClickMessage("取消");
                             }
                         });
                 normalDia.create().show();
@@ -186,7 +188,7 @@ public class LabelActivity extends BaseActivity implements OnItemLongClickListen
         in.putExtra("flag", "3");
         in.putExtra("labelindex", arg2);
         // startActivity(in);
-        in.putExtra("personlist", (Serializable) labellist.get(label.get(arg2)));
+//        in.putExtra("personlist", (Serializable) labellist.get(label.get(arg2)));
         in.putExtra("isLabelTrans", "labaltrans");
         in.putExtra("tagId", list.get(arg2).tagId);
         startActivityForResult(in, LABEL_REQUEST);
@@ -218,5 +220,23 @@ public class LabelActivity extends BaseActivity implements OnItemLongClickListen
         list = dbManager.getTableFriendTag().queryTag(0);
         liadapter = new LabelItemAdapter(this, list);
         lv.setAdapter(liadapter);
+    }
+
+    private void deleteTagList(final int position) {
+        new APIUserServer.JsonDel(APIUrl.URL_DELETE_TAG + list.get(position).tagId, null, null, new APIJsonCallbackResponse() {
+            @Override
+            public void run() {
+                JSONObject response = this.getResponse();
+                JsonFriendTagReturn jr = new JsonFriendTagReturn();
+                jr.JsonParsing(response);
+                if (jr.isAdd) {
+                    dbManager.getTableFriendTag().deleteTag(0, list.get(position).tagId);
+                    list.remove(position);
+                    liadapter.notifyDataSetChanged();
+                } else {
+                    Toast.makeText(LabelActivity.this, "删除失败", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }, this.getRequestQueue(), null).send();
     }
 }

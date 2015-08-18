@@ -1,7 +1,7 @@
 package com.API;
 
 public class APIUrl {
-    private final static String URL_BASE = "http://192.168.0.110:8080";
+    private final static String URL_BASE = "http://139.196.16.75:8080";
 
     public final static String URL_HOME = URL_BASE + "/" + "home";
 
@@ -18,6 +18,8 @@ public class APIUrl {
     public final static String URL_UPLOAD_BAIDUPUSH_USER_INFO = URL_BASE + "/" + "";
 
     //user base
+    public final static String URL_PUSH_INFO = URL_BASE + "/" + "pushinfo";
+
     private final static String URL_BASE_USER = URL_BASE + "/" + "user";
 
     public final static String URL_SYNC_FRIENDS = URL_BASE_USER + "/" + "myfriend" + "/" + "allinfo";
@@ -28,9 +30,20 @@ public class APIUrl {
 
     public final static String URL_MYTAG = URL_BASE_USER + "/mytag/friendlist";
 
+    public final static String URL_MYTAG_UPDATE = URL_BASE_USER + "/mytag/";
+
+    public final static String URL_MYTAG_UPDATE_END = "/friendlist";
+
+    public final static String URL_DELETE_TAG = URL_BASE_USER + "/mytag/";
+
+    public final static String URL_DELETE_FRIENDS = URL_BASE_USER + "/myfriend/";
+
     public final static String URL_SEARCHFRIENDS = URL_BASE_USER + "/myfriend/search";
 
     public final static String URL_FRIENDSADDCHECKINFO = URL_BASE_USER + "/myfriend/request/";
+    public final static String URL_EVENT_UPDATE = URL_BASE_USER + "/" + "myschedule";
+
+    public final static String URL_EVENT_GET = URL_BASE_USER + "/" + "myschedule" + "/" + "schedules";
 
     private final static String URL_DOWNLOAD_BASE = "";
 

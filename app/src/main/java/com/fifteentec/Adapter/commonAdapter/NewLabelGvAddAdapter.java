@@ -53,13 +53,12 @@ public class NewLabelGvAddAdapter extends BaseAdapter {
 
             for (int i = 0; i < jsonTransModified.size(); i++) {
                 for (int j = 0; j < jsonData.size(); j++) {
-//                    if (jsonTransModified.get(i).id.equals(jsonData.get(j).id)) {
-//                        isSelected.put(j, true);
-//                        setIsSelected(isSelected);
-//                        break;
-//                    }
+                    if (jsonTransModified.get(i).id == jsonData.get(j).fuid) {
+                        isSelected.put(j, true);
+                        setIsSelected(isSelected);
+                        break;
+                    }
                 }
-
             }
 
         } else {
@@ -127,12 +126,12 @@ public class NewLabelGvAddAdapter extends BaseAdapter {
                     Iterator it = jsonTrans.iterator();
                     while (it.hasNext()) {
                         JsonFriendList jp = (JsonFriendList) it.next();
-//                        if (jp.name.equals(jsonData.get(position).name)) {
-//                            it.remove();
-//                        }
+                        if (jp.nickname.equals(jsonData.get(position).nickname)) {
+                            it.remove();
+                        }
                     }
 
-                    // jsonTrans.removeAll(jp);
+//                    jsonTrans.removeAll(jp);
 
                 } else {
                     // 选中
@@ -142,11 +141,9 @@ public class NewLabelGvAddAdapter extends BaseAdapter {
                     JsonFriendList jp = new JsonFriendList();
 //                    jp.name = jsonData.get(position).name;
                     jp.id = jsonData.get(position).fuid;
-
+                    jp.nickname = jsonData.get(position).nickname;
                     jsonTrans.add(jp);
-
                 }
-
             }
         });
 

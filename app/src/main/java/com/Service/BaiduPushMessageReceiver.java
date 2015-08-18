@@ -3,12 +3,12 @@ package com.Service;
 import android.content.Context;
 import android.util.Log;
 
-import com.API.APIServer;
-import com.API.APIUrl;
+import com.Database.DBManager;
+import com.Database.FriendInvitationRecord;
 import com.baidu.android.pushservice.PushMessageReceiver;
 import com.fifteentec.Component.User.UserServer;
-import com.fifteentec.yoko.BaseActivity;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
@@ -91,8 +91,37 @@ public class BaiduPushMessageReceiver extends PushMessageReceiver {
         String messageString = "透传消息 message=\"" + message
                 + "\" customContentString=" + customContentString;
         Log.d(TAG, messageString);
-        //todo
-        //context.sendBroadcast(null);
+        try {
+            JSONObject jsonMessage = new JSONObject(message.trim());
+            int action = jsonMessage.getInt("action");
+            JSONObject jsonMessageBody = jsonMessage.getJSONObject("body");
+
+            /**
+             * 收到添加好友的actionCode为100
+             * 收到好友确认的actionCode为101
+             * 发现模块的消息队列actionCode为200
+             */
+            switch (action) {
+                case 100:
+                    //Todo
+                    long uid = jsonMessageBody.getLong("user_id");
+                    long fuid = jsonMessageBody.getLong("friend_id");
+                    String msg = jsonMessageBody.getString("msg");
+
+                    DBManager dbManager = new DBManager(context);
+                    dbManager.getTableFriendInvitation().addFriendInvitation(new FriendInvitationRecord(uid,fuid,msg));
+                    break;
+                case 101:
+                    //todo
+                    break;
+                case 200:
+                    //todo
+                    break;
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

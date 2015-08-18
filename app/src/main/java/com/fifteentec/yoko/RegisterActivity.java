@@ -29,7 +29,7 @@ public class RegisterActivity extends BaseActivity {
 
         String message = getIntent().getStringExtra("FROM_WHERE");
         if (message != null && message.equals("VALIDATE_ACTIVITY")) {
-            mPhone = APIKey.VALUE_ROLE_MOBILE_PREFIX + UserServer.getInstance().getPhone();
+            mPhone = APIKey.VALUE_ROLE_MOBILE_PREFIX + UserServer.getInstance().getMobile();
         } else {
             mPhone = "";
         }

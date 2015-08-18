@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 import android.widget.GridView;
 import android.widget.TextView;
 
-import com.fifteentec.Component.Parser.JsonFriendList;
+import com.Database.FriendInfoRecord;
 import com.fifteentec.yoko.R;
 
 import java.util.ArrayList;
@@ -24,9 +24,9 @@ public class FriendDetailsAdapter extends PagerAdapter {
     private LayoutInflater inflater;
     private Context context;
     private FriendDetailsGridViewAdapter fdgvadapter;
-    private ArrayList<JsonFriendList> jsonData = new ArrayList<JsonFriendList>();
+    private ArrayList<FriendInfoRecord> jsonData = new ArrayList<FriendInfoRecord>();
 
-    public FriendDetailsAdapter(Context context, ArrayList<JsonFriendList> jsonData) {
+    public FriendDetailsAdapter(Context context, ArrayList<FriendInfoRecord> jsonData) {
         this.context = context;
         this.jsonData = jsonData;
     }
@@ -85,13 +85,6 @@ public class FriendDetailsAdapter extends PagerAdapter {
         } else {
             viewHolder = (ViewHolder) userLayout.getTag();
         }
-
-        // userLayout = inflater.inflate(R.layout.hlistview_adapter, view,
-        // false);
-        // TextView tvName = (TextView) userLayout
-        // .findViewById(R.id.hlist_tv_label);
-        // 填充数据
-        // viewHolder.tvName.setText(position + 1 + "");
         viewHolder.hlist_rL_information_tv_name
                 .setText(jsonData.get(position).nickname);
         viewHolder.hlist_rL_information_tv_address.setText(jsonData.get(position).location);

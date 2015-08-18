@@ -1,13 +1,14 @@
 package com.Database;
 
-public class FriendTagRecord extends DBRecord{
-    public int rid;
+public class FriendTagRecord extends DBRecord {
+    public long rid;
     public long uid;
     public long fuid;
     public long tagId;
     public String tagName;
 
-    public FriendTagRecord(){
+    public FriendTagRecord() {
+
     }
 
     public FriendTagRecord(FriendTagRecord friendTagRecord) {

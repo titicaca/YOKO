@@ -15,7 +15,7 @@ public class TableFriendTag extends DBTable {
     }
 
     @Override
-    public void setTableName() {
+    protected void setTableName() {
         this.tableName = DBConstants.TABLE_FRIEND_TAG;
     }
 
@@ -101,6 +101,34 @@ public class TableFriendTag extends DBTable {
         }
 
         return tagName;
+    }
+
+    public void updateFriendsInTag(long uid, long tagId, List<FriendTagRecord> friendTagRecords) {
+        db.beginTransaction();
+
+        try {
+            db.delete(tableName,
+                    DBConstants.COLUMN_FRIEND_TAG_UID + " = ?" + " AND " +
+                            DBConstants.COLUMN_FRIEND_TAG_FUID + " <> 0" + " AND " +
+                            DBConstants.COLUMN_FRIEND_TAG_TAGID + " = ?",
+                    new String[]{String.valueOf(uid), String.valueOf(tagId)}
+            );
+
+            if (friendTagRecords != null) {
+                for (FriendTagRecord friendTagRecord : friendTagRecords) {
+                    ContentValues cv = new ContentValues();
+                    cv.put(DBConstants.COLUMN_FRIEND_TAG_UID, uid);
+                    cv.put(DBConstants.COLUMN_FRIEND_TAG_FUID, friendTagRecord.fuid);
+                    cv.put(DBConstants.COLUMN_FRIEND_TAG_TAGID, friendTagRecord.tagId);
+                    db.insert(tableName, null, cv);
+                }
+            }
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.endTransaction();
+        }
     }
 
     public void updateTagName(long uid, long tagId, String newTagName) {
@@ -218,7 +246,7 @@ public class TableFriendTag extends DBTable {
         try {
             cs = db.query(DBConstants.TABLE_FRIEND_TAG, null,
                     DBConstants.COLUMN_FRIEND_TAG_UID + " = ?" + " AND " +
-                            DBConstants.COLUMN_FRIEND_TAG_FUID + " <> 0" + " AND" +
+                            DBConstants.COLUMN_FRIEND_TAG_FUID + " <> 0" + " AND " +
                             DBConstants.COLUMN_FRIEND_TAG_TAGID + " = ?",
                     new String[]{String.valueOf(uid), String.valueOf(tagId)},
                     null, null, DBConstants.COLUMN_FRIEND_TAG_FUID);

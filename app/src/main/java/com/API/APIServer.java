@@ -607,7 +607,7 @@ public class APIServer {
                         if (this.getResponse().has(STRING_ERROR_STATUS_CODE) &&
                                 Integer.parseInt(this.getResponse().get(STRING_ERROR_STATUS_CODE).toString())
                                         == VALUE_BAD_REQUEST) {
-                            requestToken(UserServer.getInstance().getPhone(),
+                            requestToken(UserServer.getInstance().getMobile(),
                                     UserServer.getInstance().getPassword(),
                                     request, queue);
                         } else {

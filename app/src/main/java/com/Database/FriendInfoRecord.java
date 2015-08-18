@@ -4,7 +4,7 @@ package com.Database;
  * Created by benbush on 15/8/13.
  */
 public class FriendInfoRecord extends DBRecord {
-    public int rid;
+    public long rid;
     public long uid;
     public long fuid;
     public String email;

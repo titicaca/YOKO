@@ -61,7 +61,6 @@ public class NewLabelGvAddActivity extends BaseActivity implements OnClickListen
 
         jsonTransModified = (ArrayList<JsonFriendList>) in
                 .getSerializableExtra("jsonTransModified");
-        int a = jsonTransModified.size();
 
         if (jsonTransModified.size() != 0) {
             jsonTrans = jsonTransModified;
