@@ -25,17 +25,14 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.API.APIJsonCallbackResponse;
-import com.API.APIKey;
-import com.API.APIServer;
-import com.API.APIUrl;
+import com.Database.DBManager;
+import com.Database.FriendInfoRecord;
 import com.fifteentec.Adapter.commonAdapter.FriendsAdapter;
-import com.fifteentec.Component.User.UserServer;
+import com.fifteentec.Component.Parser.JsonFriendList;
 import com.fifteentec.Component.calendar.KeyboardLayout;
 import com.fifteentec.yoko.BaseActivity;
 import com.fifteentec.yoko.R;
 import com.fifteentec.yoko.friends.FriendDetailsActivity;
-import com.fifteentec.yoko.friends.JsonParsing;
 import com.fifteentec.yoko.friends.LabelActivity;
 import com.fifteentec.yoko.friends.NewFriendActivity;
 import com.fifteentec.yoko.friends.NewFriendsListActivity;
@@ -53,8 +50,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 public class FriendsFragment extends Fragment implements OnItemClickListener,
         OnClickListener, OnItemLongClickListener {
@@ -62,13 +58,14 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
     private ListView lv2; // 好友列表
     private EditText search; // 输入框
     private KeyboardLayout mainView; // 判断软键盘是否隐藏
-    private ArrayList<JsonParsing> jsonData = new ArrayList<JsonParsing>();
+    private ArrayList<JsonFriendList> jsonData = new ArrayList<JsonFriendList>();
     private View v;
     private TextView friends_tv_addfriends;
     private FriendsAdapter fAdapter;
     private BaseActivity activity;
-    private ArrayList<JsonParsing> list = new ArrayList<JsonParsing>();
-    private JsonParsing jp;
+    private DBManager dbManager;
+    private ArrayList<JsonFriendList> list = new ArrayList<JsonFriendList>();
+    private JsonFriendList jp;
     private RelativeLayout friends_rl_newfriend_button;
     private RelativeLayout friends_rl_label_button;
     private RelativeLayout friends_rl_add_button;
@@ -76,6 +73,9 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        this.activity = (BaseActivity) this.getActivity();
+        this.dbManager = this.activity.getDBManager();
+
         View view = inflater.inflate(R.layout.friends, container, false);
         friends_rl_add_button = (RelativeLayout) view.findViewById(R.id.friends_rl_add_button);
         friends_rl_label_button = (RelativeLayout) view.findViewById(R.id.friends_rl_label_button);
@@ -83,7 +83,7 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
         lv2 = (ListView) view.findViewById(R.id.friends_lv2);
         search = (EditText) view.findViewById(R.id.friends_search_et);
         this.activity = (BaseActivity) this.getActivity();
-        jp = new JsonParsing();
+        jp = new JsonFriendList();
         mainView = (KeyboardLayout) view.findViewById(R.id.keyboardLayout_friends);
         mainView.setOnkbdStateListener(new KeyboardLayout.onKybdsChangeListener() {
 
@@ -213,7 +213,7 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObjs = (JSONObject) jsonArray.opt(i);
                 // 自定义json的bean文件
-                JsonParsing jp = new JsonParsing();
+                JsonFriendList jp = new JsonFriendList();
                 try {
                     jp.parsingJson(jsonObjs);
                 } catch (Exception e) {
@@ -343,36 +343,10 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
     }
 
     private void LoadFriendsList() {
-        Map<String, String> headers = new HashMap<String, String>();
-        try {
-            headers.put(APIKey.KEY_AUTHORIZATION, UserServer.getInstance().getAccessToken());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        new APIServer.JsonGet(
-                APIUrl.URL_FRIENDLIST,
-                null,
-                headers,
-                new APIJsonCallbackResponse() {
-
-                    @Override
-                    public void run() {
-                        JSONObject response = this.getResponse();
-
-                        try {
-                            jp.parsingJson(response);
-                            // 好友列表适配器
-                            list = jp.list;
-                            fAdapter = new FriendsAdapter(getActivity(), list, "0", v);
-                            lv2.setAdapter(fAdapter);
-                            setListViewHeightBasedOnChildren(lv2);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                },
-                activity.getRequestQueue(),
-                null).send();
+        List<FriendInfoRecord> friendInfoRecords = this.dbManager.getTableFriendInfo().queryFriendsInfo(0);
+        fAdapter = new FriendsAdapter(activity, friendInfoRecords, "0", v);
+        lv2.setAdapter(fAdapter);
+        setListViewHeightBasedOnChildren(lv2);
     }
 }
 

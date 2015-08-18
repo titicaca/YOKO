@@ -1,4 +1,4 @@
-package com.fifteentec.yoko.friends;
+package com.fifteentec.Component.Parser;
 
 import org.json.JSONObject;
 
@@ -9,7 +9,7 @@ import java.io.Serializable;
  */
 public class JsonFriendTagReturn implements Serializable {
 
-    public String id;
+    public long id;
     public Boolean isAdd;
 
     public void JsonParsing(JSONObject jb) {
@@ -17,7 +17,7 @@ public class JsonFriendTagReturn implements Serializable {
         if (null == jb) {
             return;
         }
-        id = jb.optString("msg");
+        id = jb.optLong("msg");
         isAdd = jb.optBoolean("result");
     }
 

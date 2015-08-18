@@ -1,4 +1,4 @@
-package com.fifteentec.yoko.friends;
+package com.fifteentec.Component.Parser;
 
 /**
  * Created by Administrator on 2015/8/3.
@@ -10,13 +10,13 @@ import org.json.JSONObject;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class JsonParsing implements Serializable {
+public class JsonFriendList implements Serializable {
 
     /**
      *
      */
     private static final long serialVersionUID = 1L;
-    public int id;
+    public long id;
     public String nickname;
     public String mobile;
     public int sex;
@@ -28,7 +28,7 @@ public class JsonParsing implements Serializable {
     public int createdtime;
     public int status;
     public String location;
-    public ArrayList<JsonParsing> list = new ArrayList<JsonParsing>();
+    public ArrayList<JsonFriendList> list = new ArrayList<JsonFriendList>();
 
     public void parsingJson(JSONObject jsonObject) throws Exception {
         if (null == jsonObject) {
@@ -37,8 +37,8 @@ public class JsonParsing implements Serializable {
         JSONArray jsonArray = jsonObject.getJSONArray("list");
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject json = jsonArray.optJSONObject(i);
-            JsonParsing jp = new JsonParsing();
-            jp.id = json.optInt("id");
+            JsonFriendList jp = new JsonFriendList();
+            jp.id = json.optLong("id");
             jp.nickname = json.optString("nickname");
             jp.mobile = json.optString("mobile");
             jp.email = json.optString("email");

@@ -4,9 +4,6 @@ package com.fifteentec.Adapter.commonAdapter;
  * Created by Administrator on 2015/8/3.
  */
 
-import java.util.ArrayList;
-
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,14 +11,17 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.Database.FriendTagRecord;
 import com.fifteentec.yoko.R;
+
+import java.util.List;
 
 public class LabelItemAdapter extends BaseAdapter {
 
     private Context c;
-    private ArrayList<String> list = new ArrayList<String>();
+    private List<FriendTagRecord> list;
 
-    public LabelItemAdapter(Context c, ArrayList<String> list) {
+    public LabelItemAdapter(Context c, List<FriendTagRecord> list) {
         this.c = c;
         this.list = list;
     }
@@ -54,7 +54,7 @@ public class LabelItemAdapter extends BaseAdapter {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        viewHolder.label_item_tv.setText(list.get(arg0));
+        viewHolder.label_item_tv.setText(list.get(arg0).tagName);
         return convertView;
     }
 

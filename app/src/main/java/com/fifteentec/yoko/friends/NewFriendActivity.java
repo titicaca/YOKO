@@ -22,6 +22,8 @@ import com.API.APIKey;
 import com.API.APIServer;
 import com.API.APIUrl;
 import com.fifteentec.Adapter.commonAdapter.NewFriendAdapter;
+import com.fifteentec.Component.Parser.JsonFriendAdd;
+import com.fifteentec.Component.Parser.JsonFriendList;
 import com.fifteentec.Component.User.UserServer;
 import com.fifteentec.Component.calendar.KeyboardLayout;
 import com.fifteentec.yoko.BaseActivity;
@@ -39,7 +41,7 @@ public class NewFriendActivity extends BaseActivity implements OnClickListener {
     private KeyboardLayout mainView; // 判断软键盘是否隐藏
     private EditText search; // 输入框
     private ListView new_friends_lv;
-    private ArrayList<JsonParsing> list = new ArrayList<JsonParsing>();
+    private ArrayList<JsonFriendList> list = new ArrayList<JsonFriendList>();
     private ImageView new_friedns_tv_search;
     private String number[] = new String[]{"110", "120", "119", "114"};
     private NewFriendAdapter fadapter;

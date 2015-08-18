@@ -13,19 +13,19 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.fifteentec.Component.Parser.JsonFriendList;
 import com.fifteentec.yoko.R;
-import com.fifteentec.yoko.friends.JsonParsing;
 
 import java.util.ArrayList;
 
 public class NewLabelGvAdapter extends BaseAdapter {
 
     private Context c;
-    private ArrayList<JsonParsing> list = new ArrayList<JsonParsing>();
+    private ArrayList<JsonFriendList> list = new ArrayList<JsonFriendList>();
     private String flag;
     public static int ivDeleteIsVisiable = 0;
 
-    public NewLabelGvAdapter(Context c, ArrayList<JsonParsing> list, String flag) {
+    public NewLabelGvAdapter(Context c, ArrayList<JsonFriendList> list, String flag) {
         this.c = c;
         this.list = list;
         this.flag = flag;
@@ -79,14 +79,11 @@ public class NewLabelGvAdapter extends BaseAdapter {
 
         if (arg0 < list.size()) {
             viewHolder.new_label_gv_tv.setText(list.get(arg0).nickname);
-            // viewHolder.new_label_gv_tv.setVisibility(View.VISIBLE);
         } else if (arg0 == list.size()) {
             viewHolder.iv.setImageResource(R.drawable.face_05);
-            // viewHolder.new_label_gv_tv.setVisibility(View.GONE);
             viewHolder.new_label_gv_tv.setText("添加");
         } else if (arg0 == list.size() + 1) {
             viewHolder.iv.setImageResource(R.drawable.ic);
-            // viewHolder.new_label_gv_tv.setVisibility(View.GONE);
             viewHolder.new_label_gv_tv.setText("删除");
         }
 
@@ -104,33 +101,12 @@ public class NewLabelGvAdapter extends BaseAdapter {
 
             @Override
             public void onClick(View arg0) {
-                // isRefreshadapter = false;
                 list.remove(po);
                 notifyDataSetChanged();
-                // if (list.size() == 0) {
-                // ivDeleteIsVisiable = 1;
-                // }
 
             }
         });
 
-        // final int po = arg0;
-        // final ImageView iv = viewHolder.ivDelete;
-        // viewHolder.iv.setOnClickListener(new OnClickListener() {
-
-        // public void onClick(View arg0) {
-        // if (po < list.size()) {
-        // Toast.makeText(c, "1", 2222).show();
-        // } else if (po == list.size()) {
-        // Toast.makeText(c, "2", 2222).show();
-        // }
-        // else if (po == list.size() + 1) {
-        // Toast.makeText(c, "3", 2222).show();
-        // iv.setVisibility(View.VISIBLE);
-        // notifyDataSetChanged();
-        // }
-        // }
-        // });
         return convertView;
     }
 

@@ -1,6 +1,6 @@
 package com.Database;
 
-public class FriendTagRecord {
+public class FriendTagRecord extends DBRecord{
     public int rid;
     public long uid;
     public long fuid;

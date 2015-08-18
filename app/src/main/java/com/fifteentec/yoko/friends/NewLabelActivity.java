@@ -22,7 +22,12 @@ import com.API.APIJsonCallbackResponse;
 import com.API.APIKey;
 import com.API.APIServer;
 import com.API.APIUrl;
+import com.Database.DBManager;
+import com.Database.FriendInfoRecord;
+import com.Database.FriendTagRecord;
 import com.fifteentec.Adapter.commonAdapter.NewLabelGvAdapter;
+import com.fifteentec.Component.Parser.JsonFriendList;
+import com.fifteentec.Component.Parser.JsonFriendTagReturn;
 import com.fifteentec.Component.User.UserServer;
 import com.fifteentec.Component.calendar.KeyboardLayout;
 import com.fifteentec.yoko.BaseActivity;
@@ -39,6 +44,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class NewLabelActivity extends BaseActivity implements OnItemClickListener,
@@ -50,8 +56,9 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
     private NewLabelGvAdapter nlgvadapter;
     private ArrayList<String> list = new ArrayList<String>();
     private Boolean isClickDelelte = false;
-    private ArrayList<JsonParsing> jsonData = new ArrayList<JsonParsing>();
-    private ArrayList<JsonParsing> jsonTrans = new ArrayList<JsonParsing>();
+    private ArrayList<JsonFriendList> jsonData;
+    private List<FriendTagRecord> jsonTrans;
+
     public static int ADD_REQUEST = 1;
     public static int ADD_RESULT = 2;
     private TextView new_label_tv;
@@ -59,30 +66,48 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
             + File.separator + "label" + File.separator + "json.txt";
     private String labaltrans;
     private Integer labelindex = -1;
+    private BaseActivity activity;
+    private DBManager dbManager;
+    List<Long> list_id = new ArrayList<Long>();
+    private String flag;
+    private EditText new_label_et_search;
 
     @SuppressWarnings("unchecked")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.new_label);
+        this.dbManager = this.getDBManager();
         mainView = (KeyboardLayout) findViewById(R.id.keyboardLayout_new_label);
         search = (EditText) findViewById(R.id.new_label_et_search);
         new_label_gv = (GridView) findViewById(R.id.new_label_gv);
         new_label_tv = (TextView) findViewById(R.id.new_label_tv);
+        new_label_et_search = (EditText) findViewById(R.id.new_label_et_search);
 
         Intent intent = getIntent();
-        String flag = intent.getStringExtra("flag");
+        flag = intent.getStringExtra("flag");
         labelindex = intent.getIntExtra("labelindex", -1);
         labaltrans = intent.getStringExtra("isLabelTrans");
-//        jsonData = (ArrayList<JsonParsing>) intent.getSerializableExtra("personlist");
-//        if (flag.equals("0")) {
-        nlgvadapter = new NewLabelGvAdapter(this, jsonData, "0");
-        new_label_gv.setAdapter(nlgvadapter);
-//        } else {
-//            jsonTrans = jsonData;
-//            nlgvadapter = new NewLabelGvAdapter(this, jsonTrans, "0");
-//            new_label_gv.setAdapter(nlgvadapter);
-//        }
+        if (flag.equals("0")) {
+            nlgvadapter = new NewLabelGvAdapter(this, jsonData, "0");
+            new_label_gv.setAdapter(nlgvadapter);
+        } else {
+            long id = intent.getLongExtra("tagId", 0);
+            String tagName = dbManager.getTableFriendTag().queryTagName(0, id);
+            new_label_et_search.setText(tagName);
+            jsonData = new ArrayList<JsonFriendList>();
+            jsonTrans = dbManager.getTableFriendTag().queryFriendsByTag(0, id);
+            for (FriendTagRecord friendTagRecord : jsonTrans) {
+                JsonFriendList item = new JsonFriendList();
+                item.id = friendTagRecord.fuid;
+                FriendInfoRecord friendInfoRecord = dbManager.getTableFriendInfo().queryFriendInfo(0, item.id);
+                item.nickname = friendInfoRecord.nickname;
+                item.picturelink = friendInfoRecord.picturelink;
+                jsonData.add(item);
+            }
+            nlgvadapter = new NewLabelGvAdapter(this, jsonData, "0");
+            new_label_gv.setAdapter(nlgvadapter);
+        }
 
         new_label_gv.setOnItemClickListener(this);
 
@@ -127,20 +152,20 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
     public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
         switch (arg0.getId()) {
             case R.id.new_label_gv:
-                if (jsonTrans.size() == 0) {
+                if (jsonData.size() == 0) {
                     if (arg2 == list.size()) {
                         Intent in = new Intent();
                         in.setClass(NewLabelActivity.this,
                                 NewLabelGvAddActivity.class);
 
-                        in.putExtra("jsonTransModified", (Serializable) jsonTrans);
+                        in.putExtra("jsonTransModified", (Serializable) jsonData);
 
                         startActivityForResult(in, ADD_REQUEST);
 
                     }
                 } else {
 
-                    if (arg2 < jsonTrans.size()) {
+                    if (arg2 < jsonData.size()) {
                         if (isClickDelelte) {
                             if (NewLabelGvAdapter.ivDeleteIsVisiable == 0) {
                                 Intent intent = new Intent();
@@ -148,11 +173,11 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
                                         FriendDetailsActivity.class);
                                 intent.putExtra("position", arg2);
                                 // 传递集合数据时，需要将bean文件实现Serializable接口才能正常传递
-                                intent.putExtra("json", (Serializable) jsonTrans);
+                                intent.putExtra("json", (Serializable) jsonData);
                                 startActivity(intent);
                             } else {
                                 nlgvadapter = new NewLabelGvAdapter(this,
-                                        jsonTrans, "0");
+                                        jsonData, "0");
                                 new_label_gv.setAdapter(nlgvadapter);
                                 Toast.makeText(NewLabelActivity.this, "隐藏控件1",
                                         Toast.LENGTH_SHORT).show();
@@ -163,23 +188,23 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
                                     FriendDetailsActivity.class);
                             intent.putExtra("position", arg2);
                             // 传递集合数据时，需要将bean文件实现Serializable接口才能正常传递
-                            intent.putExtra("json", (Serializable) jsonTrans);
+                            intent.putExtra("json", (Serializable) jsonData);
                             startActivity(intent);
                         }
 
-                    } else if (arg2 == jsonTrans.size()) {
+                    } else if (arg2 == jsonData.size()) {
                         if (isClickDelelte) {
                             if (NewLabelGvAdapter.ivDeleteIsVisiable == 0) {
                                 Intent in = new Intent();
                                 in.setClass(NewLabelActivity.this,
                                         NewLabelGvAddActivity.class);
                                 in.putExtra("jsonTransModified",
-                                        (Serializable) jsonTrans);
+                                        (Serializable) jsonData);
 
                                 startActivityForResult(in, ADD_REQUEST);
                             } else {
                                 nlgvadapter = new NewLabelGvAdapter(this,
-                                        jsonTrans, "0");
+                                        jsonData, "0");
                                 new_label_gv.setAdapter(nlgvadapter);
                                 Toast.makeText(NewLabelActivity.this, "隐藏控件2",
                                         Toast.LENGTH_SHORT).show();
@@ -190,11 +215,11 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
                                     NewLabelGvAddActivity.class);
 
                             in.putExtra("jsonTransModified",
-                                    (Serializable) jsonTrans);
+                                    (Serializable) jsonData);
 
                             startActivityForResult(in, ADD_REQUEST);
                         }
-                    } else if (arg2 == jsonTrans.size() + 1) {
+                    } else if (arg2 == jsonData.size() + 1) {
                         isClickDelelte = true;
                         Toast.makeText(NewLabelActivity.this, "3",
                                 Toast.LENGTH_SHORT).show();
@@ -204,11 +229,11 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
                                 Toast.makeText(NewLabelActivity.this, "显示控件3",
                                         Toast.LENGTH_SHORT).show();
                                 nlgvadapter = new NewLabelGvAdapter(this,
-                                        jsonTrans, "1");
+                                        jsonData, "1");
                                 new_label_gv.setAdapter(nlgvadapter);
                             } else {
                                 nlgvadapter = new NewLabelGvAdapter(this,
-                                        jsonTrans, "0");
+                                        jsonData, "0");
                                 new_label_gv.setAdapter(nlgvadapter);
                                 Toast.makeText(NewLabelActivity.this, "隐藏控件3",
                                         Toast.LENGTH_SHORT).show();
@@ -216,7 +241,7 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
                         } else {
                             Toast.makeText(NewLabelActivity.this, "显示控件3",
                                     Toast.LENGTH_SHORT).show();
-                            nlgvadapter = new NewLabelGvAdapter(this, jsonTrans,
+                            nlgvadapter = new NewLabelGvAdapter(this, jsonData,
                                     "1");
                             new_label_gv.setAdapter(nlgvadapter);
                         }
@@ -246,7 +271,7 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObjs = (JSONObject) jsonArray.opt(i);
                 // 自定义json的bean文件
-                JsonParsing jp = new JsonParsing();
+                JsonFriendList jp = new JsonFriendList();
                 try {
                     jp.parsingJson(jsonObjs);
                 } catch (Exception e) {
@@ -286,17 +311,8 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == ADD_REQUEST && resultCode == ADD_RESULT) {
 
-            jsonTrans = new ArrayList<JsonParsing>();
-
-            jsonTrans = (ArrayList<JsonParsing>) data
-                    .getSerializableExtra("jsonTrans");
             //以后可删掉的循环，测试接口用
-//            for (int i = 0; i < jsonTrans.size(); i++) {
-//                JsonParsing j = new JsonParsing();
-//                j.id = i;
-//                jsonTrans.add(i, j);
-//            }
-            nlgvadapter = new NewLabelGvAdapter(this, jsonTrans, "0");
+            nlgvadapter = new NewLabelGvAdapter(this, jsonData, "0");
             new_label_gv.setAdapter(nlgvadapter);
         }
     }
@@ -307,7 +323,13 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
             case R.id.new_label_tv:
                 if (!search.getText().toString().equals("")) {
                     try {
-                        PostTagInfor();
+                        if (flag.equals("0")) {
+                            PostTagInfor();
+                        } else {
+
+                        }
+
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -409,9 +431,9 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
 //
 //                    } else {
 //                        String jsonstra = "";
-//                        ArrayList<JsonParsing> listNameid = new ArrayList<JsonParsing>();
+//                        ArrayList<JsonFriendList> listNameid = new ArrayList<JsonFriendList>();
 //                        ArrayList<String> label = new ArrayList<String>();
-//                        Map<String, List<JsonParsing>> labellist = new HashMap<String, List<JsonParsing>>();
+//                        Map<String, List<JsonFriendList>> labellist = new HashMap<String, List<JsonFriendList>>();
 //                        // 先读出数据，再整合，再写入输入
 //                        // 如果file中有数据，说明是第二次新建，所以需要先读取，再添加
 //                        if (labaltrans.equals("labalnews")) {
@@ -438,7 +460,7 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
 //                                        JSONObject jsonObjs1 = (JSONObject) jsonArraynameandid
 //                                                .opt(j);
 //
-//                                        JsonParsing jp = new JsonParsing();
+//                                        JsonFriendList jp = new JsonFriendList();
 //                                        try {
 //                                            jp.parsingJson(jsonObjs1);
 //                                        } catch (Exception e) {
@@ -449,15 +471,15 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
 //
 //                                    labellist.put(jsonObjs.optString("label"),
 //                                            listNameid);
-//                                    listNameid = new ArrayList<JsonParsing>();
+//                                    listNameid = new ArrayList<JsonFriendList>();
 //
 //                                }
 //                            } catch (JSONException e) {
 //                                e.printStackTrace();
 //                            }
 //                            if (jsonTrans.size() == 0) {
-//                                listNameid = new ArrayList<JsonParsing>();
-//                                JsonParsing jps = new JsonParsing();
+//                                listNameid = new ArrayList<JsonFriendList>();
+//                                JsonFriendList jps = new JsonFriendList();
 ////                                jps.id = "";
 ////                                jps.name = "";
 //                                listNameid.add(jps);
@@ -467,9 +489,9 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
 //                                        listNameid);
 //
 //                            } else {
-//                                listNameid = new ArrayList<JsonParsing>();
+//                                listNameid = new ArrayList<JsonFriendList>();
 //                                for (int i = 0; i < jsonTrans.size(); i++) {
-//                                    JsonParsing jps = new JsonParsing();
+//                                    JsonFriendList jps = new JsonFriendList();
 //                                    jps.id = jsonTrans.get(i).id;
 ////                                    jps.name = jsonTrans.get(i).name;
 //                                    listNameid.add(jps);
@@ -485,7 +507,7 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
 //                            JSONObject allData = new JSONObject();// 建立最外面的节点对象
 //                            JSONArray all = new JSONArray();
 //                            JSONArray sing = new JSONArray();// 定义数组
-//                            List<JsonParsing> jsonLabelListData = new ArrayList<JsonParsing>();
+//                            List<JsonFriendList> jsonLabelListData = new ArrayList<JsonFriendList>();
 //
 //                            try {
 //                                for (int i = 0; i < label.size(); i++) {
@@ -558,7 +580,7 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
 //                                        JSONObject jsonObjs1 = (JSONObject) jsonArraynameandid
 //                                                .opt(j);
 //
-//                                        JsonParsing jp = new JsonParsing();
+//                                        JsonFriendList jp = new JsonFriendList();
 //                                        try {
 //                                            jp.parsingJson(jsonObjs1);
 //                                        } catch (Exception e) {
@@ -596,7 +618,6 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
 //                        }
 //
 //                    }
-                    finish();
                 } else {
                     Toast.makeText(NewLabelActivity.this, "请填写一个标签名~",
                             Toast.LENGTH_SHORT).show();
@@ -617,13 +638,13 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
             e.printStackTrace();
         }
 
-        String tagName = search.getText().toString();
+        final String tagName = search.getText().toString();
         JSONObject jsono = new JSONObject();
         JSONArray jsonarray = new JSONArray();
-        for (int i = 0; i < jsonTrans.size(); i++) {
+        for (int i = 0; i < jsonData.size(); i++) {
             JSONObject ob = new JSONObject();
             try {
-                ob.put("id", jsonTrans.get(i).id);
+                ob.put("id", jsonData.get(i).id);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -641,8 +662,13 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
                 jr.JsonParsing(response);
                 if (jr.isAdd) {
                     //需给本地数据库
-//                    jsonTrans
-//                    jr.id
+                    list_id = new ArrayList<Long>();
+
+                    for (int i = 0; i < jsonData.size(); i++) {
+                        list_id.add(jsonData.get(i).id);
+                    }
+                    dbManager.getTableFriendTag().addTag(0, jr.id, tagName, list_id);
+                    finish();
                 } else {
                     Toast.makeText(NewLabelActivity.this, "添加失败", Toast.LENGTH_SHORT).show();
                 }

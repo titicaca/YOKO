@@ -3,7 +3,7 @@ package com.Database;
 /**
  * Created by benbush on 15/8/13.
  */
-public class FriendInfoRecord {
+public class FriendInfoRecord extends DBRecord {
     public int rid;
     public long uid;
     public long fuid;

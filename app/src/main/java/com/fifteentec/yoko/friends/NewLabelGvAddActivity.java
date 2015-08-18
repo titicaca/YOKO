@@ -4,7 +4,6 @@ package com.fifteentec.yoko.friends;
  * Created by Administrator on 2015/8/3.
  */
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -16,8 +15,12 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.Database.DBManager;
+import com.Database.FriendInfoRecord;
 import com.fifteentec.Adapter.commonAdapter.NewLabelGvAddAdapter;
+import com.fifteentec.Component.Parser.JsonFriendList;
 import com.fifteentec.Component.calendar.KeyboardLayout;
+import com.fifteentec.yoko.BaseActivity;
 import com.fifteentec.yoko.R;
 
 import org.apache.http.util.EncodingUtils;
@@ -27,34 +30,36 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
-public class NewLabelGvAddActivity extends Activity implements OnClickListener {
+public class NewLabelGvAddActivity extends BaseActivity implements OnClickListener {
 
     private ListView lv;
     private KeyboardLayout mainView; // 判断软键盘是否隐藏
     private EditText search; // 输入框
     private NewLabelGvAddAdapter nlgaadapter;
     // private ArrayList<String> list = new ArrayList<String>();
-    private ArrayList<JsonParsing> jsonData = new ArrayList<JsonParsing>();
-    private ArrayList<JsonParsing> jsonTrans = new ArrayList<JsonParsing>();
-    private ArrayList<JsonParsing> jsonTransModified = new ArrayList<JsonParsing>();
+    private ArrayList<JsonFriendList> jsonData = new ArrayList<JsonFriendList>();
+    private ArrayList<JsonFriendList> jsonTrans = new ArrayList<JsonFriendList>();
+    private ArrayList<JsonFriendList> jsonTransModified = new ArrayList<JsonFriendList>();
     private TextView new_label_gvadd_tv_sure;
+    private BaseActivity activity;
+    private DBManager dbManager;
 
     @SuppressWarnings("unchecked")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.new_label_gvadd);
+        this.activity = (BaseActivity) this;
+        this.dbManager = this.activity.getDBManager();
         lv = (ListView) findViewById(R.id.new_label_gvadd_lv);
         mainView = (KeyboardLayout) findViewById(R.id.keyboardLayout_new_label_gvadd);
         search = (EditText) findViewById(R.id.new_label_gvadd_et_search);
         new_label_gvadd_tv_sure = (TextView) findViewById(R.id.new_label_gvadd_tv_sure);
         Intent in = getIntent();
 
-        // setDatas();
-        //
-        readDatas();
-        jsonTransModified = (ArrayList<JsonParsing>) in
+        jsonTransModified = (ArrayList<JsonFriendList>) in
                 .getSerializableExtra("jsonTransModified");
         int a = jsonTransModified.size();
 
@@ -80,7 +85,11 @@ public class NewLabelGvAddActivity extends Activity implements OnClickListener {
             }
         });
         search.setOnFocusChangeListener(onFocusAutoClearHintListener);
-        nlgaadapter = new NewLabelGvAddAdapter(this, jsonData, jsonTrans,
+
+        List<FriendInfoRecord> friendInfoRecords = this.dbManager.getTableFriendInfo().queryFriendsInfo(0);
+
+
+        nlgaadapter = new NewLabelGvAddAdapter(this, friendInfoRecords, jsonTrans,
                 jsonTransModified);
         lv.setAdapter(nlgaadapter);
         // setListViewHeightBasedOnChildren(lv);
@@ -167,7 +176,7 @@ public class NewLabelGvAddActivity extends Activity implements OnClickListener {
 //            for (int i = 0; i < jsonArray.length(); i++) {
 //                JSONObject jsonObjs = (JSONObject) jsonArray.opt(i);
 //                // 自定义json的bean文件
-//                JsonParsing jp = new JsonParsing();
+//                JsonFriendList jp = new JsonFriendList();
 //                try {
 //                    jp.parsingJson(jsonObjs);
 //                } catch (Exception e) {
@@ -180,7 +189,7 @@ public class NewLabelGvAddActivity extends Activity implements OnClickListener {
 //            e.printStackTrace();
 //        }
         for (int i = 0; i < 12; i++) {
-            JsonParsing j = new JsonParsing();
+            JsonFriendList j = new JsonFriendList();
             j.id = i;
             jsonData.add(j);
         }

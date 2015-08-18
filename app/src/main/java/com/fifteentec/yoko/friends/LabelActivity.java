@@ -4,7 +4,6 @@ package com.fifteentec.yoko.friends;
  * Created by Administrator on 2015/8/3.
  */
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,7 +17,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.Database.DBManager;
+import com.Database.FriendTagRecord;
 import com.fifteentec.Adapter.commonAdapter.LabelItemAdapter;
+import com.fifteentec.Component.Parser.JsonFriendList;
+import com.fifteentec.yoko.BaseActivity;
 import com.fifteentec.yoko.R;
 
 import org.apache.http.util.EncodingUtils;
@@ -35,27 +38,33 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class LabelActivity extends Activity implements OnItemLongClickListener,
+public class LabelActivity extends BaseActivity implements OnItemLongClickListener,
         OnClickListener, OnItemClickListener {
 
     private ListView lv;
-    private ArrayList<JsonParsing> list = new ArrayList<JsonParsing>();
     private LabelItemAdapter liadapter;
     private TextView label_create;
     public static int LABEL_REQUEST = 3;
     private String json = "";
-    ArrayList<JsonParsing> listNameid = new ArrayList<JsonParsing>();
+    ArrayList<JsonFriendList> listNameid = new ArrayList<JsonFriendList>();
     ArrayList<String> label = new ArrayList<String>();
-    Map<String, List<JsonParsing>> labellist = new HashMap<String, List<JsonParsing>>();
+    Map<String, List<JsonFriendList>> labellist = new HashMap<String, List<JsonFriendList>>();
+    private BaseActivity activity;
+    private DBManager dbManager;
+    private List<FriendTagRecord> list;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.label);
+        this.activity = (BaseActivity) this;
+        this.dbManager = this.activity.getDBManager();
         lv = (ListView) findViewById(R.id.label_lv);
         label_create = (TextView) findViewById(R.id.label_create);
-        addlist();
-        liadapter = new LabelItemAdapter(this, label);
+
+        list = this.dbManager.getTableFriendTag().queryTag(0);
+
+        liadapter = new LabelItemAdapter(this, list);
         lv.setAdapter(liadapter);
         lv.setOnItemLongClickListener(this);
         lv.setOnItemClickListener(this);
@@ -125,7 +134,7 @@ public class LabelActivity extends Activity implements OnItemLongClickListener,
                     JSONObject jsonObjs1 = (JSONObject) jsonArraynameandid
                             .opt(j);
 
-                    JsonParsing jp = new JsonParsing();
+                    JsonFriendList jp = new JsonFriendList();
                     try {
                         jp.parsingJson(jsonObjs1);
                     } catch (Exception e) {
@@ -135,7 +144,7 @@ public class LabelActivity extends Activity implements OnItemLongClickListener,
                 }
 
                 labellist.put(jsonObjs.optString("label"), listNameid);
-                listNameid = new ArrayList<JsonParsing>();
+                listNameid = new ArrayList<JsonFriendList>();
 
             }
         } catch (JSONException e) {
@@ -160,7 +169,7 @@ public class LabelActivity extends Activity implements OnItemLongClickListener,
                 // startActivity(in);
                 in.putExtra("isLabelTrans", "labalnews");
                 in.putExtra("labelindex", -1);
-                in.putExtra("personlist", (Serializable) new ArrayList<JsonParsing>());
+                in.putExtra("personlist", (Serializable) new ArrayList<JsonFriendList>());
                 startActivityForResult(in, LABEL_REQUEST);
 
                 break;
@@ -179,6 +188,7 @@ public class LabelActivity extends Activity implements OnItemLongClickListener,
         // startActivity(in);
         in.putExtra("personlist", (Serializable) labellist.get(label.get(arg2)));
         in.putExtra("isLabelTrans", "labaltrans");
+        in.putExtra("tagId", list.get(arg2).tagId);
         startActivityForResult(in, LABEL_REQUEST);
     }
 
@@ -205,11 +215,8 @@ public class LabelActivity extends Activity implements OnItemLongClickListener,
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        addlist();
-        liadapter = new LabelItemAdapter(this, label);
+        list = dbManager.getTableFriendTag().queryTag(0);
+        liadapter = new LabelItemAdapter(this, list);
         lv.setAdapter(liadapter);
-
-
     }
 }

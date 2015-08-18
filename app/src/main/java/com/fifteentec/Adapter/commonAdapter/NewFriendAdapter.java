@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.fifteentec.yoko.R;
-import com.fifteentec.yoko.friends.JsonFriendAdd;
+import com.fifteentec.Component.Parser.JsonFriendAdd;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.ArrayList;

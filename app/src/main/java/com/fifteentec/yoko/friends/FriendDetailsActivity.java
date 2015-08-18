@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 
 import com.fifteentec.Adapter.commonAdapter.FriendDetailsAdapter;
+import com.fifteentec.Component.Parser.JsonFriendList;
 import com.fifteentec.yoko.R;
 
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ public class FriendDetailsActivity extends Activity {
     // private HorizontalListView hlv;
     private int position;
     private ViewPager vpager;
-    private ArrayList<JsonParsing> jsonData = new ArrayList<JsonParsing>();
+    private ArrayList<JsonFriendList> jsonData = new ArrayList<JsonFriendList>();
 
     // private HlistviewAdapter hladapter;
 
@@ -34,7 +35,7 @@ public class FriendDetailsActivity extends Activity {
         vpager = (ViewPager) findViewById(R.id.vPager);
         Intent intent = getIntent();
         position = intent.getIntExtra("position", 0);
-        jsonData = (ArrayList<JsonParsing>) intent.getSerializableExtra("json");
+        jsonData = (ArrayList<JsonFriendList>) intent.getSerializableExtra("json");
         FriendDetailsAdapter fdadapter = new FriendDetailsAdapter(this,
                 jsonData);
         vpager.setAdapter(fdadapter);

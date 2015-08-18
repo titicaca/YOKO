@@ -1,4 +1,4 @@
-package com.fifteentec.yoko.friends;
+package com.fifteentec.Component.Parser;
 
 import org.json.JSONObject;
 

@@ -13,26 +13,28 @@ import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import com.Database.FriendInfoRecord;
+import com.fifteentec.Component.Parser.JsonFriendList;
 import com.fifteentec.yoko.R;
-import com.fifteentec.yoko.friends.JsonParsing;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 public class NewLabelGvAddAdapter extends BaseAdapter {
 
     private Context c;
-    private ArrayList<JsonParsing> jsonData = new ArrayList<JsonParsing>();
-    private ArrayList<JsonParsing> jsonTrans = new ArrayList<JsonParsing>();
+    private List<FriendInfoRecord> jsonData = new ArrayList<FriendInfoRecord>();
+    private ArrayList<JsonFriendList> jsonTrans = new ArrayList<JsonFriendList>();
     // 用来判断checkbox选中状态
-    private ArrayList<JsonParsing> jsonTransModified = new ArrayList<JsonParsing>();
+    private ArrayList<JsonFriendList> jsonTransModified = new ArrayList<JsonFriendList>();
     private static HashMap<Integer, Boolean> isSelected;
 
     @SuppressLint("UseSparseArrays")
-    public NewLabelGvAddAdapter(Context c, ArrayList<JsonParsing> jsonData,
-                                ArrayList<JsonParsing> jsonTrans,
-                                ArrayList<JsonParsing> jsonTransModified) {
+    public NewLabelGvAddAdapter(Context c, List<FriendInfoRecord> jsonData,
+                                ArrayList<JsonFriendList> jsonTrans,
+                                ArrayList<JsonFriendList> jsonTransModified) {
         this.c = c;
         this.jsonData = jsonData;
         isSelected = new HashMap<Integer, Boolean>();
@@ -124,7 +126,7 @@ public class NewLabelGvAddAdapter extends BaseAdapter {
                     @SuppressWarnings("rawtypes")
                     Iterator it = jsonTrans.iterator();
                     while (it.hasNext()) {
-                        JsonParsing jp = (JsonParsing) it.next();
+                        JsonFriendList jp = (JsonFriendList) it.next();
 //                        if (jp.name.equals(jsonData.get(position).name)) {
 //                            it.remove();
 //                        }
@@ -137,9 +139,9 @@ public class NewLabelGvAddAdapter extends BaseAdapter {
                     isSelected.put(position, true);
                     setIsSelected(isSelected);
 
-                    JsonParsing jp = new JsonParsing();
+                    JsonFriendList jp = new JsonFriendList();
 //                    jp.name = jsonData.get(position).name;
-                    jp.id = jsonData.get(position).id;
+                    jp.id = jsonData.get(position).fuid;
 
                     jsonTrans.add(jp);
 
@@ -150,6 +152,7 @@ public class NewLabelGvAddAdapter extends BaseAdapter {
 
         // 根据isSelected来设置checkbox的选中状况
         viewHolder.cb.setChecked(getIsSelected().get(position));
+        viewHolder.new_label_gvadd_item_tv.setText(jsonData.get(position).nickname);
 //        viewHolder.new_label_gvadd_item_tv.setText(jsonData.get(position).name);
         // viewHolder.cb.setOnCheckedChangeListener(new
         // OnCheckedChangeListener() {

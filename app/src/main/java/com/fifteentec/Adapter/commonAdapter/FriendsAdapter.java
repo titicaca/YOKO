@@ -13,20 +13,20 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.Database.FriendInfoRecord;
 import com.fifteentec.yoko.R;
-import com.fifteentec.yoko.friends.JsonParsing;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class FriendsAdapter extends BaseAdapter {
 
     private Context context;
-    private ArrayList<JsonParsing> list = new ArrayList<JsonParsing>();
+    private List<FriendInfoRecord> list;
     private String flag;// 用于区分是否显示添加按钮
     private View v;
 
-    public FriendsAdapter(Context c, ArrayList<JsonParsing> list, String flag,
+    public FriendsAdapter(Context c, List<FriendInfoRecord> list, String flag,
                           View v) {
         context = c;
         this.list = list;
