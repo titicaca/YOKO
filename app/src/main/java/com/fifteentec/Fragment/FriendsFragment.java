@@ -287,7 +287,7 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
     @Override
     public void onClick(View arg0) {
         switch (arg0.getId()) {
-            case R.id.friends_rl_newfriend_button:
+            case R.id.friends_rl_add_button:
                 Intent in = new Intent();
                 in.setClass(getActivity(), NewFriendActivity.class);
                 startActivity(in);
@@ -297,7 +297,7 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
                 inn.setClass(getActivity(), LabelActivity.class);
                 startActivity(inn);
                 break;
-            case R.id.friends_rl_add_button:
+            case R.id.friends_rl_newfriend_button:
                 Intent ine = new Intent();
                 ine.setClass(getActivity(), NewFriendsListActivity.class);
                 startActivity(ine);

@@ -2,14 +2,14 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- 填充 -->
-    <solid android:color="#43B96B"/>
+    <solid android:color="#FFC774"/>
     <!-- 定义填充的颜色值 -->
 
     <!-- 描边 -->
     <stroke
 
         android:width="1dp"
-        android:color="#43B96B"/>
+        android:color="#fff"/>
     <!-- 定义描边的宽度和描边的颜色值 -->
 
     <!-- 圆角 -->
@@ -22,10 +22,10 @@
 
     <!-- 间隔 -->
     <padding
-        android:bottom="0dp"
-        android:left="0dp"
-        android:right="0dp"
-        android:top="0dp"/>
+        android:bottom="5dp"
+        android:left="10dp"
+        android:right="10dp"
+        android:top="5dp"/>
     <!-- 设置各个方向的间隔 -->
 
 </shape>

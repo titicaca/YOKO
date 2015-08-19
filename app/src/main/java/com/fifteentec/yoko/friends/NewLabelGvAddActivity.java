@@ -5,6 +5,7 @@ package com.fifteentec.yoko.friends;
  */
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -14,9 +15,11 @@ import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.Database.DBManager;
 import com.Database.FriendInfoRecord;
+import com.Database.FriendTagRecord;
 import com.fifteentec.Adapter.commonAdapter.NewLabelGvAddAdapter;
 import com.fifteentec.Component.Parser.JsonFriendList;
 import com.fifteentec.Component.calendar.KeyboardLayout;
@@ -45,6 +48,12 @@ public class NewLabelGvAddActivity extends BaseActivity implements OnClickListen
     private TextView new_label_gvadd_tv_sure;
     private BaseActivity activity;
     private DBManager dbManager;
+    private com.fifteentec.Component.calendar.PredicateLayout new_label_gvadd_pop_linearlayout;
+    private List<FriendTagRecord> listTag;
+    private boolean isAddView = true;
+    private ArrayList<JsonFriendList> listData = new ArrayList<JsonFriendList>();
+    private List<FriendTagRecord> listTrans;
+    private List<FriendInfoRecord> friendInfoRecords;
 
     @SuppressWarnings("unchecked")
     @Override
@@ -53,6 +62,11 @@ public class NewLabelGvAddActivity extends BaseActivity implements OnClickListen
         setContentView(R.layout.new_label_gvadd);
         this.activity = (BaseActivity) this;
         this.dbManager = this.activity.getDBManager();
+
+        listTag = this.dbManager.getTableFriendTag().queryTag(0);
+
+
+        new_label_gvadd_pop_linearlayout = (com.fifteentec.Component.calendar.PredicateLayout) findViewById(R.id.new_label_gvadd_pop_linearlayout);
         lv = (ListView) findViewById(R.id.new_label_gvadd_lv);
         mainView = (KeyboardLayout) findViewById(R.id.keyboardLayout_new_label_gvadd);
         search = (EditText) findViewById(R.id.new_label_gvadd_et_search);
@@ -72,7 +86,6 @@ public class NewLabelGvAddActivity extends BaseActivity implements OnClickListen
                 switch (state) {
                     // 软键盘隐藏
                     case KeyboardLayout.KEYBOARD_STATE_HIDE:
-
                         mainView.setFocusable(true);
                         mainView.setFocusableInTouchMode(true);
                         mainView.requestFocus();
@@ -84,10 +97,7 @@ public class NewLabelGvAddActivity extends BaseActivity implements OnClickListen
             }
         });
         search.setOnFocusChangeListener(onFocusAutoClearHintListener);
-
-        List<FriendInfoRecord> friendInfoRecords = this.dbManager.getTableFriendInfo().queryFriendsInfo(0);
-
-
+        friendInfoRecords = this.dbManager.getTableFriendInfo().queryFriendsInfo(0);
         nlgaadapter = new NewLabelGvAddAdapter(this, friendInfoRecords, jsonTrans,
                 jsonTransModified);
         lv.setAdapter(nlgaadapter);
@@ -104,14 +114,71 @@ public class NewLabelGvAddActivity extends BaseActivity implements OnClickListen
                 hint = textView.getHint().toString();
                 textView.setTag(hint);
                 textView.setHint("");
+                if (isAddView) {
+                    for (int i = 0; i < listTag.size(); i++) {
+                        TextView tv = new TextView(NewLabelGvAddActivity.this);
+                        tv.setTag(i);
+                        tv.setTextColor(Color.WHITE);
+                        tv.setText(listTag.get(i).tagName);
+                        tv.setPadding(20, 5, 20, 5);
+                        int colorCount = i % 5;
+                        switch (colorCount) {
+                            case 0:
+                                tv.setBackgroundResource(R.drawable.search_label_background_color1);
+                                break;
+                            case 1:
+                                tv.setBackgroundResource(R.drawable.search_label_background_color2);
+                                break;
+                            case 2:
+                                tv.setBackgroundResource(R.drawable.search_label_background_color3);
+                                break;
+                            case 3:
+                                tv.setBackgroundResource(R.drawable.search_label_background_color4);
+                                break;
+                            case 4:
+                                tv.setBackgroundResource(R.drawable.search_label_background_color5);
+                                break;
+                        }
+
+                        new_label_gvadd_pop_linearlayout.addView(tv);
+                        tv.setOnClickListener(new OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Toast.makeText(NewLabelGvAddActivity.this, v.getTag() + "", Toast.LENGTH_SHORT).show();
+                                long id = listTag.get((Integer) v.getTag()).tagId;
+                                listData = new ArrayList<JsonFriendList>();
+                                listTrans = dbManager.getTableFriendTag().queryFriendsByTag(0, id);
+                                for (FriendTagRecord friendTagRecord : listTrans) {
+                                    JsonFriendList item = new JsonFriendList();
+                                    item.id = friendTagRecord.fuid;
+                                    FriendInfoRecord friendInfoRecord = dbManager.getTableFriendInfo().queryFriendInfo(0, item.id);
+                                    item.nickname = friendInfoRecord.nickname;
+                                    item.picturelink = friendInfoRecord.picturelink;
+                                    listData.add(item);
+                                }
+                                jsonTransModified = listData;
+                                jsonTrans = listData;
+                                nlgaadapter = new NewLabelGvAddAdapter(NewLabelGvAddActivity.this, friendInfoRecords, jsonTrans,
+                                        jsonTransModified);
+                                lv.setAdapter(nlgaadapter);
+                                new_label_gvadd_pop_linearlayout.setVisibility(View.GONE);
+                            }
+                        });
+                    }
+                    isAddView = false;
+                }
+                int w = View.MeasureSpec.makeMeasureSpec(0,
+                        View.MeasureSpec.UNSPECIFIED);
+                int h = View.MeasureSpec.makeMeasureSpec(0,
+                        View.MeasureSpec.UNSPECIFIED);
+                new_label_gvadd_pop_linearlayout.measure(w, h);
+                int height = new_label_gvadd_pop_linearlayout.getMeasuredHeight();
+                int width = new_label_gvadd_pop_linearlayout.getMeasuredWidth();
+                new_label_gvadd_pop_linearlayout.setVisibility(View.VISIBLE);
             } else {
                 hint = textView.getTag().toString();
                 textView.setHint(hint);
-                // if (textView.getText().toString().equals("")) {
-                // textView.setGravity(Gravity.CENTER);
-                // } else {
-                // textView.setGravity(Gravity.LEFT);
-                // }
+                new_label_gvadd_pop_linearlayout.setVisibility(View.GONE);
             }
         }
     };
@@ -223,7 +290,9 @@ public class NewLabelGvAddActivity extends BaseActivity implements OnClickListen
                 intent.setClass(NewLabelGvAddActivity.this, NewLabelActivity.class);
                 // intent.putExtra("position", arg2);
                 // 传递集合数据时，需要将bean文件实现Serializable接口才能正常传递
+
                 intent.putExtra("jsonTrans", (Serializable) jsonTrans);
+
                 intent.putExtra("flag", "1");
                 setResult(NewLabelActivity.ADD_RESULT, intent);
                 finish();
