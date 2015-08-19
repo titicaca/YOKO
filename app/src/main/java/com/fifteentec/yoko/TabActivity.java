@@ -3,10 +3,17 @@ package com.fifteentec.yoko;
 import android.annotation.SuppressLint;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.Common.NetworkState;
+import com.Service.FriendInvitationReceiver;
 import com.fifteentec.Fragment.TabButtonFragment;
 
 public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutton {
@@ -25,6 +32,13 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
         TabSelector(R.integer.SelectorCal);
         BaseActivity.getDataSyncService().syncFriends(0);
         BaseActivity.getDataSyncService().getEvents(0);
+
+        //设置系统状态监听过滤器IntentFilter
+        IntentFilter mFilter = new IntentFilter();
+        //设定监听内容为网络状态改变
+        mFilter.addAction("com.Service.FriendInvitationReceiver.NEW_FRIEND_INVITATION");
+        //注册绑定BroadcastReceiver监听相应的系统状态
+        registerReceiver(friendInvitationReceiver, mFilter);
     }
 
     @Override
@@ -75,4 +89,20 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
 
 
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(friendInvitationReceiver);
+    }
+
+    private FriendInvitationReceiver friendInvitationReceiver = new FriendInvitationReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            Log.v("Friend Invitation", "action: " + action);
+            String msg = intent.getExtras().getString("msg");
+            Log.v("Friend Invitation", "msg: " + msg);
+        }
+    };
 }
