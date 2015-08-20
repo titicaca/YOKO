@@ -3,17 +3,15 @@ package com.fifteentec.yoko;
 import android.annotation.SuppressLint;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.fifteentec.Fragment.CalViewFragment;
-import com.Service.FriendInvitationReceiver;
+import com.Service.InvitationReceiver;
 import com.fifteentec.Fragment.TabButtonFragment;
 
 public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutton {
@@ -39,7 +37,7 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
         //设定监听内容为网络状态改变
         mFilter.addAction("com.Service.FriendInvitationReceiver.NEW_FRIEND_INVITATION");
         //注册绑定BroadcastReceiver监听相应的系统状态
-        registerReceiver(friendInvitationReceiver, mFilter);
+        registerReceiver(invitationReceiver, mFilter);
     }
 
     @Override
@@ -98,10 +96,10 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(friendInvitationReceiver);
+        unregisterReceiver(invitationReceiver);
     }
 
-    private FriendInvitationReceiver friendInvitationReceiver = new FriendInvitationReceiver() {
+    private InvitationReceiver invitationReceiver = new InvitationReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
