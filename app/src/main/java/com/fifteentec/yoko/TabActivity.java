@@ -12,7 +12,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.Common.NetworkState;
+import com.fifteentec.Fragment.CalViewFragment;
 import com.Service.FriendInvitationReceiver;
 import com.fifteentec.Fragment.TabButtonFragment;
 
@@ -20,6 +20,7 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
     private FragmentManager mFragmentManager;
     private final int EnterPage = 0;
     private TabButtonFragment mbuttonfg;
+    private CalViewFragment mCalViewFragment;
 
     @SuppressLint("NewApi")
     @Override
@@ -52,10 +53,14 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
         HideAllView(mFmTrans);
         switch (id) {
             case R.integer.SelectorCal:
-                Toast d = Toast.makeText(this, "Calendar",
-                        Toast.LENGTH_SHORT);
-                d.setDuration(Toast.LENGTH_SHORT);
-                d.show();
+
+                if(mCalViewFragment ==null){
+                    mCalViewFragment = new CalViewFragment();
+                    mFmTrans.add(R.id.id_content,mCalViewFragment,"cal");
+                }
+                else{
+                    mFmTrans.show(mCalViewFragment);
+                }
                 break;
             case R.integer.SelectorFrd:
                 Toast a = Toast.makeText(this, "Found",
