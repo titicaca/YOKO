@@ -126,6 +126,57 @@ public class TableEvent extends DBTable {
         }
     }
 
+    public EventRecord queryEventByRid(long rid) {
+        EventRecord eventRecord = null;
+        Cursor cs = null;
+        try {
+            cs = db.query(tableName, null,
+                    DBConstants.COLUMN_EVENT_RID + " = ?",
+                    new String[]{String.valueOf(rid)},
+                    null, null, null);
+            if (cs.getCount() == 1) {
+                cs.moveToFirst();
+                eventRecord = new EventRecord();
+
+                int column_index_rid = cs.getColumnIndex(DBConstants.COLUMN_EVENT_RID);
+                int column_index_uid = cs.getColumnIndex(DBConstants.COLUMN_EVENT_UID);
+                int column_index_serverid = cs.getColumnIndex(DBConstants.COLUMN_EVENT_SEVERID);
+                int column_index_introduction = cs.getColumnIndex(DBConstants.COLUMN_EVENT_INTRODUCTION);
+                int column_index_localpicturelink = cs.getColumnIndex(DBConstants.COLUMN_EVENT_LOCALPICTURELINK);
+                int column_index_remotepitcurelink = cs.getColumnIndex(DBConstants.COLUMN_EVENT_REMOTEPICTURELINK);
+                int column_index_remind = cs.getColumnIndex(DBConstants.COLUMN_EVENT_REMIND);
+                int column_index_timebegin = cs.getColumnIndex(DBConstants.COLUMN_EVENT_TIMEBEGIN);
+                int column_index_timeend = cs.getColumnIndex(DBConstants.COLUMN_EVENT_TIMEEND);
+                int column_index_type = cs.getColumnIndex(DBConstants.COLUMN_EVENT_TYPE);
+                int column_index_property = cs.getColumnIndex(DBConstants.COLUMN_EVENT_PROPERTY);
+                int column_index_detaillink = cs.getColumnIndex(DBConstants.COLUMN_EVENT_DETAILLINK);
+                int column_index_status = cs.getColumnIndex(DBConstants.COLUMN_EVENT_STATUS);
+                int column_index_updatetime = cs.getColumnIndex(DBConstants.COLUMN_EVENT_UPDATETIME);
+
+                eventRecord.rid = cs.getInt(column_index_rid);
+                eventRecord.uid = cs.getLong(column_index_uid);
+                eventRecord.serverid = cs.getLong(column_index_serverid);
+                eventRecord.introduction = cs.getString(column_index_introduction);
+                eventRecord.localpicturelink = cs.getString(column_index_localpicturelink);
+                eventRecord.remotepitcurelink = cs.getString(column_index_remotepitcurelink);
+                eventRecord.remind = cs.getLong(column_index_remind);
+                eventRecord.timebegin = cs.getLong(column_index_timebegin);
+                eventRecord.timeend = cs.getLong(column_index_timeend);
+                eventRecord.type = cs.getInt(column_index_type);
+                eventRecord.property = cs.getInt(column_index_property);
+                eventRecord.detaillink = cs.getString(column_index_detaillink);
+                eventRecord.status = cs.getInt(column_index_status);
+                eventRecord.updatetime = column_index_updatetime;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cs != null) cs.close();
+        }
+
+        return eventRecord;
+    }
+
     public EventRecord queryEventByServerId(long serverId) {
         EventRecord eventRecord = null;
         Cursor cs = null;
@@ -182,6 +233,10 @@ public class TableEvent extends DBTable {
     }
 
     public List<EventRecord> queryEvent(long uid, long startTime, long endTime, int status) {
+        return queryEvent(uid, startTime, endTime, status, 1);
+    }
+
+    public List<EventRecord> queryEvent(long uid, long startTime, long endTime, int status, int modified) {
         List<EventRecord> eventRecords = null;
         Cursor cs = null;
         try {
@@ -189,8 +244,9 @@ public class TableEvent extends DBTable {
                     DBConstants.COLUMN_EVENT_UID + " = ?" + " AND " +
                             DBConstants.COLUMN_EVENT_TIMEBEGIN + " >= ?" + " AND " +
                             DBConstants.COLUMN_EVENT_TIMEBEGIN + " < ?" + " AND " +
+                            DBConstants.COLUMN_EVENT_STATUS + " <= ?" + " AND " +
                             DBConstants.COLUMN_EVENT_MODIFIED + " <= ?",
-                    new String[]{String.valueOf(uid), String.valueOf(startTime), String.valueOf(endTime), String.valueOf(status)},
+                    new String[]{String.valueOf(uid), String.valueOf(startTime), String.valueOf(endTime), String.valueOf(status), String.valueOf(modified)},
                     null, null, DBConstants.COLUMN_EVENT_TIMEBEGIN);
             eventRecords = cursorToList(cs);
         } catch (Exception e) {
@@ -207,13 +263,18 @@ public class TableEvent extends DBTable {
     }
 
     public List<EventRecord> queryEvent(long uid, int status) {
+        return queryEvent(uid, status, 1);
+    }
+
+    public List<EventRecord> queryEvent(long uid, int status, int modified) {
         List<EventRecord> eventRecords = null;
         Cursor cs = null;
         try {
             cs = db.query(tableName, null,
                     DBConstants.COLUMN_EVENT_UID + " = ?" + " AND " +
-                    DBConstants.COLUMN_EVENT_MODIFIED + " <= ?",
-                    new String[]{String.valueOf(uid), String.valueOf(status)},
+                            DBConstants.COLUMN_EVENT_STATUS + " <= ?" + " AND " +
+                            DBConstants.COLUMN_EVENT_MODIFIED + " <= ?",
+                    new String[]{String.valueOf(uid), String.valueOf(status), String.valueOf(modified)},
                     null, null, DBConstants.COLUMN_EVENT_TIMEBEGIN);
             eventRecords = cursorToList(cs);
         } catch (Exception e) {

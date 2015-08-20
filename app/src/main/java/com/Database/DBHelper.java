@@ -120,7 +120,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 DBConstants.COLUMN_EVENT_DETAILLINK + " CHAR(255), " +
                 DBConstants.COLUMN_EVENT_STATUS + " INT1, " +
                 DBConstants.COLUMN_EVENT_MODIFIED + " INT1, " +
-                DBConstants.COLUMN_EVENT_UPDATETIME + "INT8" +
+                DBConstants.COLUMN_EVENT_UPDATETIME + " INT8" +
                 ")");
     }
 

@@ -3,11 +3,9 @@ package com.fifteentec.Fragment;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.Color;
+
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,35 +17,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.Database.DBManager;
 import com.Database.EventRecord;
-import com.Database.TableEvent;
 import com.fifteentec.Component.User.UserServer;
-import com.fifteentec.Component.calendar.CalUtil;
 import com.fifteentec.Component.calendar.CalView;
 import com.fifteentec.Component.calendar.CalendarController;
 import com.fifteentec.Component.calendar.DayEventView;
-import com.fifteentec.Component.calendar.EventListView;
 import com.fifteentec.Component.calendar.NewEventView;
 import com.fifteentec.yoko.BaseActivity;
 import com.fifteentec.yoko.R;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.security.Timestamp;
-import java.text.DateFormat;
-import java.text.FieldPosition;
-import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Locale;
+
 
 public class CalViewFragment extends Fragment {
 
@@ -61,6 +47,8 @@ public class CalViewFragment extends Fragment {
     private EventListViewFragment mListView;
     private FrameLayout mMainView;
     private NewEventView mNewEventView;
+    private DayEventView mdayEventView;
+    private WeekEventFragment mWeekEventFragment;
 
     private final int EVENT_LIST = 0x00;
     private final int CAL_VIEW_MONTH_TAP = 0x01;
@@ -80,7 +68,11 @@ public class CalViewFragment extends Fragment {
     private final String TIMEEND ="EndTime";
     private final String TYPE = "Type";
     private final String REMIND ="Reminder";
+    private final String RID = "Rid";
 
+    private final int DAY_EVENT_VIEW = 0x00;
+
+    private boolean month = true;
 
 
     @Override
@@ -93,7 +85,7 @@ public class CalViewFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         this.activity = (BaseActivity)this.getActivity();
-        this.dbManager = (DBManager)this.activity.getDBManager();
+        this.dbManager = this.activity.getDBManager();
     }
 
 
@@ -108,16 +100,35 @@ public class CalViewFragment extends Fragment {
         mMonthText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+                if(month){
+                    if(mWeekEventFragment !=null){
+                        if(mListView != null) fragmentTransaction.hide(mListView);
+                        fragmentTransaction.show(mWeekEventFragment).commit();
+
+                    }else {
+                        if(mListView != null) fragmentTransaction.hide(mListView);
+                        mWeekEventFragment = WeekEventFragment.newInstance(mDate.getCurArray());
+                        fragmentTransaction.add(R.id.id_event_content,mWeekEventFragment).commit();
+                    }
+                    month = false;
+                }else{
+                    if(mListView !=null){
+                        if(mWeekEventFragment != null) fragmentTransaction.hide(mWeekEventFragment);
+                        fragmentTransaction.show(mListView).commit();
+
+                    }else {
+                        if(mWeekEventFragment != null) fragmentTransaction.hide(mWeekEventFragment);
+                        mListView = EventListViewFragment.newInstance(mDate.getCurArray());
+                        fragmentTransaction.add(R.id.id_event_content,mListView).commit();
+                    }
+                    month =true;
+                }
                 mCalView.SwitchMode();
             }
         });
         mYearText = (TextView) view.findViewById(R.id.id_cal_view_year);
-        mYearText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                CreateNewEvent();
-            }
-        });
         mCalView =  (CalView) view.findViewById(R.id.id_cal_view);
         mCalView.init(mDate.getNowCalendar());
         mCalView.setCalViewListner(new CalView.CalViewListener() {
@@ -130,9 +141,11 @@ public class CalViewFragment extends Fragment {
 
             @Override
             public void ShowDayDetail(GregorianCalendar date) {
-                GregorianCalendar temp = new GregorianCalendar(date.get(Calendar.YEAR),date.get(Calendar.MONTH),date.get(Calendar.DAY_OF_MONTH),0,0,0);
+                showDayEventView(date);
+
             }
         });
+
 
         FragmentTransaction mTrans = mFragmentManager.beginTransaction();
         mListView = EventListViewFragment.newInstance(mDate.getNowArray());
@@ -144,6 +157,8 @@ public class CalViewFragment extends Fragment {
             }
         });
         mTrans.add(R.id.id_event_content,mListView).commit();
+
+        mWeekEventFragment = WeekEventFragment.newInstance(mDate.getNowArray());
         return view;
     }
 
@@ -173,64 +188,34 @@ public class CalViewFragment extends Fragment {
                 break;
             case IMAGE_OPENCAMERA_CODE:
                 if(resultCode == Activity.RESULT_OK){
-                    /*
-                    Bitmap bitmap = (Bitmap) data.getExtras().get("data");
-                    String sdStatus = Environment.getExternalStorageState();
-                    if(!sdStatus.equals(Environment.MEDIA_MOUNTED)){
-                        Log.v("YOKO","Storage is not mounted");
-                        return;
-                    }
-                    GregorianCalendar date =new GregorianCalendar();
-                    String name = "YOKO"+date.get(Calendar.YEAR)+""+(date.get(Calendar.MONTH)+1)+""+date.get(Calendar.DAY_OF_MONTH)+""+date.get(Calendar.HOUR)+""+date.get(Calendar.MINUTE)+".jpg";
-
-                    File file =new File("/sdcard/DCIM/Camera/");
-                    file.mkdirs();
-                    String fileName ="/sdcard/DCIM/Camera/"+name;
-
-                    FileOutputStream b= null;
-                    try {
-                        b = new FileOutputStream(fileName);
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, b);
-                    }catch (FileNotFoundException e){
-                        Log.e("YOKO",e.toString());
-                    } finally {
-                        try {
-                            b.flush();
-                            b.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    if (mNewEventView != null) {
-                        mNewEventView.addNewPic(fileName);
-                    }
-
-                    Uri aim = data.getData();
-                    String[] proj = { MediaStore.Images.Media.DATA };
-                    Cursor actualimagecursor = getActivity().managedQuery(aim,proj,null,null,null);
-                    int actual_image_column_index = actualimagecursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                    actualimagecursor.moveToFirst();
-                    String img_path = actualimagecursor.getString(actual_image_column_index);
-                    Log.d("Test",img_path);
-                    */
                     if(RECENT_FILE_NAME != null&&mNewEventView != null) mNewEventView.addNewPic(CAMERA_PATH+RECENT_FILE_NAME);
                 }
         }
     }
 
-    private void CreateNewEvent(){
-        mNewEventView = NewEventView.newInstance(getActivity(),NewEventView.BLANK_EVENT);
+    private void CreateNewEvent(int type,EventRecord eventRecord){
+        mNewEventView = NewEventView.newInstance(getActivity(),type,eventRecord);
         mNewEventView.setNewEventListtenr(new NewEventView.NewEventListener() {
             @Override
-            public void CreateFinish(Bundle bundle) {
+            public void CreateFinish(Bundle bundle,int isNewEvent) {
                 CancelCreate();
                 EventRecord eventRecord = new EventRecord();
+
                 eventRecord.introduction = bundle.getString(INTRODUCTION);
                 eventRecord.timebegin = bundle.getLong(TIMEBEGIN);
                 eventRecord.timeend = bundle.getLong(TIMEEND);
                 eventRecord.type = bundle.getInt(TYPE);
                 eventRecord.remind = bundle.getLong(REMIND);
-                dbManager.getTableEvent().addEvent(eventRecord);
+                eventRecord.timebegin = bundle.getLong(TIMEBEGIN);
+                eventRecord.uid = UserServer.getInstance().getUserid();
+
+                if(isNewEvent != NewEventView.EXIST_EVENT) {
+                    EventRecordUpdate(dbManager.getTableEvent().addEvent(eventRecord),false);
+                }else{
+                    eventRecord.rid = bundle.getLong(RID);
+                    dbManager.getTableEvent().updateEvent(eventRecord);
+                    EventRecordUpdate(eventRecord.rid,true);
+                }
 
             }
 
@@ -264,6 +249,11 @@ public class CalViewFragment extends Fragment {
         mMainView.addView(mNewEventView);
     }
 
+    private void EventRecordUpdate(long rid,boolean exist) {
+        if(mdayEventView != null){
+            mdayEventView.EventRecordUpdate(rid,exist);
+        }
+    }
 
 
     private void UpdateTime(int Updater) {
@@ -279,8 +269,35 @@ public class CalViewFragment extends Fragment {
         }
     }
 
-    private void showDayEventView(){
-        DayEventView dayEventView = DayEventView.newInstance(getActivity(),mDate.getCurCalendar());
-        mMainView.addView(dayEventView);
+    private void showDayEventView(GregorianCalendar date) {
+        if (mdayEventView == null) {
+            mdayEventView = DayEventView.newInstance(getActivity(), date);
+            mdayEventView.setTag(DAY_EVENT_VIEW);
+            mdayEventView.setDayEventViewListener(new DayEventView.DayEventViewListener() {
+                @Override
+                public void createRecord(int Type,EventRecord eventRecord) {
+                    CreateNewEvent(Type,eventRecord);
+                }
+
+                @Override
+                public void closeDayView() {
+                    mMainView.removeView(mdayEventView);
+                    mdayEventView = null;
+                }
+
+                @Override
+                public void deleteRecord(long rid) {
+                    dbManager.getTableEvent().deleteEvent(rid);
+                }
+
+                @Override
+                public void checkExist(long rid) {
+
+                    CreateNewEvent(NewEventView.EXIST_EVENT,dbManager.getTableEvent().queryEventByRid(rid));
+                }
+
+            });
+            mMainView.addView(mdayEventView);
+        }
     }
 }

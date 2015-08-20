@@ -93,6 +93,7 @@ public class CalView extends View implements GestureDetector.OnGestureListener{
             mMode = true;
         }
 
+
     }
 
     private int findWeekPosition(int year,int month,int day){

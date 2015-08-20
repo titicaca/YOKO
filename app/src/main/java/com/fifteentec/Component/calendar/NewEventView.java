@@ -32,6 +32,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.Database.EventRecord;
 import com.fifteentec.yoko.R;
 
 import java.util.ArrayList;
@@ -60,10 +61,12 @@ public class NewEventView extends ViewGroup{
 
     private ArrayList<Bitmap> SavedPic ;
 
+    private int isNewEvent;
     public  final static int BLANK_EVENT = 0x00;
     public  final static int EXIST_EVENT = 0x01;
+    public final static int HAVE_TIME = 0x03;
 
-    private  final int TEXT_INPUT = 0x00;
+    private final int TEXT_INPUT = 0x00;
     private final int FUNCITON_MODE = 0x10;
 
 
@@ -82,11 +85,11 @@ public class NewEventView extends ViewGroup{
     private int TagSelected =-1;
     private GregorianCalendar StartDate;
     private GregorianCalendar EndDate;
-    private String introduction;
-
+    private String introduction = "null";
+    private long rid = 0;
 
     public interface NewEventListener{
-        void CreateFinish(Bundle bundle);
+        void CreateFinish(Bundle bundle,int isNewEvent);
         void addNewBitMap(boolean open);
         void CancelCreate();
 
@@ -101,13 +104,33 @@ public class NewEventView extends ViewGroup{
         return true;
     }
 
-    public static NewEventView newInstance(Context context,int OpenType){
+    public static NewEventView newInstance(Context context,int OpenType,EventRecord eventRecord){
         NewEventView mView = new NewEventView(context);
         mView.init();
 
         switch (OpenType){
             case BLANK_EVENT:
                 mView.BlankEvnentView();
+                mView.isNewEvent= BLANK_EVENT;
+                break;
+            case EXIST_EVENT:
+                mView.isNewEvent = EXIST_EVENT;
+                mView.StartDate.setTimeInMillis(eventRecord.timebegin);
+                mView.EndDate.setTimeInMillis(eventRecord.timeend);
+                mView.TagSelected = eventRecord.type;
+                mView.introduction = eventRecord.introduction;
+                mView.RemindSelected = (int)eventRecord.remind;
+                mView.rid = eventRecord.rid;
+                mView.BlankEvnentView();
+
+                break;
+            case HAVE_TIME:
+                mView.isNewEvent = HAVE_TIME;
+                mView.StartDate.setTimeInMillis(eventRecord.timebegin);
+                mView.EndDate.setTimeInMillis(eventRecord.timeend);
+                mView.BlankEvnentView();
+
+                break;
         }
 
         return mView;
@@ -192,7 +215,8 @@ public class NewEventView extends ViewGroup{
                 bundle.putLong("EndTime",EndDate.getTimeInMillis());
                 bundle.putLong("Reminder",RemindSelected);
                 bundle.putInt("Type",TagSelected);
-                mEventListener.CreateFinish(bundle);
+                bundle.putLong("Rid",rid);
+                mEventListener.CreateFinish(bundle,isNewEvent);
             }
         });
         addView(mShareButton);
@@ -505,6 +529,7 @@ public class NewEventView extends ViewGroup{
             setTextSize(TypedValue.COMPLEX_UNIT_SP, TextSize);
             setGravity(Gravity.TOP);
             setHint(HintString);
+            if(introduction != "null") setText(introduction);
             setPadding(LeftPadding, TopPadding, RightPadding, BottonPadding);
             addTextChangedListener(mtextWatcher);
         }

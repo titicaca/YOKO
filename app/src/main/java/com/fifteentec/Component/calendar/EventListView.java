@@ -34,6 +34,10 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
     private GestureDetector mGesture;
     private EventListListener mEventListListener;
 
+
+    /**
+     * 通过滚动EventList来改变当前事件,通知CalViewFragment改变时间.
+     */
     public interface EventListListener{
         public void DateChange(ArrayList<Integer> list);
     }
@@ -157,6 +161,9 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
     }
 
 
+    /**
+     * 单个事件的List,当天的所有事件组成一个View.
+     */
     private class EventList extends View{
 
         private ArrayList<String> mDate;
@@ -169,7 +176,7 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
         private int mPaddingRectRight = 40;
         private Paint mRectPaint;
         private Paint mTextPaint;
-        public int ViewHeight;
+        public int ViewHeight; // View高度
         public EventList(Context context) {
             this(context, null);
         }
@@ -237,6 +244,9 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
     }
 
 
+    /**
+     * 控制整个View的排布与管理,动态加载上\下\当前View三个总共3*ScreenHeight的视图,提供预加载的能力.
+     */
     private class EventController{
 
 
@@ -268,6 +278,11 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
             return result;
 
         }
+
+        /**
+         * 加载上页面的View
+         * @return 本次加载过程中增加的Height
+         */
         public int  addHideViewList(){
             mBottonIndex--;
             GregorianCalendar tempDate = new GregorianCalendar(mCurDate.get(0),mCurDate.get(1),mCurDate.get(2));
@@ -285,6 +300,11 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
 
 
         }
+
+        /**
+         * 加载下视图的View
+         * @return 本次加载增加的Height
+         */
         public int addViewList(){
             mTopIndex++;
             GregorianCalendar tempDate = new GregorianCalendar(mCurDate.get(0),mCurDate.get(1),mCurDate.get(2));
@@ -302,6 +322,10 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
             return mEL.ViewHeight;
         }
 
+        /**
+         * 删除上页面的View
+         * @return 本次删除删去的height
+         */
         private int removeViewList(){
             mTopIndex--;
             EventList view = ((EventList)(getChildAt(getChildCount()-1)));
@@ -311,6 +335,10 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
             return result;
         }
 
+        /**
+         * 自己看
+         * @return
+         */
         private int removeHideViewList(){
             mBottonIndex++;
             EventList view = ((EventList)(getChildAt(1)));
@@ -321,6 +349,10 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
         }
 
 
+        /**
+         * 滚动offset单位的index之后的视图
+         * @param offset
+         */
         public void changeDate(int offset ){
             GregorianCalendar temp = new GregorianCalendar(mCurDate.get(0),mCurDate.get(1),mCurDate.get(2));
             temp.add(Calendar.DAY_OF_MONTH, offset);
@@ -347,6 +379,11 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
 
         }
 
+        /**
+         * 得到数据库的事件
+         * @param date
+         * @return
+         */
         public ArrayList<String> getEvenet(ArrayList<Integer> date){
             String a = new String();
             a= "year" +date.get(0) +"+month" +date.get(1)+ "+day"+date.get(2)+"+week"+date.get(3);
