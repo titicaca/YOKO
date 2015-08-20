@@ -7,6 +7,7 @@ import android.util.Log;
 import com.API.APIServer;
 import com.API.APIUrl;
 import com.Database.DBManager;
+import com.Database.EventInvitationRecord;
 import com.Database.FriendInvitationRecord;
 import com.android.volley.RequestQueue;
 import com.baidu.android.pushservice.PushMessageReceiver;
@@ -101,30 +102,70 @@ public class BaiduPushMessageReceiver extends PushMessageReceiver {
             int action = jsonMessage.getInt("action");
             JSONObject jsonMessageBody = jsonMessage.getJSONObject("body");
 
+            DBManager dbManager = new DBManager(context);
+            Intent intent;
+
+            long uid;
+            long fuid;
+            String msg;
+            int type;
+            long eventId;
+
             /**
              * 收到添加好友的actionCode为100
              * 收到好友确认的actionCode为101
-             * 发现模块的消息队列actionCode为200
+             * 收到事件邀请的actionCode为200
+             * 收到事件确认的actionCode为201
              */
             switch (action) {
                 case 100:
                     //Todo
-                    long uid = jsonMessageBody.getLong("user_id");
-                    long fuid = jsonMessageBody.getLong("friend_id");
-                    String msg = jsonMessageBody.getString("msg");
+                    uid = jsonMessageBody.getLong("user_id");
+                    fuid = jsonMessageBody.getLong("friend_id");
+                    msg = jsonMessageBody.getString("msg");
 
-                    DBManager dbManager = new DBManager(context);
                     dbManager.getTableFriendInvitation().addFriendInvitation(new FriendInvitationRecord(uid, fuid, msg));
 
-                    Intent intent = new Intent("com.Service.FriendInvitationReceiver.NEW_FRIEND_INVITATION");
-                    intent.putExtra("msg", "new friend");
+                    intent = new Intent("com.Service.InvitationReceiver.NEW_FRIEND_INVITATION");
+                    intent.putExtra("msg", "new friend invitation");
+
                     context.sendBroadcast(intent);
+
                     break;
                 case 101:
                     //todo
                     break;
                 case 200:
                     //todo
+                    uid = jsonMessageBody.getLong("user_id");
+                    fuid = jsonMessageBody.getLong("friend_id");
+                    msg = jsonMessageBody.getString("msg");
+                    type = jsonMessageBody.getInt("type");
+                    eventId = jsonMessageBody.getLong("eventId");
+
+                    dbManager.getTableEventInvitation().addEventInvitation(new EventInvitationRecord(uid, fuid, msg, type, eventId));
+
+                    intent = new Intent("com.Service.InvitationReceiver.NEW_EVENT_INVITATION");
+                    intent.putExtra("msg", "new event invitation");
+
+                    context.sendBroadcast(intent);
+
+                    break;
+                case 201:
+                    //todo
+                    uid = jsonMessageBody.getLong("user_id");
+                    fuid = jsonMessageBody.getLong("friend_id");
+                    msg = jsonMessageBody.getString("msg");
+                    type = jsonMessageBody.getInt("type");
+                    eventId = jsonMessageBody.getLong("eventId");
+
+                    dbManager.getTableEventInvitation().deleteEventInvitation(uid, fuid, type, eventId);
+
+                    intent = new Intent("com.Service.InvitationReceiver.CONFIRM_EVENT_INVITATION");
+                    intent.putExtra("msg", "confirm event invitation");
+
+                    context.sendBroadcast(intent);
+
                     break;
             }
 

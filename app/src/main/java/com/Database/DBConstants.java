@@ -36,6 +36,16 @@ public class DBConstants {
     public final static String COLUMN_FRIEND_INVITATION_MSG = "msg";
     public final static String COLUMN_FRIEND_INVITATION_CREATETIME = "createtime";
 
+    //for table event_invitation
+    public final static String TABLE_EVENT_INVITATION = "event_invitation";
+    public final static String COLUMN_EVENT_INVITATION_RID = "_id";
+    public final static String COLUMN_EVENT_INVITATION_UID = "uid";
+    public final static String COLUMN_EVENT_INVITATION_FUID = "fuid";
+    public final static String COLUMN_EVENT_INVITATION_MSG = "msg";
+    public final static String COLUMN_EVENT_INVITATION_TYPE = "type";
+    public final static String COLUMN_EVENT_INVITATION_EVENTID = "eventId";
+    public final static String COLUMN_EVENT_INVITATION_CREATETIME = "createtime";
+
     //for table event
     public final static String TABLE_EVENT = "event";
     public final static String COLUMN_EVENT_RID = "_id";

@@ -10,6 +10,7 @@ public class DBManager {
     private TableFriendInfo tableFriendInfo;
     private TableFriendInvitation tableFriendInvitation;
     private TableEvent tableEvent;
+    private TableEventInvitation tableEventInvitation;
 
     public DBManager(Context context) {
         dbHelper = new DBHelper(context);
@@ -20,6 +21,7 @@ public class DBManager {
         tableFriendInfo = new TableFriendInfo(db);
         tableFriendInvitation = new TableFriendInvitation(db);
         tableEvent = new TableEvent(db);
+        tableEventInvitation = new TableEventInvitation(db);
     }
 
     public void closeDB() {
@@ -40,5 +42,9 @@ public class DBManager {
 
     public TableEvent getTableEvent() {
         return this.tableEvent;
+    }
+
+    public TableEventInvitation getTableEventInvitation() {
+        return this.tableEventInvitation;
     }
 }
