@@ -14,6 +14,7 @@ import com.API.APIJsonCallbackResponse;
 import com.API.APIKey;
 import com.API.APIServer;
 import com.API.APIUrl;
+import com.API.APIUserServer;
 import com.Common.NetworkState;
 import com.Database.DBManager;
 import com.Database.EventRecord;
@@ -112,9 +113,7 @@ public class DataSyncService extends Service {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put(APIKey.KEY_AUTHORIZATION, null);
-                new APIServer.JsonGet(APIUrl.URL_SYNC_FRIENDS, null, headers, new APIJsonCallbackResponse(){
+                new APIUserServer.JsonGet(APIUrl.URL_SYNC_FRIENDS, null, null, new APIJsonCallbackResponse(){
                     @Override
                     public void run() {
                         if (this.getResponse() == null) return;
@@ -168,10 +167,7 @@ public class DataSyncService extends Service {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put(APIKey.KEY_AUTHORIZATION, null);
-
-                new APIServer.JsonGet(APIUrl.URL_EVENT_GET, null, headers,
+                new APIUserServer.JsonGet(APIUrl.URL_EVENT_GET, null, null,
                         new APIJsonCallbackResponse() {
                             @Override
                             public void run() {
@@ -189,7 +185,7 @@ public class DataSyncService extends Service {
                 List<EventRecord> eventRecords= dbManager.getTableEvent().queryEvent(uid, 1);
 
                 for (EventRecord eventRecord : eventRecords) {
-                    //只上传
+                    //todo 先上传图片到七牛，之后上传事件主体
                     if (eventRecord.modified == 0) continue;
 
                     JSONObject event = new JSONObject();
@@ -211,11 +207,9 @@ public class DataSyncService extends Service {
                         e.printStackTrace();
                     }
 
-                    Map<String, String> headers = new HashMap<String, String>();
-                    headers.put(APIKey.KEY_AUTHORIZATION, null);
                     if (eventRecord.serverid == 0) {
                         //post
-                        new APIServer.JsonPost(APIUrl.URL_EVENT_UPDATE, event, headers,
+                        new APIUserServer.JsonPost(APIUrl.URL_EVENT_UPDATE, event, null,
                                 new APIJsonCallbackResponse() {
                                     @Override
                                     public void run() {
@@ -225,7 +219,7 @@ public class DataSyncService extends Service {
                     } else {
                         if (eventRecord.status == 0) {
                             //put
-                            new APIServer.JsonPut(APIUrl.URL_EVENT_UPDATE, event, headers,
+                            new APIUserServer.JsonPut(APIUrl.URL_EVENT_UPDATE, event, null,
                                     new APIJsonCallbackResponse() {
                                         @Override
                                         public void run() {
@@ -234,7 +228,7 @@ public class DataSyncService extends Service {
                                     }, requestQueue, null).send();
                         } else {
                             //del
-                            new APIServer.JsonDel(APIUrl.URL_EVENT_UPDATE, event, headers,
+                            new APIUserServer.JsonDel(APIUrl.URL_EVENT_UPDATE, event, null,
                                     new APIJsonCallbackResponse() {
                                         @Override
                                         public void run() {
