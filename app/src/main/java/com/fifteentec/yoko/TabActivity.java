@@ -10,14 +10,21 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.fifteentec.Component.User.UserServer;
+import com.fifteentec.Fragment.FriendsFragment;
+import com.fifteentec.Fragment.MyPageFragment;
 import com.fifteentec.Fragment.CalViewFragment;
 import com.Service.InvitationReceiver;
 import com.fifteentec.Fragment.TabButtonFragment;
+import com.fifteentec.TestRicheng.TestFragment;
 
 public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutton {
     private FragmentManager mFragmentManager;
     private final int EnterPage = 0;
     private TabButtonFragment mbuttonfg;
+    private FriendsFragment friendsFragment;
+    private MyPageFragment myPageFragment;
+    private TestFragment tf;
     private CalViewFragment mCalViewFragment;
 
     @SuppressLint("NewApi")
@@ -28,16 +35,22 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
         setContentView(R.layout.activity_tab_main_layout);
         mbuttonfg = (TabButtonFragment) mFragmentManager.findFragmentById(R.id.tab_main_botton);
         mbuttonfg.setButton(this);
+        //TabSelector(R.integer.SelectorCir);
         TabSelector(R.integer.SelectorCal);
-        BaseActivity.getDataSyncService().syncFriends(0);
-        BaseActivity.getDataSyncService().getEvents(0);
-
+        BaseActivity.getDataSyncService().syncFriends(UserServer.getInstance().getUserid());
+        BaseActivity.getDataSyncService().getEvents(UserServer.getInstance().getUserid());
+        Log.e("uid", UserServer.getInstance().getUserid() + "");
         //设置系统状态监听过滤器IntentFilter
         IntentFilter mFilter = new IntentFilter();
         //设定监听内容为网络状态改变
         mFilter.addAction("com.Service.FriendInvitationReceiver.NEW_FRIEND_INVITATION");
         //注册绑定BroadcastReceiver监听相应的系统状态
         registerReceiver(invitationReceiver, mFilter);
+    }
+
+
+    public interface MyListener {
+        public void showMessage(String str);
     }
 
     @Override
@@ -49,6 +62,12 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
     public void TabSelector(int id) {
         FragmentTransaction mFmTrans = mFragmentManager.beginTransaction();
         HideAllView(mFmTrans);
+//        FragmentTransaction localFragmentTransaction = getFragmentManager().beginTransaction();
+//        localFragmentTransaction.replace(R.id.fragment_container, tabFiveFragment, TAB_FIVE);
+//        localFragmentTransaction.addToBackStack(null);// wp add
+//        localFragmentTransaction.commit();
+//            mFmTrans.add(R.id.id_content, friendsFragment, "cal");
+
         switch (id) {
             case R.integer.SelectorCal:
 
@@ -65,12 +84,30 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
                         Toast.LENGTH_SHORT);
                 a.setDuration(Toast.LENGTH_SHORT);
                 a.show();
+
+
                 break;
             case R.integer.SelectorCir:
                 Toast b = Toast.makeText(this, "Friend",
                         Toast.LENGTH_SHORT);
                 b.setDuration(Toast.LENGTH_SHORT);
                 b.show();
+                //testfragment  &  friendsFragment
+//                if (null == tf) {
+//                    tf = new TestFragment();
+//                    mFmTrans.add(R.id.id_content, tf, "frd");
+//                } else {
+//                    mFmTrans.show(tf);
+//                }
+
+                if (friendsFragment == null) {
+                    friendsFragment = new FriendsFragment();
+                     mFmTrans.add(R.id.id_content, friendsFragment, "friend");
+                }else {
+                    mFmTrans.show( friendsFragment);
+                }
+//                    mFmTrans.show(friendsFragment);
+
 
                 break;
 
@@ -79,6 +116,12 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
                         Toast.LENGTH_SHORT);
                 c.setDuration(Toast.LENGTH_SHORT);
                 c.show();
+                if (myPageFragment == null) {
+                    myPageFragment = new MyPageFragment();
+                    mFmTrans.add(R.id.id_content, myPageFragment, "home");
+                } else {
+                    mFmTrans.show(myPageFragment);
+                }
                 break;
             default:
                 Log.e("Error", "Wrong TabActivity Selector");
@@ -88,24 +131,27 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
         mFmTrans.commit();
     }
 
-    private void HideAllView(FragmentTransaction mFmTrans) {
-
-
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(invitationReceiver);
     }
 
+    private void HideAllView(FragmentTransaction mFmTrans) {
+        if (mCalViewFragment != null) mFmTrans.hide(mCalViewFragment);
+        if (myPageFragment != null) mFmTrans.hide(myPageFragment);
+        if (friendsFragment != null) mFmTrans.hide(friendsFragment);
+    }
+
     private InvitationReceiver invitationReceiver = new InvitationReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            Log.v("Friend Invitation", "action: " + action);
-            String msg = intent.getExtras().getString("msg");
-            Log.v("Friend Invitation", "msg: " + msg);
+            Log.v("Invitation", "action: " + action);
+            String msg = intent.getExtras().getString(InvitationReceiver.ACTION_KEY_MSG);
+            Log.v("Invitation", "msg: " + msg);
+            int action_code = intent.getExtras().getInt(InvitationReceiver.ACTION_KEY_ACTION_CODE);
+            Log.v("Invitation", "code: " + action_code);
         }
     };
 }

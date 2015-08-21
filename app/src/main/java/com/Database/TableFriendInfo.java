@@ -39,6 +39,11 @@ public class TableFriendInfo extends DBTable {
             db.delete(DBConstants.TABLE_FRIEND_INFO,
                     DBConstants.COLUMN_FRIEND_INFO_UID + " = ?",
                     new String[]{String.valueOf(uid)});
+
+            db.delete(DBConstants.TABLE_FRIEND_TAG,
+                    DBConstants.COLUMN_FRIEND_TAG_UID + " = ?",
+                    new String[]{String.valueOf(uid)});
+
             db.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
@@ -55,6 +60,12 @@ public class TableFriendInfo extends DBTable {
                     DBConstants.COLUMN_FRIEND_INFO_UID + " = ?" + " AND  " +
                     DBConstants.COLUMN_FRIEND_INFO_FUID + " = ?",
                     new String[]{String.valueOf(uid), String.valueOf(fuid)});
+
+            db.delete(DBConstants.TABLE_FRIEND_TAG,
+                    DBConstants.COLUMN_FRIEND_TAG_UID + " = ?" + " AND " +
+                    DBConstants.COLUMN_FRIEND_TAG_FUID + " = ?",
+                    new String[]{String.valueOf(uid), String.valueOf(fuid)});
+
             db.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();

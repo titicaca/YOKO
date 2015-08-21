@@ -74,7 +74,59 @@ public class TableFriendTag extends DBTable {
             db.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
-        }finally {
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    public String queryTagName(long uid, long tagId) {
+        String tagName = null;
+        Cursor cs = null;
+
+        try {
+            cs = db.query(DBConstants.TABLE_FRIEND_TAG, null,
+                    DBConstants.COLUMN_FRIEND_INFO_UID + " = ?" + " AND " +
+                            DBConstants.COLUMN_FRIEND_INFO_FUID + " = 0" + " AND " +
+                            DBConstants.COLUMN_FRIEND_TAG_TAGID + " = ?",
+                    new String[]{String.valueOf(uid), String.valueOf(tagId)},
+                    null, null, null);
+            if (cs != null) {
+                cs.moveToFirst();
+                tagName = cs.getString(cs.getColumnIndex(DBConstants.COLUMN_FRIEND_TAG_TAGNAME));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cs != null) cs.close();
+        }
+
+        return tagName;
+    }
+
+    public void updateFriendsInTag(long uid, long tagId, List<FriendTagRecord> friendTagRecords) {
+        db.beginTransaction();
+
+        try {
+            db.delete(tableName,
+                    DBConstants.COLUMN_FRIEND_TAG_UID + " = ?" + " AND " +
+                            DBConstants.COLUMN_FRIEND_TAG_FUID + " <> 0" + " AND " +
+                            DBConstants.COLUMN_FRIEND_TAG_TAGID + " = ?",
+                    new String[]{String.valueOf(uid), String.valueOf(tagId)}
+            );
+
+            if (friendTagRecords != null) {
+                for (FriendTagRecord friendTagRecord : friendTagRecords) {
+                    ContentValues cv = new ContentValues();
+                    cv.put(DBConstants.COLUMN_FRIEND_TAG_UID, uid);
+                    cv.put(DBConstants.COLUMN_FRIEND_TAG_FUID, friendTagRecord.fuid);
+                    cv.put(DBConstants.COLUMN_FRIEND_TAG_TAGID, friendTagRecord.tagId);
+                    db.insert(tableName, null, cv);
+                }
+            }
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
             db.endTransaction();
         }
     }
@@ -105,6 +157,27 @@ public class TableFriendTag extends DBTable {
                     DBConstants.COLUMN_FRIEND_TAG_UID + " = ?" + " AND " +
                             DBConstants.COLUMN_FRIEND_TAG_FUID + " = ?",
                     new String[]{String.valueOf(uid), String.valueOf(fuid)});
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    public void addTag(long uid, long tagId, String tagName, List<Long> friends) {
+        db.beginTransaction();
+
+        try {
+            db.execSQL("INSERT OR IGNORE INTO " + DBConstants.TABLE_FRIEND_TAG + " VALUES(NULL, ?, ?, ?, ?)",
+                    new Object[]{uid, 0, tagId, tagName});
+
+            if (friends != null) {
+                for (long friend : friends) {
+                    db.execSQL("INSERT OR IGNORE INTO " + DBConstants.TABLE_FRIEND_TAG + " VALUES(NULL, ?, ?, ?, ?)",
+                            new Object[]{uid, friend, tagId, tagName});
+                }
+            }
             db.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
@@ -147,7 +220,7 @@ public class TableFriendTag extends DBTable {
     }
 
     public List<FriendTagRecord> queryTagsByFriend(long uid, long fuid) {
-        List<FriendTagRecord>  friendTagRecords = null;
+        List<FriendTagRecord> friendTagRecords = null;
         Cursor cs = null;
         try {
             cs = db.query(DBConstants.TABLE_FRIEND_TAG, null,
@@ -173,7 +246,7 @@ public class TableFriendTag extends DBTable {
         try {
             cs = db.query(DBConstants.TABLE_FRIEND_TAG, null,
                     DBConstants.COLUMN_FRIEND_TAG_UID + " = ?" + " AND " +
-                            DBConstants.COLUMN_FRIEND_TAG_FUID + " <> 0" + " AND" +
+                            DBConstants.COLUMN_FRIEND_TAG_FUID + " <> 0" + " AND " +
                             DBConstants.COLUMN_FRIEND_TAG_TAGID + " = ?",
                     new String[]{String.valueOf(uid), String.valueOf(tagId)},
                     null, null, DBConstants.COLUMN_FRIEND_TAG_FUID);
@@ -194,7 +267,7 @@ public class TableFriendTag extends DBTable {
         try {
             cs = db.query(DBConstants.TABLE_FRIEND_TAG, null,
                     DBConstants.COLUMN_FRIEND_INFO_UID + " = ?" + " AND " +
-                    DBConstants.COLUMN_FRIEND_INFO_FUID + " = 0",
+                            DBConstants.COLUMN_FRIEND_INFO_FUID + " = 0",
                     new String[]{String.valueOf(uid)},
                     null, null, DBConstants.COLUMN_FRIEND_TAG_TAGID);
             friendTagRecords = cursorToList(cs);

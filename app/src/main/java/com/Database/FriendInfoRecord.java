@@ -1,6 +1,9 @@
 package com.Database;
 
-public class FriendInfoRecord {
+/**
+ * Created by benbush on 15/8/13.
+ */
+public class FriendInfoRecord extends DBRecord {
     public long rid;
     public long uid;
     public long fuid;

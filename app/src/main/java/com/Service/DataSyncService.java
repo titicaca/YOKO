@@ -19,14 +19,11 @@ import com.Common.NetworkState;
 import com.Database.DBManager;
 import com.Database.EventRecord;
 import com.Database.FriendInfoRecord;
-import com.Database.FriendInvitationRecord;
 import com.Database.FriendTagRecord;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.fifteentec.Component.Parser.DataSyncServerParser;
-import com.fifteentec.Component.User.UserServer;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 

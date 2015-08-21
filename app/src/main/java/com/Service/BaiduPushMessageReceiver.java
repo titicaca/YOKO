@@ -4,15 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.API.APIServer;
-import com.API.APIUrl;
 import com.Database.DBManager;
 import com.Database.EventInvitationRecord;
 import com.Database.FriendInvitationRecord;
-import com.android.volley.RequestQueue;
 import com.baidu.android.pushservice.PushMessageReceiver;
 import com.fifteentec.Component.User.UserServer;
-import com.fifteentec.yoko.BaseActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -126,8 +122,9 @@ public class BaiduPushMessageReceiver extends PushMessageReceiver {
 
                     dbManager.getTableFriendInvitation().addFriendInvitation(new FriendInvitationRecord(uid, fuid, msg));
 
-                    intent = new Intent("com.Service.InvitationReceiver.NEW_FRIEND_INVITATION");
-                    intent.putExtra("msg", "new friend invitation");
+                    intent = new Intent(InvitationReceiver.ACTION_NEW_FRIEND_INVITATION);
+                    intent.putExtra(InvitationReceiver.ACTION_KEY_MSG, "new friend invitation");
+                    intent.putExtra(InvitationReceiver.ACTION_KEY_ACTION_CODE, InvitationReceiver.ACTION_CODE_NEW_FRIEND_INVITATION);
 
                     context.sendBroadcast(intent);
 

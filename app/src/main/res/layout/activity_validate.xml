@@ -28,7 +28,6 @@
             android:id="@+id/validate_input_phone_et"
             android:layout_width="280dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="false"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="107dp"
             android:hint="@string/hint_input_your_phone"
@@ -95,19 +94,18 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
+        android:orientation="vertical"
         android:clickable="false"
-        android:orientation="vertical">
+        android:layout_marginBottom="5dp">
 
         <TextView
             android:id="@+id/try_app_tv"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="25dp"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:gravity="center_horizontal"
             android:text="@string/string_try_app" />
-
     </RelativeLayout>
 
 </LinearLayout>
