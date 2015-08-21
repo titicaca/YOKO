@@ -34,7 +34,7 @@ import com.API.APIUrl;
 import com.API.APIUserServer;
 import com.Database.DBManager;
 import com.Database.FriendInfoRecord;
-import com.Service.FriendInvitationReceiver;
+import com.Service.InvitationReceiver;
 import com.fifteentec.Adapter.commonAdapter.FriendsAdapter;
 import com.fifteentec.Component.Parser.JsonFriendList;
 import com.fifteentec.Component.Parser.JsonFriendTagReturn;
@@ -102,7 +102,7 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
         //设置系统状态监听过滤器IntentFilter
         IntentFilter mFilter = new IntentFilter();
         //设定监听内容为网络状态改变
-        mFilter.addAction("com.Service.FriendInvitationReceiver.NEW_FRIEND_INVITATION");
+        mFilter.addAction(InvitationReceiver.ACTION_NEW_EVENT_INVITATION);
         //注册绑定BroadcastReceiver监听相应的系统状态
         getActivity().registerReceiver(friendInvitationReceiver, mFilter);
 
@@ -400,13 +400,15 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
         }, this.activity.getRequestQueue(), null).send();
     }
 
-    private FriendInvitationReceiver friendInvitationReceiver = new FriendInvitationReceiver() {
+    private InvitationReceiver friendInvitationReceiver = new InvitationReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            Log.v("Friend Invitation", "action: " + action);
-            String msg = intent.getExtras().getString("msg");
-            Log.v("Friend Invitation", "msg: " + msg);
+            Log.v("Invitation", "action: " + action);
+            String msg = intent.getExtras().getString(InvitationReceiver.ACTION_KEY_MSG);
+            Log.v("Invitation", "msg: " + msg);
+            int action_code = intent.getExtras().getInt(InvitationReceiver.ACTION_KEY_ACTION_CODE);
+            Log.v("Invitation", "code: " + action_code);
             friends_iv_add_newfriend.setVisibility(View.VISIBLE);
         }
     };

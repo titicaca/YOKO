@@ -83,7 +83,7 @@
         <activity
             android:name=".TabActivity"
             android:hardwareAccelerated="false"
-            android:label="TabAvtivity"
+            android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan|stateHidden">
         </activity>
@@ -159,12 +159,16 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name="com.Service.FriendInvitationReceiver">
+        <receiver android:name="com.Service.InvitationReceiver">
             <intent-filter>
                 <!-- 收到好友请求 -->
-                <action android:name="com.Service.FriendInvitationReceiver.NEW_FRIEND_INVITATION" />
+                <action android:name="com.Service.InvitationReceiver.NEW_FRIEND_INVITATION" />
                 <!-- 收到好友确认 -->
-                <action android:name="com.Service.FriendInvitationReceiver.CONFIRM_FRIEND_INVITATION" />
+                <action android:name="com.Service.InvitationReceiver.CONFIRM_FRIEND_INVITATION" />
+                <!-- 收到活动邀请 -->
+                <action android:name="com.Service.InvitationReceiver.NEW_EVENT_INVITATION" />
+                <!-- 收到活动确认 -->
+                <action android:name="com.Service.InvitationReceiver.CONFIRM_EVENT_INVITATION" />
             </intent-filter>
         </receiver>
     </application>

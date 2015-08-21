@@ -7,9 +7,6 @@ public abstract class DBTable {
     protected SQLiteDatabase db;
     protected String tableName;
 
-    DBTable(){
-    }
-
     DBTable(SQLiteDatabase db){
         this.db = db;
         setTableName();

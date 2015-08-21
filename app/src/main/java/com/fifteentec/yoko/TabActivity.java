@@ -10,10 +10,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.Service.FriendInvitationReceiver;
 import com.fifteentec.Component.User.UserServer;
 import com.fifteentec.Fragment.FriendsFragment;
 import com.fifteentec.Fragment.MyPageFragment;
+import com.fifteentec.Fragment.CalViewFragment;
+import com.Service.InvitationReceiver;
 import com.fifteentec.Fragment.TabButtonFragment;
 import com.fifteentec.TestRicheng.TestFragment;
 
@@ -24,6 +25,7 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
     private FriendsFragment friendsFragment;
     private MyPageFragment myPageFragment;
     private TestFragment tf;
+    private CalViewFragment mCalViewFragment;
 
     @SuppressLint("NewApi")
     @Override
@@ -33,7 +35,7 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
         setContentView(R.layout.activity_tab_main_layout);
         mbuttonfg = (TabButtonFragment) mFragmentManager.findFragmentById(R.id.tab_main_botton);
         mbuttonfg.setButton(this);
-        TabSelector(R.integer.SelectorCir);
+        //TabSelector(R.integer.SelectorCir);
         TabSelector(R.integer.SelectorCal);
         BaseActivity.getDataSyncService().syncFriends(UserServer.getInstance().getUserid());
         BaseActivity.getDataSyncService().getEvents(UserServer.getInstance().getUserid());
@@ -43,7 +45,7 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
         //设定监听内容为网络状态改变
         mFilter.addAction("com.Service.FriendInvitationReceiver.NEW_FRIEND_INVITATION");
         //注册绑定BroadcastReceiver监听相应的系统状态
-        registerReceiver(friendInvitationReceiver, mFilter);
+        registerReceiver(invitationReceiver, mFilter);
     }
 
 
@@ -68,10 +70,14 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
 
         switch (id) {
             case R.integer.SelectorCal:
-                Toast d = Toast.makeText(this, "Calendar",
-                        Toast.LENGTH_SHORT);
-                d.setDuration(Toast.LENGTH_SHORT);
-                d.show();
+
+                if(mCalViewFragment ==null){
+                    mCalViewFragment = new CalViewFragment();
+                    mFmTrans.add(R.id.id_content,mCalViewFragment,"cal");
+                }
+                else{
+                    mFmTrans.show(mCalViewFragment);
+                }
                 break;
             case R.integer.SelectorFrd:
                 Toast a = Toast.makeText(this, "Found",
@@ -96,9 +102,10 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
 
                 if (friendsFragment == null) {
                     friendsFragment = new FriendsFragment();
-//                    mFmTrans.add(R.id.id_content, friendsFragment, "cal");
+                     mFmTrans.add(R.id.id_content, friendsFragment, "friend");
+                }else {
+                    mFmTrans.show( friendsFragment);
                 }
-                mFmTrans.replace(R.id.id_content, friendsFragment, null);
 //                    mFmTrans.show(friendsFragment);
 
 
@@ -111,9 +118,10 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
                 c.show();
                 if (myPageFragment == null) {
                     myPageFragment = new MyPageFragment();
-//                    mFmTrans.add(R.id.id_content, friendsFragment, "cal");
+                    mFmTrans.add(R.id.id_content, myPageFragment, "home");
+                } else {
+                    mFmTrans.show(myPageFragment);
                 }
-                mFmTrans.replace(R.id.id_content, myPageFragment, null);
                 break;
             default:
                 Log.e("Error", "Wrong TabActivity Selector");
@@ -126,19 +134,24 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(friendInvitationReceiver);
+        unregisterReceiver(invitationReceiver);
     }
 
     private void HideAllView(FragmentTransaction mFmTrans) {
+        if (mCalViewFragment != null) mFmTrans.hide(mCalViewFragment);
+        if (myPageFragment != null) mFmTrans.hide(myPageFragment);
+        if (friendsFragment != null) mFmTrans.hide(friendsFragment);
     }
 
-    private FriendInvitationReceiver friendInvitationReceiver = new FriendInvitationReceiver() {
+    private InvitationReceiver invitationReceiver = new InvitationReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            Log.v("Friend Invitation", "action: " + action);
-            String msg = intent.getExtras().getString("msg");
-            Log.v("Friend Invitation", "msg: " + msg);
+            Log.v("Invitation", "action: " + action);
+            String msg = intent.getExtras().getString(InvitationReceiver.ACTION_KEY_MSG);
+            Log.v("Invitation", "msg: " + msg);
+            int action_code = intent.getExtras().getInt(InvitationReceiver.ACTION_KEY_ACTION_CODE);
+            Log.v("Invitation", "code: " + action_code);
         }
     };
 }
