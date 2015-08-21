@@ -127,7 +127,6 @@ public class BaiduPushMessageReceiver extends PushMessageReceiver {
                     intent.putExtra(InvitationReceiver.ACTION_KEY_ACTION_CODE, InvitationReceiver.ACTION_CODE_NEW_FRIEND_INVITATION);
 
                     context.sendBroadcast(intent);
-
                     break;
                 case 101:
                     //todo

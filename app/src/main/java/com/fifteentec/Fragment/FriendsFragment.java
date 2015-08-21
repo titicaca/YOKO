@@ -102,7 +102,7 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
         //设置系统状态监听过滤器IntentFilter
         IntentFilter mFilter = new IntentFilter();
         //设定监听内容为网络状态改变
-        mFilter.addAction(InvitationReceiver.ACTION_NEW_EVENT_INVITATION);
+        mFilter.addAction(InvitationReceiver.ACTION_NEW_FRIEND_INVITATION);
         //注册绑定BroadcastReceiver监听相应的系统状态
         getActivity().registerReceiver(friendInvitationReceiver, mFilter);
 
