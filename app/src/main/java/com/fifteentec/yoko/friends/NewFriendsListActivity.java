@@ -41,17 +41,17 @@ public class NewFriendsListActivity extends BaseActivity {
         setContentView(R.layout.newfriends_list);
         this.activity = (BaseActivity) this;
         this.dbManager = this.activity.getDBManager();
+
         listdata = dbManager.getTableFriendInvitation().queryFriendInvitation(UserServer.getInstance().getUserid());
         mainView = (KeyboardLayout) findViewById(R.id.keyboardLayout_new_friendslist);
         search = (EditText) findViewById(R.id.new_friednslist_et_search);
         new_friednslist_lv = (ListView) findViewById(R.id.new_friednslist_lv);
-
         if (listdata == null) {
             listdata = new ArrayList<FriendInvitationRecord>();
-            nfladapter = new NewFriendsListAdapter(this, listdata);
+            nfladapter = new NewFriendsListAdapter(this, listdata, dbManager, activity);
             new_friednslist_lv.setAdapter(nfladapter);
         } else {
-            nfladapter = new NewFriendsListAdapter(this, listdata);
+            nfladapter = new NewFriendsListAdapter(this, listdata, dbManager, activity);
             new_friednslist_lv.setAdapter(nfladapter);
         }
 
@@ -114,5 +114,4 @@ public class NewFriendsListActivity extends BaseActivity {
                 + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
         listView.setLayoutParams(params);
     }
-
 }

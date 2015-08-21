@@ -38,6 +38,7 @@ import com.Service.FriendInvitationReceiver;
 import com.fifteentec.Adapter.commonAdapter.FriendsAdapter;
 import com.fifteentec.Component.Parser.JsonFriendList;
 import com.fifteentec.Component.Parser.JsonFriendTagReturn;
+import com.fifteentec.Component.User.UserServer;
 import com.fifteentec.Component.calendar.KeyboardLayout;
 import com.fifteentec.yoko.BaseActivity;
 import com.fifteentec.yoko.R;
@@ -80,6 +81,16 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
     private RelativeLayout friends_rl_add_button;
     private List<FriendInfoRecord> friendInfoRecords = null;
     private ImageView friends_iv_add_newfriend;
+    public static final int FRIENDINVICODE = 6;
+
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == FRIENDINVICODE) {
+            LoadFriendsList();
+        }
+
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -316,7 +327,8 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
                 friends_iv_add_newfriend.setVisibility(View.GONE);
                 Intent ine = new Intent();
                 ine.setClass(getActivity(), NewFriendsListActivity.class);
-                startActivity(ine);
+//                startActivity(ine);
+                startActivityForResult(ine, FRIENDINVICODE);
                 break;
 
             default:
@@ -362,7 +374,7 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
     }
 
     private void LoadFriendsList() {
-        friendInfoRecords = this.dbManager.getTableFriendInfo().queryFriendsInfo(0);
+        friendInfoRecords = this.dbManager.getTableFriendInfo().queryFriendsInfo(UserServer.getInstance().getUserid());
         fAdapter = new FriendsAdapter(activity, friendInfoRecords, "0", v);
         lv2.setAdapter(fAdapter);
         setListViewHeightBasedOnChildren(lv2);
@@ -376,7 +388,7 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
                 JsonFriendTagReturn jr = new JsonFriendTagReturn();
                 jr.JsonParsing(response);
                 if (jr.isAdd) {
-                    dbManager.getTableFriendInfo().deleteFriendInfo(0, friendInfoRecords.get(position).fuid);
+                    dbManager.getTableFriendInfo().deleteFriendInfo(UserServer.getInstance().getUserid(), friendInfoRecords.get(position).fuid);
                     friendInfoRecords.remove(position);
                     fAdapter.notifyDataSetChanged();
                     // 因为之前listview已经固定高度，所以删除后，需重新定高

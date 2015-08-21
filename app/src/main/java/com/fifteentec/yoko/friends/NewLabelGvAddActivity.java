@@ -22,6 +22,7 @@ import com.Database.FriendInfoRecord;
 import com.Database.FriendTagRecord;
 import com.fifteentec.Adapter.commonAdapter.NewLabelGvAddAdapter;
 import com.fifteentec.Component.Parser.JsonFriendList;
+import com.fifteentec.Component.User.UserServer;
 import com.fifteentec.Component.calendar.KeyboardLayout;
 import com.fifteentec.yoko.BaseActivity;
 import com.fifteentec.yoko.R;
@@ -63,7 +64,7 @@ public class NewLabelGvAddActivity extends BaseActivity implements OnClickListen
         this.activity = (BaseActivity) this;
         this.dbManager = this.activity.getDBManager();
 
-        listTag = this.dbManager.getTableFriendTag().queryTag(0);
+        listTag = this.dbManager.getTableFriendTag().queryTag(UserServer.getInstance().getUserid());
 
 
         new_label_gvadd_pop_linearlayout = (com.fifteentec.Component.calendar.PredicateLayout) findViewById(R.id.new_label_gvadd_pop_linearlayout);
@@ -97,7 +98,7 @@ public class NewLabelGvAddActivity extends BaseActivity implements OnClickListen
             }
         });
         search.setOnFocusChangeListener(onFocusAutoClearHintListener);
-        friendInfoRecords = this.dbManager.getTableFriendInfo().queryFriendsInfo(0);
+        friendInfoRecords = this.dbManager.getTableFriendInfo().queryFriendsInfo(UserServer.getInstance().getUserid());
         nlgaadapter = new NewLabelGvAddAdapter(this, friendInfoRecords, jsonTrans,
                 jsonTransModified);
         lv.setAdapter(nlgaadapter);
@@ -147,11 +148,11 @@ public class NewLabelGvAddActivity extends BaseActivity implements OnClickListen
                                 Toast.makeText(NewLabelGvAddActivity.this, v.getTag() + "", Toast.LENGTH_SHORT).show();
                                 long id = listTag.get((Integer) v.getTag()).tagId;
                                 listData = new ArrayList<JsonFriendList>();
-                                listTrans = dbManager.getTableFriendTag().queryFriendsByTag(0, id);
+                                listTrans = dbManager.getTableFriendTag().queryFriendsByTag(UserServer.getInstance().getUserid(), id);
                                 for (FriendTagRecord friendTagRecord : listTrans) {
                                     JsonFriendList item = new JsonFriendList();
                                     item.id = friendTagRecord.fuid;
-                                    FriendInfoRecord friendInfoRecord = dbManager.getTableFriendInfo().queryFriendInfo(0, item.id);
+                                    FriendInfoRecord friendInfoRecord = dbManager.getTableFriendInfo().queryFriendInfo(UserServer.getInstance().getUserid(), item.id);
                                     item.nickname = friendInfoRecord.nickname;
                                     item.picturelink = friendInfoRecord.picturelink;
                                     listData.add(item);

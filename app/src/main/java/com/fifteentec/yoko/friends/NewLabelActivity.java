@@ -94,14 +94,14 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
             new_label_gv.setAdapter(nlgvadapter);
         } else {
             id = intent.getLongExtra("tagId", 0);
-            String tagName = dbManager.getTableFriendTag().queryTagName(0, id);
+            String tagName = dbManager.getTableFriendTag().queryTagName(UserServer.getInstance().getUserid(), id);
             new_label_et_search.setText(tagName);
             jsonData = new ArrayList<JsonFriendList>();
-            jsonTrans = dbManager.getTableFriendTag().queryFriendsByTag(0, id);
+            jsonTrans = dbManager.getTableFriendTag().queryFriendsByTag(UserServer.getInstance().getUserid(), id);
             for (FriendTagRecord friendTagRecord : jsonTrans) {
                 JsonFriendList item = new JsonFriendList();
                 item.id = friendTagRecord.fuid;
-                FriendInfoRecord friendInfoRecord = dbManager.getTableFriendInfo().queryFriendInfo(0, item.id);
+                FriendInfoRecord friendInfoRecord = dbManager.getTableFriendInfo().queryFriendInfo(UserServer.getInstance().getUserid(), item.id);
                 item.nickname = friendInfoRecord.nickname;
                 item.picturelink = friendInfoRecord.picturelink;
                 jsonData.add(item);
@@ -668,7 +668,7 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
                         for (int i = 0; i < jsonData.size(); i++) {
                             list_id.add(jsonData.get(i).id);
                         }
-                        dbManager.getTableFriendTag().addTag(0, jr.id, tagName, list_id);
+                        dbManager.getTableFriendTag().addTag(UserServer.getInstance().getUserid(), jr.id, tagName, list_id);
                         finish();
                     } else {
                         Toast.makeText(NewLabelActivity.this, "添加失败", Toast.LENGTH_SHORT).show();
@@ -691,8 +691,8 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
                             ft.tagId = jr.id;
                             friendTagRecords.add(ft);
                         }
-                        dbManager.getTableFriendTag().updateTagName(0, jr.id, tagName);
-                        dbManager.getTableFriendTag().updateFriendsInTag(0, jr.id, friendTagRecords);
+                        dbManager.getTableFriendTag().updateTagName(UserServer.getInstance().getUserid(), jr.id, tagName);
+                        dbManager.getTableFriendTag().updateFriendsInTag(UserServer.getInstance().getUserid(), jr.id, friendTagRecords);
                         finish();
                     } else {
                         Toast.makeText(NewLabelActivity.this, "修改失败", Toast.LENGTH_SHORT).show();

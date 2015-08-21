@@ -47,7 +47,7 @@ public class NewFriendActivity extends BaseActivity implements OnClickListener {
     private NewFriendAdapter fadapter;
     private RelativeLayout new_friends_rl_check;
     private TextView new_friends_tv_send;
-    private EditText new_friends_et_check;
+    private EditText new_friends_et_check_gone;
     private TextView new_friedns_back;
     private ImageView new_friedns_back_iv;
     private String id;
@@ -62,7 +62,7 @@ public class NewFriendActivity extends BaseActivity implements OnClickListener {
         search = (EditText) findViewById(R.id.new_friedns_et_search);
         new_friends_tv_send = (TextView) findViewById(R.id.new_friends_tv_send);
         new_friends_lv = (ListView) findViewById(R.id.new_friends_lv);
-        new_friends_et_check = (EditText) findViewById(R.id.new_friends_et_check);
+        new_friends_et_check_gone = (EditText) findViewById(R.id.new_friends_et_check_gone);
         new_friedns_back = (TextView) findViewById(R.id.new_friedns_back);
         new_friedns_back_iv = (ImageView) findViewById(R.id.new_friedns_back_iv);
 
@@ -150,10 +150,10 @@ public class NewFriendActivity extends BaseActivity implements OnClickListener {
                 }
                 break;
             case R.id.new_friends_tv_send:
-                if (!new_friends_et_check.getText().toString().trim().equals("")) {
+                if (!new_friends_et_check_gone.getText().toString().trim().equals("")) {
                     new_friends_rl_check.setVisibility(View.GONE);
-                    new_friends_et_check.setText("");
-                    SendCheckInfo();
+                    SendCheckInfo(new_friends_et_check_gone.getText().toString());
+                    new_friends_et_check_gone.setText("");
 
                 }
                 break;
@@ -207,17 +207,16 @@ public class NewFriendActivity extends BaseActivity implements OnClickListener {
         }, this.getRequestQueue(), null).send();
     }
 
-    private void SendCheckInfo() {
+    private void SendCheckInfo(String strEdit) {
         Map<String, String> headers = new HashMap<String, String>();
         try {
             headers.put(APIKey.KEY_AUTHORIZATION, UserServer.getInstance().getAccessToken());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        String searchstr = new_friends_et_check.getText().toString();
         JSONObject ob = new JSONObject();
         try {
-            ob.put("msg", searchstr);
+            ob.put("msg", strEdit);
         } catch (JSONException e) {
             e.printStackTrace();
         }

@@ -11,7 +11,9 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.Service.FriendInvitationReceiver;
+import com.fifteentec.Component.User.UserServer;
 import com.fifteentec.Fragment.FriendsFragment;
+import com.fifteentec.Fragment.MyPageFragment;
 import com.fifteentec.Fragment.TabButtonFragment;
 import com.fifteentec.TestRicheng.TestFragment;
 
@@ -20,6 +22,7 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
     private final int EnterPage = 0;
     private TabButtonFragment mbuttonfg;
     private FriendsFragment friendsFragment;
+    private MyPageFragment myPageFragment;
     private TestFragment tf;
 
     @SuppressLint("NewApi")
@@ -32,9 +35,9 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
         mbuttonfg.setButton(this);
         TabSelector(R.integer.SelectorCir);
         TabSelector(R.integer.SelectorCal);
-        BaseActivity.getDataSyncService().syncFriends(0);
-        BaseActivity.getDataSyncService().getEvents(0);
-
+        BaseActivity.getDataSyncService().syncFriends(UserServer.getInstance().getUserid());
+        BaseActivity.getDataSyncService().getEvents(UserServer.getInstance().getUserid());
+        Log.e("uid", UserServer.getInstance().getUserid() + "");
         //设置系统状态监听过滤器IntentFilter
         IntentFilter mFilter = new IntentFilter();
         //设定监听内容为网络状态改变
@@ -69,11 +72,6 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
                         Toast.LENGTH_SHORT);
                 d.setDuration(Toast.LENGTH_SHORT);
                 d.show();
-                if (null == tf) {
-                    tf = new TestFragment();
-                }
-                mFmTrans.replace(R.id.id_content, tf, null);
-
                 break;
             case R.integer.SelectorFrd:
                 Toast a = Toast.makeText(this, "Found",
@@ -111,6 +109,11 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
                         Toast.LENGTH_SHORT);
                 c.setDuration(Toast.LENGTH_SHORT);
                 c.show();
+                if (myPageFragment == null) {
+                    myPageFragment = new MyPageFragment();
+//                    mFmTrans.add(R.id.id_content, friendsFragment, "cal");
+                }
+                mFmTrans.replace(R.id.id_content, myPageFragment, null);
                 break;
             default:
                 Log.e("Error", "Wrong TabActivity Selector");

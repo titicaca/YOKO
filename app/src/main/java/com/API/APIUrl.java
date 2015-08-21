@@ -32,6 +32,8 @@ public class APIUrl {
 
     public final static String URL_MYTAG_UPDATE = URL_BASE_USER + "/mytag/";
 
+    public final static String URL_NEWFRIEND_INVI = URL_BASE_USER + "/myfriend/response/";
+
     public final static String URL_MYTAG_UPDATE_END = "/friendlist";
 
     public final static String URL_DELETE_TAG = URL_BASE_USER + "/mytag/";

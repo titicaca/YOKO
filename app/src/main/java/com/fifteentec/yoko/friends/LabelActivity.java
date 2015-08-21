@@ -25,6 +25,7 @@ import com.Database.FriendTagRecord;
 import com.fifteentec.Adapter.commonAdapter.LabelItemAdapter;
 import com.fifteentec.Component.Parser.JsonFriendList;
 import com.fifteentec.Component.Parser.JsonFriendTagReturn;
+import com.fifteentec.Component.User.UserServer;
 import com.fifteentec.yoko.BaseActivity;
 import com.fifteentec.yoko.R;
 
@@ -66,7 +67,7 @@ public class LabelActivity extends BaseActivity implements OnItemLongClickListen
         lv = (ListView) findViewById(R.id.label_lv);
         label_create = (TextView) findViewById(R.id.label_create);
 
-        list = this.dbManager.getTableFriendTag().queryTag(0);
+        list = this.dbManager.getTableFriendTag().queryTag(UserServer.getInstance().getUserid());
 
         liadapter = new LabelItemAdapter(this, list);
         lv.setAdapter(liadapter);
@@ -217,7 +218,7 @@ public class LabelActivity extends BaseActivity implements OnItemLongClickListen
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        list = dbManager.getTableFriendTag().queryTag(0);
+        list = dbManager.getTableFriendTag().queryTag(UserServer.getInstance().getUserid());
         liadapter = new LabelItemAdapter(this, list);
         lv.setAdapter(liadapter);
     }
@@ -230,7 +231,7 @@ public class LabelActivity extends BaseActivity implements OnItemLongClickListen
                 JsonFriendTagReturn jr = new JsonFriendTagReturn();
                 jr.JsonParsing(response);
                 if (jr.isAdd) {
-                    dbManager.getTableFriendTag().deleteTag(0, list.get(position).tagId);
+                    dbManager.getTableFriendTag().deleteTag(UserServer.getInstance().getUserid(), list.get(position).tagId);
                     list.remove(position);
                     liadapter.notifyDataSetChanged();
                 } else {
