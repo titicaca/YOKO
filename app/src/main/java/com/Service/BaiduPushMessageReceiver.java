@@ -1,6 +1,7 @@
 package com.Service;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import com.Database.DBManager;
@@ -109,7 +110,11 @@ public class BaiduPushMessageReceiver extends PushMessageReceiver {
                     String msg = jsonMessageBody.getString("msg");
 
                     DBManager dbManager = new DBManager(context);
-                    dbManager.getTableFriendInvitation().addFriendInvitation(new FriendInvitationRecord(uid,fuid,msg));
+                    dbManager.getTableFriendInvitation().addFriendInvitation(new FriendInvitationRecord(uid, fuid, msg));
+
+                    Intent intent = new Intent("com.Service.FriendInvitationReceiver.NEW_FRIEND_INVITATION");
+                    intent.putExtra("msg", "new friend");
+                    context.sendBroadcast(intent);
                     break;
                 case 101:
                     //todo

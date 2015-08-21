@@ -6,8 +6,10 @@ package com.fifteentec.Fragment;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -20,6 +22,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -31,6 +34,7 @@ import com.API.APIUrl;
 import com.API.APIUserServer;
 import com.Database.DBManager;
 import com.Database.FriendInfoRecord;
+import com.Service.FriendInvitationReceiver;
 import com.fifteentec.Adapter.commonAdapter.FriendsAdapter;
 import com.fifteentec.Component.Parser.JsonFriendList;
 import com.fifteentec.Component.Parser.JsonFriendTagReturn;
@@ -75,6 +79,7 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
     private RelativeLayout friends_rl_label_button;
     private RelativeLayout friends_rl_add_button;
     private List<FriendInfoRecord> friendInfoRecords = null;
+    private ImageView friends_iv_add_newfriend;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -82,8 +87,18 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
         this.activity = (BaseActivity) this.getActivity();
         this.dbManager = this.activity.getDBManager();
 
+
+        //设置系统状态监听过滤器IntentFilter
+        IntentFilter mFilter = new IntentFilter();
+        //设定监听内容为网络状态改变
+        mFilter.addAction("com.Service.FriendInvitationReceiver.NEW_FRIEND_INVITATION");
+        //注册绑定BroadcastReceiver监听相应的系统状态
+        getActivity().registerReceiver(friendInvitationReceiver, mFilter);
+
+
         View view = inflater.inflate(R.layout.friends, container, false);
         friends_rl_add_button = (RelativeLayout) view.findViewById(R.id.friends_rl_add_button);
+        friends_iv_add_newfriend = (ImageView) view.findViewById(R.id.friends_iv_add_newfriend);
         friends_rl_label_button = (RelativeLayout) view.findViewById(R.id.friends_rl_label_button);
         friends_rl_newfriend_button = (RelativeLayout) view.findViewById(R.id.friends_rl_newfriend_button);
         lv2 = (ListView) view.findViewById(R.id.friends_lv2);
@@ -298,6 +313,7 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
                 startActivity(inn);
                 break;
             case R.id.friends_rl_newfriend_button:
+                friends_iv_add_newfriend.setVisibility(View.GONE);
                 Intent ine = new Intent();
                 ine.setClass(getActivity(), NewFriendsListActivity.class);
                 startActivity(ine);
@@ -371,5 +387,17 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
             }
         }, this.activity.getRequestQueue(), null).send();
     }
+
+    private FriendInvitationReceiver friendInvitationReceiver = new FriendInvitationReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            Log.v("Friend Invitation", "action: " + action);
+            String msg = intent.getExtras().getString("msg");
+            Log.v("Friend Invitation", "msg: " + msg);
+            friends_iv_add_newfriend.setVisibility(View.VISIBLE);
+        }
+    };
+
 }
 

@@ -5,7 +5,6 @@ package com.fifteentec.yoko.friends;
  */
 
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
@@ -14,27 +13,48 @@ import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+import com.Database.DBManager;
+import com.Database.FriendInvitationRecord;
 import com.fifteentec.Adapter.commonAdapter.NewFriendsListAdapter;
+import com.fifteentec.Component.User.UserServer;
 import com.fifteentec.Component.calendar.KeyboardLayout;
+import com.fifteentec.yoko.BaseActivity;
 import com.fifteentec.yoko.R;
 
-public class NewFriendsListActivity extends Activity {
+import java.util.ArrayList;
+import java.util.List;
+
+public class NewFriendsListActivity extends BaseActivity {
 
     private KeyboardLayout mainView; // 判断软键盘是否隐藏
     private EditText search; // 输入框
     private ListView new_friednslist_lv;
     private NewFriendsListAdapter nfladapter;
+    private BaseActivity activity;
+    private DBManager dbManager;
+    private List<FriendInvitationRecord> listdata = new ArrayList<FriendInvitationRecord>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.newfriends_list);
+        this.activity = (BaseActivity) this;
+        this.dbManager = this.activity.getDBManager();
+        listdata = dbManager.getTableFriendInvitation().queryFriendInvitation(UserServer.getInstance().getUserid());
         mainView = (KeyboardLayout) findViewById(R.id.keyboardLayout_new_friendslist);
         search = (EditText) findViewById(R.id.new_friednslist_et_search);
         new_friednslist_lv = (ListView) findViewById(R.id.new_friednslist_lv);
 
-        nfladapter = new NewFriendsListAdapter(this);
-        new_friednslist_lv.setAdapter(nfladapter);
+        if (listdata == null) {
+            listdata = new ArrayList<FriendInvitationRecord>();
+            nfladapter = new NewFriendsListAdapter(this, listdata);
+            new_friednslist_lv.setAdapter(nfladapter);
+        } else {
+            nfladapter = new NewFriendsListAdapter(this, listdata);
+            new_friednslist_lv.setAdapter(nfladapter);
+        }
+
 
         mainView.setOnkbdStateListener(new KeyboardLayout.onKybdsChangeListener() {
 
@@ -42,7 +62,6 @@ public class NewFriendsListActivity extends Activity {
                 switch (state) {
                     // 软键盘隐藏
                     case KeyboardLayout.KEYBOARD_STATE_HIDE:
-
                         mainView.setFocusable(true);
                         mainView.setFocusableInTouchMode(true);
                         mainView.requestFocus();
@@ -68,11 +87,6 @@ public class NewFriendsListActivity extends Activity {
             } else {
                 hint = textView.getTag().toString();
                 textView.setHint(hint);
-                // if (textView.getText().toString().equals("")) {
-                // textView.setGravity(Gravity.CENTER);
-                // } else {
-                // textView.setGravity(Gravity.LEFT);
-                // }
             }
         }
     };

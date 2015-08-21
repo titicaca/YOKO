@@ -1,86 +1,191 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
     <RelativeLayout
-        android:id="@+id/hlist_rl_title"
+        android:id="@+id/h_adapter_rl"
         android:layout_width="fill_parent"
-        android:layout_height="40dp"
-        android:padding="5dp" >
+        android:layout_height="60dp"
+        android:background="#EEEEEE">
 
         <ImageView
-            android:id="@+id/hlist_iv_back"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:id="@+id/h_adapter_back_iv"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_centerVertical="true"
-            android:background="@drawable/ic_launcher" />
+            android:layout_marginLeft="10dp"
+            android:src="@drawable/ic_keyboard_arrow_left_black"/>
+
+        <ImageView
+            android:id="@+id/h_adapter_iv_set"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/h_adapter_back_iv"
+            android:background="@drawable/ic"/>
 
         <TextView
+            android:id="@+id/h_adapter_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/hlist_iv_back"
-            android:text="好友" />
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@id/h_adapter_iv_set"
+            android:text="添加朋友"
+            android:textSize="20sp"/>
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/settings_friends_add"/>
     </RelativeLayout>
 
     <ImageView
         android:id="@+id/hlist_iv_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/hlist_rl_title"
-        android:layout_marginLeft="10dp"
+        android:layout_below="@+id/h_adapter_rl"
+        android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
-        android:background="@drawable/ic_launcher" />
-
-    <TextView
-        android:id="@+id/hlist_tv_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/hlist_rl_title"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:background="#f00"
-        android:text="标签"
-        android:textSize="30sp" />
+        android:background="@drawable/ic_launcher"/>
 
     <RelativeLayout
         android:id="@+id/hlist_rL_information"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_below="@id/hlist_iv_icon"
+        android:layout_centerHorizontal="true"
         android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp" >
+        android:layout_marginTop="10dp">
 
         <TextView
             android:id="@+id/hlist_rL_information_tv_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="姓名" />
+            android:layout_centerHorizontal="true"
+            android:text="姓名"/>
+
+        <TextView
+            android:id="@+id/hlist_rL_information_tv_sign"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/hlist_rL_information_tv_name"
+            android:layout_centerHorizontal="true"
+            android:text="个性签名"/>
 
         <View
             android:id="@+id/hlist_rL_information_view1"
             android:layout_width="fill_parent"
-            android:layout_height="1dp"
-            android:layout_below="@id/hlist_rL_information_tv_name"
-            android:background="#000" />
+            android:layout_height="0.1dp"
+            android:layout_below="@+id/hlist_rL_information_tv_sign"
+            android:layout_centerHorizontal="true"
+            android:background="#A5DEB8"/>
 
         <ImageView
             android:id="@+id/hlist_rL_information_iv_address"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_below="@id/hlist_rL_information_view1"
-            android:background="@drawable/ic_launcher" />
+            android:background="@drawable/ic_launcher"/>
 
         <TextView
             android:id="@+id/hlist_rL_information_tv_address"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/hlist_rL_information_view1"
-            android:layout_toRightOf="@id/hlist_rL_information_iv_address"
-            android:text="所在地" />
+            android:layout_centerHorizontal="true"
+            android:text="所在地"/>
+
+        <View
+            android:id="@+id/hlist_rL_information_view2"
+            android:layout_width="fill_parent"
+            android:layout_height="0.1dp"
+            android:layout_below="@+id/hlist_rL_information_tv_address"
+            android:layout_centerHorizontal="true"
+            android:background="#A5DEB8"/>
+
+
     </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="200dp"
+        android:layout_height="100dp"
+        android:layout_below="@+id/hlist_rL_information"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="34"
+                android:textColor="#49BB6F"
+                android:textSize="20sp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="喜欢"
+                android:textSize="14sp"/>
+
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="76"
+                android:textColor="#49BB6F"
+                android:textSize="20sp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="去过"
+                android:textSize="14sp"/>
+
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="21"
+                android:textColor="#49BB6F"
+                android:textSize="20sp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="好友"
+                android:textSize="14sp"/>
+        </LinearLayout>
+
+
+    </RelativeLayout>
+
 
     <ImageView
         android:id="@+id/hlist_iv_xx1"
@@ -89,7 +194,8 @@
         android:layout_below="@id/hlist_rL_information"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
-        android:background="@drawable/ic_launcher" />
+        android:background="@drawable/ic"
+        android:visibility="invisible"/>
 
     <ImageView
         android:id="@+id/hlist_iv_xx2"
@@ -98,7 +204,8 @@
         android:layout_below="@id/hlist_rL_information"
         android:layout_marginTop="10dp"
         android:layout_toRightOf="@id/hlist_iv_xx1"
-        android:background="@drawable/ic_launcher" />
+        android:background="@drawable/ic_launcher"
+        android:visibility="invisible"/>
 
     <TextView
         android:id="@+id/hlist_tv_descriptions"
@@ -107,37 +214,9 @@
         android:layout_below="@id/hlist_iv_xx1"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
-        android:text="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
+        android:text="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        android:visibility="invisible"/>
 
-    <TextView
-        android:id="@+id/hlist_tv_like"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/hlist_tv_label"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:text="34喜欢" />
-
-    <TextView
-        android:id="@+id/hlist_tv_arrive"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/hlist_tv_like"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="40dp"
-        android:text="23到过" />
-
-    <TextView
-        android:id="@+id/hlist_tv_friends"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/hlist_tv_arrive"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="40dp"
-        android:text="34好友" />
 
     <View
         android:id="@+id/hlist__view"
@@ -145,14 +224,14 @@
         android:layout_height="0.1dp"
         android:layout_below="@id/hlist_tv_descriptions"
         android:layout_marginTop="5dp"
-        android:background="#000" />
+        android:background="#000"/>
 
     <GridView
         android:id="@+id/hlist_gv_images"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/hlist__view"
-        android:numColumns="4" >
+        android:numColumns="4">
     </GridView>
 
 </RelativeLayout>

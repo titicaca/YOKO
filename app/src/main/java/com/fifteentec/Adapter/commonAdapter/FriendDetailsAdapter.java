@@ -12,10 +12,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.Database.FriendInfoRecord;
 import com.fifteentec.yoko.R;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.ArrayList;
 
@@ -48,23 +50,6 @@ public class FriendDetailsAdapter extends PagerAdapter {
     @SuppressWarnings("unused")
     @Override
     public Object instantiateItem(ViewGroup view, int position) {
-        // if (view == null) {
-        // LayoutInflater inflater = LayoutInflater.from(context);
-        // convertView = inflater.inflate(R.layout.friends_adapter, null);
-        // convertView.setTag(viewHolder);
-        //
-        // inflater = LayoutInflater.from(context);
-        // // 自定义的view
-        // View userLayout = inflater.inflate(R.layout.hlistview_adapter,
-        // view, false);
-        // TextView tvName = (TextView) userLayout
-        // .findViewById(R.id.hlist_tv_label);
-        // // 填充数据
-        // tvName.setText(list.get(position));
-        //
-        // } else {
-        // viewHolder = (ViewHolder) convertView.getTag();
-        // }
         ViewHolder viewHolder = new ViewHolder();
         inflater = LayoutInflater.from(context);
         // 自定义的view
@@ -73,8 +58,9 @@ public class FriendDetailsAdapter extends PagerAdapter {
         if (userLayout == null) {
             userLayout = inflater.inflate(R.layout.hlistview_adapter, view,
                     false);
+            viewHolder.hlist_rL_information_iv_address = (ImageView) userLayout.findViewById(R.id.hlist_rL_information_iv_address);
             viewHolder.tvName = (TextView) userLayout
-                    .findViewById(R.id.hlist_tv_label);
+                    .findViewById(R.id.hlist_rL_information_tv_name);
             viewHolder.hlist_rL_information_tv_address = (TextView) userLayout.findViewById(R.id.hlist_rL_information_tv_address);
             viewHolder.gv = (GridView) userLayout
                     .findViewById(R.id.hlist_gv_images);
@@ -85,6 +71,7 @@ public class FriendDetailsAdapter extends PagerAdapter {
         } else {
             viewHolder = (ViewHolder) userLayout.getTag();
         }
+        ImageLoader.getInstance().displayImage(jsonData.get(position).picturelink, viewHolder.hlist_rL_information_iv_address);
         viewHolder.hlist_rL_information_tv_name
                 .setText(jsonData.get(position).nickname);
         viewHolder.hlist_rL_information_tv_address.setText(jsonData.get(position).location);
@@ -99,6 +86,7 @@ public class FriendDetailsAdapter extends PagerAdapter {
         public GridView gv;
         public TextView hlist_rL_information_tv_name;
         public TextView hlist_rL_information_tv_address;
+        public ImageView hlist_rL_information_iv_address;
     }
 
     @Override

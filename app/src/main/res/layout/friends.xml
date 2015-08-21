@@ -113,6 +113,15 @@
                             android:layout_marginTop="5dp"
                             android:text="新的朋友"/>
 
+                        <ImageView
+                            android:id="@+id/friends_iv_add_newfriend"
+                            android:layout_width="10dp"
+                            android:layout_height="10dp"
+                            android:layout_alignParentBottom="true"
+                            android:layout_alignParentRight="true"
+                            android:background="@drawable/ic"
+                            android:visibility="gone"/>
+
                     </RelativeLayout>
 
                     <RelativeLayout

@@ -83,7 +83,7 @@ public class TableFriendInvitation extends DBTable {
             cs = db.query(tableName, null,
                     DBConstants.COLUMN_FRIEND_INVITATION_FUID + " = ?",
                     new String[]{String.valueOf(fuid)},
-                    null, null, DBConstants.COLUMN_FRIEND_INVITATION_CREATETIME + "DESC");
+                    null, null, DBConstants.COLUMN_FRIEND_INVITATION_CREATETIME + " DESC ");
             friendInvitationRecords = cursorToList(cs);
         } catch (Exception e) {
             e.printStackTrace();

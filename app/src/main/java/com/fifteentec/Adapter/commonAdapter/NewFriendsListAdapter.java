@@ -11,36 +11,32 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.Database.FriendInvitationRecord;
 import com.fifteentec.yoko.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class NewFriendsListAdapter extends BaseAdapter {
 
     private ArrayList<String> list = new ArrayList<String>();
     private Context c;
+    private List<FriendInvitationRecord> listdata;
 
-    public NewFriendsListAdapter(Context c) {
-        list = new ArrayList<String>();
-        list.add("1");
-        list.add("1");
-        list.add("1");
-        list.add("1");
-        list.add("1");
-        list.add("1");
+    public NewFriendsListAdapter(Context c, List<FriendInvitationRecord> listdata) {
         this.c = c;
+        this.listdata = listdata;
     }
 
     @Override
     public int getCount() {
-        return list.size();
+        return listdata.size();
     }
 
     @Override
     public Object getItem(int arg0) {
-        return list.get(arg0);
+        return listdata.get(arg0);
     }
 
     @Override
@@ -69,12 +65,6 @@ public class NewFriendsListAdapter extends BaseAdapter {
                     @Override
                     public void onClick(View arg0) {
                         if (tv_add.getText().toString().equals("添加")) {
-                            tv_add.setText("已添加");
-                            Toast.makeText(c, "添加成功 " + po, Toast.LENGTH_SHORT)
-                                    .show();
-                        } else {
-                            Toast.makeText(c, "已经添加过啦" + po, Toast.LENGTH_SHORT)
-                                    .show();
                         }
                     }
                 });
