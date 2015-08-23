@@ -62,10 +62,6 @@ public class EventListViewFragment extends Fragment{
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-
-
         mContext = getActivity();
         mEvnetView =  new EventListView(mContext);
         mEvnetView.init(new ArrayList<>(mCurDate));

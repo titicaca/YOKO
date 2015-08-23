@@ -1,5 +1,7 @@
 package com.fifteentec.Component.calendar;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -10,7 +12,7 @@ import java.util.List;
 public class CalUtil {
 
     public static final List<Integer> LENTH_OF_MONTH = new ArrayList<>(Arrays.asList(31,28,31,30,31,30,31,31,30,31,30,31));
-
+    public static final long TimeOfDayInMills = 115740000;
     public static final List<String> WEEK_NAME = new ArrayList<>(Arrays.asList("Non","Sun.","Mon.","Tue.","Wed.","Thr.","Fri.","Sat."));
     public static boolean isLeapYear (int year){
         GregorianCalendar temp = new GregorianCalendar(year,1,1);
@@ -86,6 +88,25 @@ public class CalUtil {
         }
 
         return mCurWeekList;
+    }
+
+    public static ArrayList<Long> GetWeekBeginTimeInMills(long time){
+        GregorianCalendar day = new GregorianCalendar();
+        day.setTimeInMillis(time);
+        int week = day.get(Calendar.DAY_OF_WEEK)-1;
+        day.add(Calendar.DAY_OF_MONTH, -week);
+        int month = day.get(Calendar.MONTH);
+        int year = day.get(Calendar.YEAR);
+        int date = day.get(Calendar.DAY_OF_MONTH);
+        day.set(year,month,date,0,0);
+        ArrayList<Long> result = new ArrayList<>();
+        for (int i = 0; i < LENTH_OF_WEEK; i++) {
+            result.add(day.getTimeInMillis());
+            day.add(Calendar.DAY_OF_MONTH,1);
+        }
+
+        return result;
+
     }
 
     public static ArrayList<GregorianCalendar> GetThreeDayInWeekFromeDayOfMonth(GregorianCalendar date)

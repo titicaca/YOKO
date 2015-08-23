@@ -156,9 +156,23 @@ public class CalViewFragment extends Fragment {
                 UpdateTime(EVENT_LIST);
             }
         });
+        mWeekEventFragment = WeekEventFragment.newInstance(mDate.getNowArray());
+        mWeekEventFragment.setmWeekViewFragmentLinstener(new WeekEventFragment.WeekViewFragmentLinstener() {
+            @Override
+            public void CheckExist(long rid) {
+                CreateNewEvent(NewEventView.EXIST_EVENT,dbManager.getTableEvent().queryEventByRid(rid));
+            }
+
+            @Override
+            public void CreateRecord(int TYPE, EventRecord eventRecord) {
+                CreateNewEvent(TYPE,eventRecord);
+            }
+        });
+        mTrans.add(R.id.id_event_content,mWeekEventFragment);
+        mTrans.hide(mWeekEventFragment);
         mTrans.add(R.id.id_event_content,mListView).commit();
 
-        mWeekEventFragment = WeekEventFragment.newInstance(mDate.getNowArray());
+
         return view;
     }
 
@@ -252,6 +266,9 @@ public class CalViewFragment extends Fragment {
     private void EventRecordUpdate(long rid,boolean exist) {
         if(mdayEventView != null){
             mdayEventView.EventRecordUpdate(rid,exist);
+        }
+        if(mWeekEventFragment != null){
+            mWeekEventFragment.EventRecordUpdate(rid,exist);
         }
     }
 
