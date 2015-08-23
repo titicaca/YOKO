@@ -1,6 +1,8 @@
 package com.Database;
 
-public class FriendInvitationRecord {
+import org.json.JSONObject;
+
+public class FriendInvitationRecord extends DBRecord{
     public long rid;
     public long uid;
     public long fuid;
@@ -23,5 +25,10 @@ public class FriendInvitationRecord {
         this.uid = uid;
         this.fuid = fuid;
         this.msg = msg;
+    }
+
+    @Override
+    public JSONObject toJson() {
+        return null;
     }
 }

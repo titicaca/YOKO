@@ -37,8 +37,7 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
         mbuttonfg.setButton(this);
         //TabSelector(R.integer.SelectorCir);
         TabSelector(R.integer.SelectorCal);
-        BaseActivity.getDataSyncService().syncFriends(UserServer.getInstance().getUserid());
-        BaseActivity.getDataSyncService().getEvents(UserServer.getInstance().getUserid());
+
         Log.e("uid", UserServer.getInstance().getUserid() + "");
         //设置系统状态监听过滤器IntentFilter
         IntentFilter mFilter = new IntentFilter();

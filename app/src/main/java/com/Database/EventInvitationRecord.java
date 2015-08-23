@@ -1,9 +1,11 @@
 package com.Database;
 
+import org.json.JSONObject;
+
 /**
  * Created by benbush on 15/8/20.
  */
-public class EventInvitationRecord {
+public class EventInvitationRecord extends DBRecord{
     public long rid;
     public long uid;
     public long fuid;
@@ -32,5 +34,10 @@ public class EventInvitationRecord {
         this.msg = msg;
         this.type = type;
         this.eventId = eventId;
+    }
+
+    @Override
+    public JSONObject toJson() {
+        return null;
     }
 }
