@@ -4,6 +4,9 @@ import com.Database.FriendInfoRecord;
 import com.Database.FriendInvitationRecord;
 import com.Database.FriendTagRecord;
 import com.Service.DataSyncService;
+import com.fifteentec.FoundItems.EventBrief;
+import com.fifteentec.FoundItems.FavoriteBrief;
+import com.fifteentec.FoundItems.GroupBrief;
 
 import org.json.JSONArray;
 import org.json.JSONException;

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    <RadioButton
+        android:id="@+id/event_intro2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="top"
+        android:text="@string/tab_favorite"
+        android:checked="true"
+        android:textSize="14sp"
+        android:textColor="@color/black"
+        android:paddingLeft="5dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:paddingRight="5dp" />
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="60dp"
+        android:gravity="top"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="8dp">
+
+        <ImageView
+            android:id="@+id/group_detail_event_logo2"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@drawable/me_head_bg"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="8dp"
+            />
+        <com.fifteentec.FoundItems.CircularImage
+            android:id="@+id/cover_group_detail_event_logo2"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="8dp"
+            />
+
+        <TextView
+            android:id="@+id/group_detail_event_name2"
+            android:text="default_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_toRightOf="@id/group_detail_event_logo2"
+            android:textSize="18sp"
+            />
+        <TextView
+            android:id="@+id/tags2"
+            android:text="@string/tags"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:gravity="center_vertical"
+            android:layout_toRightOf="@id/group_detail_event_logo2"
+            android:layout_below="@id/group_detail_event_name2"
+            android:textSize="12sp"
+            />
+    </RelativeLayout>
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:background="@color/black"
+        android:layout_marginTop="10dp"
+        />
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="10dp">
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/event_time2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/time"/>
+
+                <TextView
+                    android:id="@+id/event_set_time2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/event_location2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/location"/>
+                <TextView
+                    android:id="@+id/event_set_location2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+            <TextView
+                android:id="@+id/event_detail2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/eventDetail"/>
+
+
+            <TextView
+                android:id="@+id/event_detail_content2"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                />
+            <ImageView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:src="@drawable/event_eg"/>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
