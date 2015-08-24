@@ -16,7 +16,8 @@
             android:layout_height="30dp"
             android:layout_centerVertical="true"
             android:layout_marginLeft="10dp"
-            android:src="@drawable/ic_keyboard_arrow_left_black"/>
+            android:src="@drawable/ic_keyboard_arrow_left_black"
+            android:visibility="gone"/>
 
         <ImageView
             android:id="@+id/mypage_adapter_iv_set"
