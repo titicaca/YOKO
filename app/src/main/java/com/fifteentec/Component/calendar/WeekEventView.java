@@ -126,6 +126,15 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
         return weekEventView;
     }
 
+    public void UpdateViewByTime(ArrayList<Integer> date){
+        StartDate = new GregorianCalendar(date.get(0),date.get(1),date.get(2),0,0);
+        TodayTimeInMills = StartDate.getTimeInMillis();
+        mEventManager = EventManager.newInstance(((BaseActivity) mContext).getDBManager().getTableEvent(), EventManager.WEEK_VIEW_EVENT_MANAGER, TodayTimeInMills);
+        UpdateEventArray();
+        ClearExistRect();
+        CleartempRect();
+    }
+
     public void UpdateView(long rid,boolean exist){
         if(!exist) mEventManager.addEvent(rid);
         UpdateEventArray();
@@ -134,11 +143,11 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
         invalidate();
     }
     public void initView(ArrayList<Integer> date){
-        StartDate = new GregorianCalendar(date.get(0),date.get(1),date.get(2));
+        StartDate = new GregorianCalendar(date.get(0),date.get(1),date.get(2),0,0);
         setWillNotDraw(false);
         mSurface = new Surface();
         TodayTimeInMills = StartDate.getTimeInMillis();
-        mEventManager = EventManager.newInstance(((BaseActivity) mContext).getDBManager().getTableEvent(), EventManager.WEEK_VIEW_ENENT_MANAGER, TodayTimeInMills);
+        mEventManager = EventManager.newInstance(((BaseActivity) mContext).getDBManager().getTableEvent(), EventManager.WEEK_VIEW_EVENT_MANAGER, TodayTimeInMills);
         mTempRectCanvas = new tempRectCanvas(mContext);
         addView(mTempRectCanvas);
         gestureDetector  = new GestureDetector(mContext,this);
@@ -161,6 +170,7 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
                 addNewEvent(eventItem);
             }
         }
+        invalidate();
     }
 
     public void addNewEvent(EventItem eventItem){
@@ -271,7 +281,6 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
             } while (isChanged);
 
 
-            Log.d("Test","Size "+ChangeList.size()+" Colum "+Before_colum);
             RerangeList(ChangeList, Before_colum);
             invalidate();
         }
@@ -338,6 +347,12 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
             ChangeList.remove(getIndex);
         }
 
+    }
+
+    public void UpdateScale(){
+        firstEntry = true;
+        scrollTo(0,0);
+        invalidate();
     }
 
     @Override

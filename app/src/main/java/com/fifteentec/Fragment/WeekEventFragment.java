@@ -48,9 +48,22 @@ public class WeekEventFragment extends Fragment {
         }
     }
 
+    public void UpdateViewTime(ArrayList<Integer> date){
+        mCurDate.clear();
+        mCurDate.add(date.get(0));
+        mCurDate.add(date.get(1));
+        mCurDate.add(date.get(2));
+        mCurDate.add(date.get(3));
+        weekEventView.UpdateViewByTime(mCurDate);
+    }
+
     public void EventRecordUpdate(long rid,boolean exist){
         weekEventView.UpdateView(rid,exist);
 
+    }
+
+    public void UpdateScale(){
+        weekEventView.UpdateScale();
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

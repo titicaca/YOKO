@@ -19,7 +19,8 @@ import java.util.List;
 public class EventManager {
 
     public final static int DAY_VIEW_EVENT_MANAGER =0x00;
-    public final static int WEEK_VIEW_ENENT_MANAGER = 0x02;
+    public final static int WEEK_VIEW_EVENT_MANAGER = 0x02;
+    public final static int EVENT_LIST_EVENT_MANAGER = 0x03;
     public final static int WRONG_TYPE = 0x01;
 
     public final static int MillsInOneDay = 86400000;
@@ -47,10 +48,9 @@ public class EventManager {
                     else {
                         eventManager.NormalEvent.add(eventRecord.rid);
                     }
-
                 }
                 return eventManager;
-            case WEEK_VIEW_ENENT_MANAGER:
+            case WEEK_VIEW_EVENT_MANAGER:
                 eventManager = new EventManager(tableEvent);
                 eventManager.mType = Type;
                 eventManager.DayView_Date = TimeInMill;
@@ -58,6 +58,19 @@ public class EventManager {
                 for (int i = 0; i < CalUtil.LENTH_OF_WEEK; i++) {
                     EventManager temp = EventManager.newInstance(tableEvent,DAY_VIEW_EVENT_MANAGER,DayStart.get(i));
                     eventManager.WeekManager.add(temp);
+                }
+                return eventManager;
+            case EVENT_LIST_EVENT_MANAGER:
+                eventManager = new EventManager(tableEvent);
+                eventManager.mType = Type;
+                eventManager.DayView_Date = TimeInMill;
+                long EndTime = eventManager.DayView_Date +MillsInOneDay;
+                List<EventRecord> eventRecords1 = eventManager.mtableEvent.queryEvent(UserServer.getInstance().getUserid(),eventManager.DayView_Date,EndTime);
+                for(EventRecord eventRecord:eventRecords1){
+                    if(eventRecord.timebegin == eventRecord.timeend) eventManager.AlldayEvent.add(eventRecord.rid);
+                    else {
+                        eventManager.NormalEvent.add(eventRecord.rid);
+                    }
                 }
                 return eventManager;
             default:
@@ -90,7 +103,7 @@ public class EventManager {
     }
 
     public EventManager getEventMangerInDayOfWeek(int index){
-        if(mType == WEEK_VIEW_ENENT_MANAGER){
+        if(mType == WEEK_VIEW_EVENT_MANAGER){
             return WeekManager.get(index);
         }else{
             return null;
@@ -137,7 +150,7 @@ public class EventManager {
                 NormalEvent.add(rid);
                 return false;
             }
-        }else if(mType == WEEK_VIEW_ENENT_MANAGER){
+        }else if(mType == WEEK_VIEW_EVENT_MANAGER){
             for (int i = 0; i < CalUtil.LENTH_OF_WEEK; i++) {
                 if(eventRecord.timebegin <WeekManager.get(i).DayView_Date+MillsInOneDay&&eventRecord.timebegin>=WeekManager.get(i).DayView_Date){
                     if(eventRecord.timebegin == eventRecord.timeend){
@@ -167,7 +180,7 @@ public class EventManager {
     }
 
     public boolean deleteByRid(long rid){
-        if(mType == WEEK_VIEW_ENENT_MANAGER){
+        if(mType == WEEK_VIEW_EVENT_MANAGER){
             for (int i = 0; i < CalUtil.LENTH_OF_WEEK; i++) {
                 EventManager eventManager = WeekManager.get(i);
                 if(eventManager.deleteByRid(rid))

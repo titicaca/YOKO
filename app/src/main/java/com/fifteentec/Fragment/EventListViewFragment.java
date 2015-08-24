@@ -34,7 +34,7 @@ public class EventListViewFragment extends Fragment{
     private EventListView mEvnetView;
 
     public interface EventListFragmentListener{
-        public void ListDateChange(ArrayList<Integer> list);
+        void ListDateChange(ArrayList<Integer> list);
     }
 
     public void setEventFragmentListener(EventListFragmentListener listener){
