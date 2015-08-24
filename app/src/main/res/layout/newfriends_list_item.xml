@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/newfriends_item_iv_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:background="@drawable/ic_launcher"/>
+
+    <TextView
+        android:id="@+id/newfriends_item_tv_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/newfriends_item_iv_icon"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/newfriends_item_iv_icon"
+        android:text="姓名"/>
+
+    <TextView
+        android:id="@+id/newfriends_item_tv_check"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/newfriends_item_iv_icon"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/newfriends_item_iv_icon"
+        android:text="验证信息xxxxxxx"/>
+
+    <TextView
+        android:id="@+id/newfriends_item_tv_add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/newfriends_item_iv_icon"
+        android:layout_marginRight="20dp"
+        android:layout_toLeftOf="@+id/newfriends_item_tv_delete"
+        android:text="添加"/>
+
+    <TextView
+        android:id="@+id/newfriends_item_tv_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/newfriends_item_iv_icon"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="20dp"
+        android:text="删除"
+        />
+
+</RelativeLayout>

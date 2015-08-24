@@ -581,7 +581,6 @@ public class UserServer {
                                 ? "获取用户信息失败!"
                                 : "获取用户信息成功!\n" + this.getResponse().toString()),
                         Toast.LENGTH_LONG).show();*/
-
                 if (this.getResponse() != null) {
                     try {
                         if (this.getResponse().has(APIKey.KEY_USER_ID)) {
@@ -627,6 +626,10 @@ public class UserServer {
                         e.printStackTrace();
                     }
                 }
+
+                //上报服务器后与服务器同步用户数据
+                BaseActivity.getDataSyncService().syncFriends(UserServer.getInstance().getUserid());
+                BaseActivity.getDataSyncService().getEvents(UserServer.getInstance().getUserid());
             }
         }, activity.getRequestQueue(), null).send();
 

@@ -31,7 +31,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginLeft="8dp"
             />
-        <com.fifteentec.item.CircularImage
+        <com.fifteentec.FoundItems.CircularImage
             android:id="@+id/cover_group_detail_event_logo2"
             android:layout_width="60dp"
             android:layout_height="60dp"

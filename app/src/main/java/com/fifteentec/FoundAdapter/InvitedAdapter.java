@@ -8,8 +8,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.fifteentec.item.EventBrief;
-import com.fifteentec.item.InvitedBrief;
+import com.fifteentec.FoundItems.InvitedBrief;
 import com.fifteentec.yoko.R;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -88,8 +87,7 @@ public class InvitedAdapter extends BaseAdapter{
 
 
         if (null != eventList.get(position).getLogoUri()
-                && !"".equals(eventList.get(position).getLogoUri())) {
-            item.logo.setVisibility(View.VISIBLE);
+                && !"".equals(eventList.get(position).getLogoUri())&& !"null".equals(eventList.get(position).getLogoUri())) {
             imageLoader.displayImage(eventList.get(position).getLogoUri(), item.logo);
         } else {
             item.logo.setImageResource(R.drawable.logo_default);

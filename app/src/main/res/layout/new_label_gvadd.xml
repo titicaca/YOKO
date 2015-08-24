@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.fifteentec.Component.calendar.KeyboardLayout
+    android:id="@+id/keyboardLayout_new_label_gvadd"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <RelativeLayout
+                    android:id="@+id/new_label_gvadd_rl1"
+                    android:layout_width="fill_parent"
+                    android:layout_height="60dp">
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="选择好友"/>
+
+                    <TextView
+                        android:id="@+id/new_label_gvadd_tv_sure"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:text="确认"
+                        android:textSize="25sp"/>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/new_label_gvadd_rl_search"
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:layout_below="@+id/new_label_gvadd_rl1"
+                    android:layout_marginTop="5dip"
+                    android:background="#ff0">
+
+                    <EditText
+                        android:id="@+id/new_label_gvadd_et_search"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_toLeftOf="@+id/new_label_gvadd_tv_search"
+                        android:background="#00f"
+                        android:gravity="center_vertical"
+                        android:hint="搜索"
+                        android:paddingLeft="10dp"
+                        android:singleLine="true"
+                        android:textSize="16sp"/>
+
+                    <TextView
+                        android:id="@+id/new_label_gvadd_tv_search"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_alignParentRight="true"
+                        android:layout_gravity="center_vertical"
+                        android:background="@drawable/ic_launcher"/>
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/new_label_gvadd_tv"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/new_label_gvadd_rl_search"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:text="选择标签组"
+                    android:textSize="25sp"/>
+
+
+                <View
+                    android:id="@+id/new_label_gvadd_view"
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:layout_below="@+id/new_label_gvadd_tv"
+                    android:background="#000"/>
+
+                <ListView
+                    android:id="@+id/new_label_gvadd_lv"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/new_label_gvadd_view"
+                    android:layout_marginTop="5dp">
+                </ListView>
+
+                <com.fifteentec.Component.calendar.PredicateLayout
+                    android:id="@+id/new_label_gvadd_pop_linearlayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/new_label_gvadd_rl_search"
+                    android:layout_centerHorizontal="true"
+                    android:background="#fff"
+                    android:visibility="gone">
+                </com.fifteentec.Component.calendar.PredicateLayout>
+
+
+            </RelativeLayout>
+        </LinearLayout>
+    </ScrollView>
+
+</com.fifteentec.Component.calendar.KeyboardLayout>

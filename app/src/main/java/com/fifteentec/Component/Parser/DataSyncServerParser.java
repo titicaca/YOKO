@@ -2,10 +2,9 @@ package com.fifteentec.Component.Parser;
 
 import com.Database.FriendInfoRecord;
 import com.Database.FriendTagRecord;
-import com.Service.DataSyncService;
-import com.fifteentec.item.EventBrief;
-import com.fifteentec.item.FavoriteBrief;
-import com.fifteentec.item.GroupBrief;
+import com.fifteentec.FoundItems.EventBrief;
+import com.fifteentec.FoundItems.FavoriteBrief;
+import com.fifteentec.FoundItems.GroupBrief;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -83,7 +82,6 @@ public class DataSyncServerParser {
 
         return friendInfoRecords;
     }
-
     public static List<GroupBrief> parseGroupBriefInfo(final JSONObject response) {
         List<GroupBrief> groupBriefs = new ArrayList<GroupBrief>();
 
@@ -160,5 +158,3 @@ public class DataSyncServerParser {
         return eventBriefs;
     }
 }
-
-

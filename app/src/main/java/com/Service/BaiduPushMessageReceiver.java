@@ -1,16 +1,15 @@
 package com.Service;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
-import com.API.APIServer;
-import com.API.APIUrl;
 import com.Database.DBManager;
+import com.Database.EventInvitationRecord;
+import com.Database.FriendInfoRecord;
 import com.Database.FriendInvitationRecord;
-import com.android.volley.RequestQueue;
 import com.baidu.android.pushservice.PushMessageReceiver;
 import com.fifteentec.Component.User.UserServer;
-import com.fifteentec.yoko.BaseActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -100,30 +99,125 @@ public class BaiduPushMessageReceiver extends PushMessageReceiver {
             int action = jsonMessage.getInt("action");
             JSONObject jsonMessageBody = jsonMessage.getJSONObject("body");
 
+            DBManager dbManager = new DBManager(context);
+            Intent intent;
+
             /**
              * 收到添加好友的actionCode为100
              * 收到好友确认的actionCode为101
-             * 发现模块的消息队列actionCode为200
+             * 收到事件邀请的actionCode为200
+             * 收到事件确认的actionCode为201
              */
             switch (action) {
                 case 100:
-                    //Todo
-                    long uid = jsonMessageBody.getLong("user_id");
-                    long fuid = jsonMessageBody.getLong("friend_id");
-                    String msg = jsonMessageBody.getString("msg");
+                    saveNewFriendInvitation(jsonMessageBody, dbManager);
 
-                    DBManager dbManager = new DBManager(context);
-                    dbManager.getTableFriendInvitation().addFriendInvitation(new FriendInvitationRecord(uid,fuid,msg));
+                    intent = new Intent(InvitationReceiver.ACTION_NEW_FRIEND_INVITATION);
+                    intent.putExtra(InvitationReceiver.ACTION_KEY_MSG, "new friend invitation");
+                    intent.putExtra(InvitationReceiver.ACTION_KEY_ACTION_CODE, InvitationReceiver.ACTION_CODE_NEW_FRIEND_INVITATION);
+
+                    context.sendBroadcast(intent);
                     break;
                 case 101:
-                    //todo
+                    saveNewFriendConfirm(jsonMessageBody, dbManager);
+
+                    intent = new Intent(InvitationReceiver.ACTION_CONFIRM_FRIEND_INVITATION);
+                    intent.putExtra(InvitationReceiver.ACTION_KEY_MSG, "confirm friend invitation");
+                    intent.putExtra(InvitationReceiver.ACTION_KEY_ACTION_CODE, InvitationReceiver.ACTION_CODE_CONFIRM_FRIEND_INVITATION);
+
                     break;
                 case 200:
-                    //todo
+                    saveNewEventInvitation(jsonMessageBody, dbManager);
+
+                    intent = new Intent(InvitationReceiver.ACTION_NEW_EVENT_INVITATION);
+                    intent.putExtra(InvitationReceiver.ACTION_KEY_MSG, "new event invitation");
+                    intent.putExtra(InvitationReceiver.ACTION_KEY_ACTION_CODE, InvitationReceiver.ACTION_CODE_NEW_EVENT_INVITATION);
+
+                    context.sendBroadcast(intent);
+
+                    break;
+                case 201:
+                    saveNewEventConfirm(jsonMessageBody, dbManager);
+
+                    intent = new Intent(InvitationReceiver.ACTION_CONFIRM_EVENT_INVITATION);
+                    intent.putExtra(InvitationReceiver.ACTION_KEY_MSG, "confirm event invitation");
+                    intent.putExtra(InvitationReceiver.ACTION_KEY_ACTION_CODE, InvitationReceiver.ACTION_CODE_CONFIRM_EVENT_INVITATION);
+
+                    context.sendBroadcast(intent);
+
                     break;
             }
 
         } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void saveNewFriendInvitation(JSONObject jsonMessageBody, DBManager dbManager) {
+        try {
+            long uid = jsonMessageBody.getLong("user_id");
+            long fuid = jsonMessageBody.getLong("friend_id");
+            String msg = jsonMessageBody.getString("msg");
+
+            dbManager.getTableFriendInvitation().addFriendInvitation(new FriendInvitationRecord(uid, fuid, msg));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void saveNewFriendConfirm(JSONObject jsonMessageBody, DBManager dbManager) {
+        try {
+            long uid = UserServer.getInstance().getUserid();
+            long fuid = jsonMessageBody.getLong("id");
+            String nickname = jsonMessageBody.getString("nickname");
+            String mobile = jsonMessageBody.getString("mobile");
+            int sex = jsonMessageBody.getInt("sex");
+            String location = jsonMessageBody.getString("location");
+            String email = jsonMessageBody.getString("email");
+            String qq = jsonMessageBody.getString("qq");
+            String wechat = jsonMessageBody.getString("wechat");
+            String weibo = jsonMessageBody.getString("weibo");
+            String picturelink = jsonMessageBody.getString("picturelink");
+            long createdtime = jsonMessageBody.getLong("createdtime");
+            long logintime = jsonMessageBody.getLong("logintime");
+            int status = jsonMessageBody.getInt("status");
+            int collectnumber = jsonMessageBody.getInt("collectnumber");
+            int enrollnumber = jsonMessageBody.getInt("enrollnumber");
+            int friendnumber = jsonMessageBody.getInt("friendnumber");
+
+            FriendInfoRecord friendInfoRecord = new FriendInfoRecord(uid, fuid, email, location, mobile, nickname, picturelink, qq, sex, wechat, weibo, collectnumber, enrollnumber, friendnumber, logintime);
+            dbManager.getTableFriendInfo().addFriendInfo(friendInfoRecord);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void saveNewEventInvitation(JSONObject jsonMessageBody, DBManager dbManager) {
+        try {
+            //todo
+            long uid = jsonMessageBody.getLong("user_id");
+            long fuid = jsonMessageBody.getLong("friend_id");
+            String msg = jsonMessageBody.getString("msg");
+            int type = jsonMessageBody.getInt("type");
+            long eventId = jsonMessageBody.getLong("eventId");
+
+            dbManager.getTableEventInvitation().addEventInvitation(new EventInvitationRecord(uid, fuid, msg, type, eventId));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void saveNewEventConfirm(JSONObject jsonMessageBody, DBManager dbManager) {
+        try {
+            //todo
+            long uid = jsonMessageBody.getLong("user_id");
+            long fuid = jsonMessageBody.getLong("friend_id");
+            String msg = jsonMessageBody.getString("msg");
+            int type = jsonMessageBody.getInt("type");
+            long eventId = jsonMessageBody.getLong("eventId");
+
+            dbManager.getTableEventInvitation().deleteEventInvitation(uid, fuid, type, eventId);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

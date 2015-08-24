@@ -8,8 +8,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.fifteentec.item.EventBrief;
-import com.fifteentec.item.FavoriteBrief;
+import com.fifteentec.FoundItems.FavoriteBrief;
 import com.fifteentec.yoko.R;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -89,16 +88,14 @@ public class FavoriteAdapter extends BaseAdapter{
 
 
         if (null != eventList.get(position).getLogoUri()
-                && !"".equals(eventList.get(position).getLogoUri())) {
-            item.logo.setVisibility(View.VISIBLE);
+                && !"".equals(eventList.get(position).getLogoUri())&&!"null".equals(eventList.get(position).getLogoUri())) {
             imageLoader.displayImage(eventList.get(position).getLogoUri(), item.logo);
         } else {
             item.logo.setImageResource(R.drawable.logo_default);
         }
 
         if (null != eventList.get(position).getEventUri()
-                && !"".equals(eventList.get(position).getEventUri())) {
-            item.event.setVisibility(View.VISIBLE);
+                && !"".equals(eventList.get(position).getEventUri())&& !"null".equals(eventList.get(position).getEventUri())) {
             imageLoader.displayImage(eventList.get(position).getEventUri(),item.event);
         } else {
             item.event.setImageResource(R.drawable.event_eg);

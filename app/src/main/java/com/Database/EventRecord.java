@@ -1,6 +1,8 @@
 package com.Database;
 
-public class EventRecord {
+import org.json.JSONObject;
+
+public class EventRecord extends DBRecord{
     public long rid;
     public long uid;
     public long serverid;
@@ -58,5 +60,10 @@ public class EventRecord {
         this.status = status;
         this.modified = modified;
         this.updatetime = updatetime;
+    }
+
+    @Override
+    public JSONObject toJson() {
+        return null;
     }
 }

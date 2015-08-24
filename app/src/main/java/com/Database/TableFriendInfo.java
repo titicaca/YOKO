@@ -21,8 +21,8 @@ public class TableFriendInfo extends DBTable {
     @Override
     public void createUniqueIndex() {
         try {
-            db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS " + DBConstants.TABLE_FRIEND_INFO + "_unique_index" + " ON " +
-                    DBConstants.TABLE_FRIEND_INFO + " (" +
+            db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS " + tableName + "_unique_index" + " ON " +
+                    tableName + " (" +
                     DBConstants.COLUMN_FRIEND_INFO_UID + ", " +
                     DBConstants.COLUMN_FRIEND_INFO_FUID +
                     ")");
@@ -36,9 +36,14 @@ public class TableFriendInfo extends DBTable {
         db.beginTransaction();
 
         try {
-            db.delete(DBConstants.TABLE_FRIEND_INFO,
+            db.delete(tableName,
                     DBConstants.COLUMN_FRIEND_INFO_UID + " = ?",
                     new String[]{String.valueOf(uid)});
+
+            db.delete(DBConstants.TABLE_FRIEND_TAG,
+                    DBConstants.COLUMN_FRIEND_TAG_UID + " = ?",
+                    new String[]{String.valueOf(uid)});
+
             db.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
@@ -51,10 +56,16 @@ public class TableFriendInfo extends DBTable {
         db.beginTransaction();
 
         try {
-            db.delete(DBConstants.TABLE_FRIEND_INFO,
+            db.delete(tableName,
                     DBConstants.COLUMN_FRIEND_INFO_UID + " = ?" + " AND  " +
                     DBConstants.COLUMN_FRIEND_INFO_FUID + " = ?",
                     new String[]{String.valueOf(uid), String.valueOf(fuid)});
+
+            db.delete(DBConstants.TABLE_FRIEND_TAG,
+                    DBConstants.COLUMN_FRIEND_TAG_UID + " = ?" + " AND " +
+                    DBConstants.COLUMN_FRIEND_TAG_FUID + " = ?",
+                    new String[]{String.valueOf(uid), String.valueOf(fuid)});
+
             db.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
@@ -82,7 +93,7 @@ public class TableFriendInfo extends DBTable {
             cv.put(DBConstants.COLUMN_FRIEND_INFO_FRIENDNUMBER, friendInfoRecord.friendnumber);
             cv.put(DBConstants.COLUMN_FRIEND_INFO_LOGINTIME, friendInfoRecord.logintime);
 
-            db.update(DBConstants.TABLE_FRIEND_TAG, cv,
+            db.update(tableName, cv,
                     DBConstants.COLUMN_FRIEND_INFO_UID + " = ?" + " AND " +
                     DBConstants.COLUMN_FRIEND_INFO_FUID + " = ?",
                     new String[]{String.valueOf(friendInfoRecord.uid), String.valueOf(friendInfoRecord.fuid)});
@@ -98,7 +109,7 @@ public class TableFriendInfo extends DBTable {
         db.beginTransaction();
 
         try {
-            db.execSQL("INSERT OR IGNORE INTO " + DBConstants.TABLE_FRIEND_INFO + " VALUES(NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            db.execSQL("INSERT OR IGNORE INTO " + tableName + " VALUES(NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     new Object[]{friendInfoRecord.uid, friendInfoRecord.fuid, friendInfoRecord.email, friendInfoRecord.location,
                                 friendInfoRecord.mobile, friendInfoRecord.nickname, friendInfoRecord.picturelink, friendInfoRecord.qq,
                                 friendInfoRecord.sex, friendInfoRecord.wechat, friendInfoRecord.weibo, friendInfoRecord.collectnumber,
@@ -116,12 +127,14 @@ public class TableFriendInfo extends DBTable {
     public FriendInfoRecord queryFriendInfo(long uid, long fuid) {
         FriendInfoRecord friendInfoRecord = null;
         Cursor cs = null;
+
         try {
-            cs = db.query(DBConstants.TABLE_FRIEND_INFO, null,
+            cs = db.query(tableName, null,
                     DBConstants.COLUMN_FRIEND_INFO_UID + " = ?" + " AND " +
                             DBConstants.COLUMN_FRIEND_INFO_FUID + " = ?",
                     new String[]{String.valueOf(uid), String.valueOf(fuid)},
                     null, null, null);
+
             if (cs.getCount() == 1) {
                 cs.moveToFirst();
                 friendInfoRecord = new FriendInfoRecord();
@@ -172,8 +185,9 @@ public class TableFriendInfo extends DBTable {
     public List<FriendInfoRecord> queryFriendsInfo(long uid) {
         List<FriendInfoRecord>  friendInfoRecords = null;
         Cursor cs = null;
+
         try {
-            cs = db.query(DBConstants.TABLE_FRIEND_INFO, null,
+            cs = db.query(tableName, null,
                     DBConstants.COLUMN_FRIEND_INFO_UID + " = ?",
                     new String[]{String.valueOf(uid)},
                     null, null, DBConstants.COLUMN_FRIEND_INFO_LOGINTIME + " DESC");
@@ -239,12 +253,12 @@ public class TableFriendInfo extends DBTable {
         db.beginTransaction();
 
         try {
-            db.delete(DBConstants.TABLE_FRIEND_INFO,
+            db.delete(tableName,
                     DBConstants.COLUMN_FRIEND_INFO_UID + " = ?",
                     new String[]{String.valueOf(uid)});
 
             for (FriendInfoRecord friendInfoRecord : friendInfoRecords) {
-                db.execSQL("INSERT OR IGNORE INTO " + DBConstants.TABLE_FRIEND_INFO + " VALUES(NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                db.execSQL("INSERT OR IGNORE INTO " + tableName + " VALUES(NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                         new Object[]{friendInfoRecord.uid, friendInfoRecord.fuid, friendInfoRecord.email, friendInfoRecord.location,
                                 friendInfoRecord.mobile, friendInfoRecord.nickname, friendInfoRecord.picturelink, friendInfoRecord.qq,
                                 friendInfoRecord.sex, friendInfoRecord.wechat, friendInfoRecord.weibo, friendInfoRecord.collectnumber,

@@ -1,14 +1,16 @@
 package com.fifteentec.Component.calendar;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 public class CalendarController {
 
     private GregorianCalendar mTimeCur;
-
-    private ArrayList<Integer> mCurDate;
+    public final ArrayList<String> MONTH_NAME = new ArrayList<>(Arrays.asList("Jan.","Feb.","Mar.","Apr.","May","Jun.","Jul.","Aug.","Sept.","Oct.","Nov.","Dec."));
+    private   ArrayList<Integer> mCurDate;
     private int mCurDayOfMonth;
     private int mCurDayOfWeek;
     private int mCurWeekOfMonth;
@@ -27,14 +29,14 @@ public class CalendarController {
     private int mNowYear;
     private int mNowMonth;
 
-    public CalendarController() {
-        // Locale.setDefault(Locale.CHINA);
+    public CalendarController()
+    {
         mTimeNow = new GregorianCalendar();
         mNowDayOfMonth = mTimeNow.get(Calendar.DAY_OF_MONTH);
         mNowDayOfWeek = mTimeNow.get(Calendar.DAY_OF_WEEK);
         mNowWeekOfMonth = mTimeNow.get(Calendar.WEEK_OF_MONTH);
         mNowWeekOfYear = mTimeNow.get(Calendar.WEEK_OF_YEAR);
-        mNowYear = mTimeNow.get(Calendar.YEAR);
+        mNowYear =mTimeNow.get(Calendar.YEAR);
         mNowMonth = mTimeNow.get(Calendar.MONTH);
 
         mNowDate = new ArrayList<Integer>(4);
@@ -44,6 +46,7 @@ public class CalendarController {
         mNowDate.add(mNowDayOfMonth);
         mNowDate.add(mNowDayOfWeek);
 
+        mTimeCur = new GregorianCalendar(mNowYear,mNowMonth,mNowDayOfMonth);
         mCurDate = new ArrayList<>(4);
 
         UpdateCur(mTimeNow);
@@ -60,11 +63,12 @@ public class CalendarController {
         this.mCurMonth = mTime.get(Calendar.MONTH);
         this.mCurDayOfMonth = mTime.get(Calendar.DAY_OF_MONTH);
         this.mCurDayOfWeek = mTime.get(Calendar.DAY_OF_WEEK);
+        this.mTimeCur = new GregorianCalendar(mCurYear,mCurMonth,mCurDayOfMonth);
 
     }
 
     public void UpdateCur(ArrayList<Integer> date) {
-        if (date.size() == 4) {
+        if(date.size() == 4) {
             this.mCurDate.clear();
             this.mCurDate.add(date.get(0));
             this.mCurDate.add(date.get(1));
@@ -74,30 +78,37 @@ public class CalendarController {
             this.mCurMonth = date.get(1);
             this.mCurDayOfMonth = date.get(2);
             this.mCurDayOfWeek = date.get(3);
+            this.mTimeCur = new GregorianCalendar(mCurYear,mCurMonth,mCurDayOfMonth);
         }
     }
 
-    public int getCurDayOfMonth() {
+    public int getCurDayOfMonth()
+    {
         return this.mCurDayOfMonth;
     }
 
-    public int getCurDayOfWeek() {
+    public int getCurDayOfWeek()
+    {
         return this.mCurDayOfWeek;
     }
 
-    public int getCurWeekOfMonth() {
+    public int getCurWeekOfMonth()
+    {
         return this.mCurWeekOfMonth;
     }
 
-    public int getCurYear() {
+    public int getCurYear()
+    {
         return this.mCurYear;
     }
 
-    public int getCurMonth() {
+    public int getCurMonth()
+    {
         return this.mCurMonth;
     }
 
-    public int getCurWeekOfYear() {
+    public int getCurWeekOfYear()
+    {
         return mCurWeekOfYear;
     }
 
@@ -105,18 +116,8 @@ public class CalendarController {
     public ArrayList<Integer> getCurArray() {
         return this.mCurDate;
     }
-
-    public GregorianCalendar getCurCalendar() {
-        return mTimeCur;
-    }
-
-    ;
-
-    public GregorianCalendar getNowCalendar() {
-        return mTimeNow;
-    }
-
-    ;
+    public GregorianCalendar getCurCalendar() {return CalUtil.CopyDate(mTimeCur);};
+    public GregorianCalendar getNowCalendar() {return mTimeNow;};
 
     public ArrayList<Integer> getNowArray() {
         return this.mNowDate;
