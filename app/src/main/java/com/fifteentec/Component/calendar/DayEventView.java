@@ -99,7 +99,8 @@ public class DayEventView extends ViewGroup {
     private void init(GregorianCalendar today) {
         mSurface = new Surface();
         mDate = CalUtil.CopyDate(today);
-        mEventManager = EventManager.newInstance(((BaseActivity)mcontext).getDBManager().getTableEvent(),EventManager.DAY_VIEW_EVENT_MANAGER,today.getTimeInMillis());
+        GregorianCalendar time = new GregorianCalendar(today.get(Calendar.YEAR),today.get(Calendar.MONTH),today.get(Calendar.DAY_OF_MONTH),0,0);
+        mEventManager = EventManager.newInstance(((BaseActivity)mcontext).getDBManager().getTableEvent(),EventManager.DAY_VIEW_EVENT_MANAGER,time.getTimeInMillis());
 
         mBackgroundView = new View(mcontext);
         mBackgroundView.setBackgroundColor(mSurface.BackgoundColor);

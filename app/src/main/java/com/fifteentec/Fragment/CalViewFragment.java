@@ -24,6 +24,7 @@ import com.Database.EventRecord;
 import com.fifteentec.Component.User.UserServer;
 import com.fifteentec.Component.calendar.CalView;
 import com.fifteentec.Component.calendar.CalendarController;
+import com.fifteentec.Component.calendar.CalendarView;
 import com.fifteentec.Component.calendar.DayEventView;
 import com.fifteentec.Component.calendar.NewEventView;
 import com.fifteentec.yoko.BaseActivity;
@@ -37,7 +38,8 @@ import java.util.GregorianCalendar;
 
 public class CalViewFragment extends Fragment {
 
-    private CalView mCalView;
+    //private CalView mCalView;
+    private CalendarView mCalendarView;
 
     private CalendarController mDate;
 
@@ -75,6 +77,7 @@ public class CalViewFragment extends Fragment {
     private boolean month = true;
 
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         if(mDate == null)
@@ -101,6 +104,14 @@ public class CalViewFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
+                //mCalView.SwitchMode();
+                mWeekEventFragment.UpdateScale();
+            }
+        });
+        mYearText = (TextView) view.findViewById(R.id.id_cal_view_year);
+        mYearText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
                 if(month){
                     if(mWeekEventFragment !=null){
@@ -117,7 +128,6 @@ public class CalViewFragment extends Fragment {
                     if(mListView !=null){
                         if(mWeekEventFragment != null) fragmentTransaction.hide(mWeekEventFragment);
                         fragmentTransaction.show(mListView).commit();
-
                     }else {
                         if(mWeekEventFragment != null) fragmentTransaction.hide(mWeekEventFragment);
                         mListView = EventListViewFragment.newInstance(mDate.getCurArray());
@@ -125,11 +135,16 @@ public class CalViewFragment extends Fragment {
                     }
                     month =true;
                 }
-                mCalView.SwitchMode();
             }
         });
-        mYearText = (TextView) view.findViewById(R.id.id_cal_view_year);
+
+        mCalendarView = (CalendarView) view.findViewById(R.id.id_cal_view);
+        mCalendarView.initView(mDate.getNowArray(),dbManager.getTableEvent());
+
+/*
         mCalView =  (CalView) view.findViewById(R.id.id_cal_view);
+
+
         mCalView.init(mDate.getNowCalendar());
         mCalView.setCalViewListner(new CalView.CalViewListener() {
             @Override
@@ -142,11 +157,9 @@ public class CalViewFragment extends Fragment {
             @Override
             public void ShowDayDetail(GregorianCalendar date) {
                 showDayEventView(date);
-
             }
         });
-
-
+*/
         FragmentTransaction mTrans = mFragmentManager.beginTransaction();
         mListView = EventListViewFragment.newInstance(mDate.getNowArray());
         mListView.setEventFragmentListener(new EventListViewFragment.EventListFragmentListener() {
@@ -156,9 +169,23 @@ public class CalViewFragment extends Fragment {
                 UpdateTime(EVENT_LIST);
             }
         });
+        mWeekEventFragment = WeekEventFragment.newInstance(mDate.getNowArray());
+        mWeekEventFragment.setmWeekViewFragmentLinstener(new WeekEventFragment.WeekViewFragmentLinstener() {
+            @Override
+            public void CheckExist(long rid) {
+                CreateNewEvent(NewEventView.EXIST_EVENT,dbManager.getTableEvent().queryEventByRid(rid));
+            }
+
+            @Override
+            public void CreateRecord(int TYPE, EventRecord eventRecord) {
+                CreateNewEvent(TYPE,eventRecord);
+            }
+        });
+        mTrans.add(R.id.id_event_content,mWeekEventFragment);
+        mTrans.hide(mWeekEventFragment);
         mTrans.add(R.id.id_event_content,mListView).commit();
 
-        mWeekEventFragment = WeekEventFragment.newInstance(mDate.getNowArray());
+
         return view;
     }
 
@@ -253,6 +280,9 @@ public class CalViewFragment extends Fragment {
         if(mdayEventView != null){
             mdayEventView.EventRecordUpdate(rid,exist);
         }
+        if(mWeekEventFragment != null){
+            mWeekEventFragment.EventRecordUpdate(rid,exist);
+        }
     }
 
 
@@ -262,10 +292,12 @@ public class CalViewFragment extends Fragment {
         switch (Updater){
             case CAL_VIEW_MONTH_TAP:
                 mListView.UpdateTime(mDate.getCurArray());
+                mWeekEventFragment.UpdateViewTime(mDate.getCurArray());
                 break;
             case EVENT_LIST:
                 GregorianCalendar temp =mDate.getCurCalendar();
-                mCalView.UpdateTime(temp);
+                //mCalView.UpdateTime(temp);
+                mWeekEventFragment.UpdateViewTime(mDate.getCurArray());
         }
     }
 
@@ -297,6 +329,7 @@ public class CalViewFragment extends Fragment {
                 }
 
             });
+
             mMainView.addView(mdayEventView);
         }
     }
