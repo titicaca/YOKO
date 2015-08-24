@@ -1,6 +1,5 @@
 package com.fifteentec.FoundFragment;
 
-
 import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -22,7 +21,7 @@ import com.API.APIJsonCallbackResponse;
 import com.API.APIUrl;
 import com.API.APIUserServer;
 import com.android.volley.RequestQueue;
-import com.fifteentec.Component.Parser.DataSyncServerParser;
+import com.fifteentec.Component.Parser.FoundDataParser;
 import com.fifteentec.FoundAdapter.GroupAdapter;
 import com.fifteentec.FoundItems.GroupBrief;
 import com.fifteentec.yoko.BaseActivity;
@@ -98,7 +97,7 @@ public class FoundGroup extends Fragment {
                 JSONObject object=this.getResponse();
                 Log.e("object", object.toString());
 
-                groupList = DataSyncServerParser.parseGroupBriefInfo(object);
+                groupList = FoundDataParser.parseGroupBriefInfo(object);
                 if(groupList!=null){
                     joinedAdapter = new GroupAdapter(getActivity().getLayoutInflater(),groupList,true);
                     mListView.setAdapter(joinedAdapter);

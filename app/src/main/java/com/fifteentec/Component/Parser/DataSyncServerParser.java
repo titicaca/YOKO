@@ -1,6 +1,7 @@
 package com.fifteentec.Component.Parser;
 
 import com.Database.FriendInfoRecord;
+import com.Database.FriendInvitationRecord;
 import com.Database.FriendTagRecord;
 import com.Service.DataSyncService;
 import com.fifteentec.FoundItems.EventBrief;
@@ -84,79 +85,31 @@ public class DataSyncServerParser {
         return friendInfoRecords;
     }
 
-    public static List<GroupBrief> parseGroupBriefInfo(final JSONObject response) {
-        List<GroupBrief> groupBriefs = new ArrayList<GroupBrief>();
+    public static List<FriendInvitationRecord> parseFriendInvitationResponse(final JSONObject response) {
+        List<FriendInvitationRecord> friendInvitationRecords = new ArrayList<FriendInvitationRecord>();
 
         try {
-            JSONArray groups = response.getJSONArray("list");
-            for (int i = 0; i < groups.length(); ++i) {
-                JSONObject group = (JSONObject)groups.get(i);
-                String groupName=group.getString("name");
-                String groupIntro=group.getString("introduction");
-                String bigPicUrl = group.getString("picturelink");
+            JSONArray records = response.getJSONArray("list");
+            for (int i = 0; i < records.length(); ++i) {
+                JSONObject record = (JSONObject)records.get(i);
 
-                GroupBrief briefItem = new GroupBrief ();
-                briefItem.setGroupName(groupName);
-                briefItem.setGroupIntro(groupIntro);
-                //briefItem.setBigPicUri(bigPicUrl);
+                long uid = record.getLong("user_id");
+                long fuid = record.getLong("friend_id");
+                String msg = record.getString("msg");
+                long createdtime = record.getLong("createdtime");
 
-                groupBriefs.add(briefItem);
+                FriendInvitationRecord friendInvitationRecord = new FriendInvitationRecord();
+                friendInvitationRecord.uid = uid;
+                friendInvitationRecord.fuid = fuid;
+                friendInvitationRecord.msg = msg;
+                friendInvitationRecord.createdtime = createdtime;
+
+                friendInvitationRecords.add(friendInvitationRecord);
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        return groupBriefs;
-    }
-
-
-    public static List<EventBrief> parseEventBriefInfo(final JSONObject response) {
-        List<EventBrief> eventBriefs = new ArrayList<EventBrief>();
-
-        try {
-            JSONArray groups = response.getJSONArray("list");
-            for (int i = 0; i < groups.length(); ++i) {
-                JSONObject group = (JSONObject)groups.get(i);
-                String groupName=group.getString("name");
-                String groupIntro=group.getString("introduction");
-                String PicUrl = group.getString("picturelink");
-
-                EventBrief briefItem = new EventBrief();
-                briefItem.setGroupName(groupName);
-                briefItem.setEventIntro(groupIntro);
-                briefItem.setEventUri(PicUrl);
-
-                eventBriefs.add(briefItem);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return eventBriefs;
-    }
-
-    public static List<FavoriteBrief> parseFavoriteBriefInfo(final JSONObject response) {
-        List<FavoriteBrief> eventBriefs = new ArrayList<FavoriteBrief>();
-
-        try {
-            JSONArray groups = response.getJSONArray("list");
-            for (int i = 0; i < groups.length(); ++i) {
-                JSONObject group = (JSONObject)groups.get(i);
-                String groupName=group.getString("name");
-                String groupIntro=group.getString("introduction");
-                String PicUrl = group.getString("picturelink");
-
-                FavoriteBrief briefItem = new FavoriteBrief();
-                briefItem.setGroupName(groupName);
-                briefItem.setEventIntro(groupIntro);
-                briefItem.setEventUri(PicUrl);
-
-                eventBriefs.add(briefItem);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return eventBriefs;
+        return friendInvitationRecords;
     }
 }

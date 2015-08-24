@@ -1,6 +1,5 @@
 package com.fifteentec.FoundFragment;
 
-
 import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -17,7 +16,7 @@ import com.API.APIJsonCallbackResponse;
 import com.API.APIUrl;
 import com.API.APIUserServer;
 import com.android.volley.RequestQueue;
-import com.fifteentec.Component.Parser.DataSyncServerParser;
+import com.fifteentec.Component.Parser.FoundDataParser;
 import com.fifteentec.FoundAdapter.EventAdapter;
 import com.fifteentec.FoundItems.EventBrief;
 import com.fifteentec.yoko.BaseActivity;
@@ -27,9 +26,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-
-;
-
 
 /**
  * Created by cj on 2015/8/7.
@@ -67,7 +63,7 @@ public class FoundEvent extends Fragment {
                 JSONObject object = this.getResponse();
                 Log.e("Event object", object.toString());
 
-                eventList = DataSyncServerParser.parseEventBriefInfo(object);
+                eventList = FoundDataParser.parseEventBriefInfo(object);
                 eventAdapter = new EventAdapter(getActivity().getLayoutInflater(),eventList);
                 events.setAdapter(eventAdapter);
             }
