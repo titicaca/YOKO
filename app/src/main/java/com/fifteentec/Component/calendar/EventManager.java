@@ -21,6 +21,7 @@ public class EventManager {
     public final static int DAY_VIEW_EVENT_MANAGER =0x00;
     public final static int WEEK_VIEW_EVENT_MANAGER = 0x02;
     public final static int EVENT_LIST_EVENT_MANAGER = 0x03;
+    public final static int MONTH_VIEW_EVENT_MANAGER= 0x04;
     public final static int WRONG_TYPE = 0x01;
 
     public final static int MillsInOneDay = 86400000;

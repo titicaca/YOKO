@@ -24,6 +24,7 @@ import com.Database.EventRecord;
 import com.fifteentec.Component.User.UserServer;
 import com.fifteentec.Component.calendar.CalView;
 import com.fifteentec.Component.calendar.CalendarController;
+import com.fifteentec.Component.calendar.CalendarView;
 import com.fifteentec.Component.calendar.DayEventView;
 import com.fifteentec.Component.calendar.NewEventView;
 import com.fifteentec.yoko.BaseActivity;
@@ -37,7 +38,8 @@ import java.util.GregorianCalendar;
 
 public class CalViewFragment extends Fragment {
 
-    private CalView mCalView;
+    //private CalView mCalView;
+    private CalendarView mCalendarView;
 
     private CalendarController mDate;
 
@@ -102,7 +104,7 @@ public class CalViewFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                mCalView.SwitchMode();
+                //mCalView.SwitchMode();
                 mWeekEventFragment.UpdateScale();
             }
         });
@@ -135,7 +137,14 @@ public class CalViewFragment extends Fragment {
                 }
             }
         });
+
+        mCalendarView = (CalendarView) view.findViewById(R.id.id_cal_view);
+        mCalendarView.initView(mDate.getNowArray(),dbManager.getTableEvent());
+
+/*
         mCalView =  (CalView) view.findViewById(R.id.id_cal_view);
+
+
         mCalView.init(mDate.getNowCalendar());
         mCalView.setCalViewListner(new CalView.CalViewListener() {
             @Override
@@ -150,8 +159,7 @@ public class CalViewFragment extends Fragment {
                 showDayEventView(date);
             }
         });
-
-
+*/
         FragmentTransaction mTrans = mFragmentManager.beginTransaction();
         mListView = EventListViewFragment.newInstance(mDate.getNowArray());
         mListView.setEventFragmentListener(new EventListViewFragment.EventListFragmentListener() {
@@ -288,7 +296,7 @@ public class CalViewFragment extends Fragment {
                 break;
             case EVENT_LIST:
                 GregorianCalendar temp =mDate.getCurCalendar();
-                mCalView.UpdateTime(temp);
+                //mCalView.UpdateTime(temp);
                 mWeekEventFragment.UpdateViewTime(mDate.getCurArray());
         }
     }
