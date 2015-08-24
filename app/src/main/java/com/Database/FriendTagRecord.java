@@ -1,5 +1,7 @@
 package com.Database;
 
+import org.json.JSONObject;
+
 public class FriendTagRecord extends DBRecord {
     public long rid;
     public long uid;
@@ -24,5 +26,10 @@ public class FriendTagRecord extends DBRecord {
         this.fuid = fuid;
         this.tagId = tagId;
         this.tagName = tagName;
+    }
+
+    @Override
+    public JSONObject toJson() {
+        return null;
     }
 }

@@ -1,5 +1,7 @@
 package com.Database;
 
+import org.json.JSONObject;
+
 /**
  * Created by benbush on 15/8/13.
  */
@@ -64,5 +66,10 @@ public class FriendInfoRecord extends DBRecord {
         this.enrollnumber = enrollnumber;
         this.friendnumber = friendnumber;
         this.logintime = logintime;
+    }
+
+    @Override
+    public JSONObject toJson() {
+        return null;
     }
 }
