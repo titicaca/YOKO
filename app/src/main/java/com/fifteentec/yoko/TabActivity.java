@@ -38,7 +38,7 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
         //TabSelector(R.integer.SelectorCir);
         TabSelector(R.integer.SelectorCal);
 
-        Log.e("uid", UserServer.getInstance().getUserid() + "");
+        Log.v("uid", UserServer.getInstance().getUserid() + "");
         //设置系统状态监听过滤器IntentFilter
         IntentFilter mFilter = new IntentFilter();
         //设定监听内容为网络状态改变
