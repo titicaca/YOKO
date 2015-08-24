@@ -19,6 +19,7 @@ import com.Common.NetworkState;
 import com.Database.DBManager;
 import com.Database.EventRecord;
 import com.Database.FriendInfoRecord;
+import com.Database.FriendInvitationRecord;
 import com.Database.FriendTagRecord;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
@@ -106,6 +107,39 @@ public class DataSyncService extends Service {
         }
     }
 
+    public void syncFriendInvitations(final long uid) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                new APIUserServer.JsonGet(APIUrl.URL_SYNC_FRIEND_INVITATIONS, null, null, new APIJsonCallbackResponse() {
+                    @Override
+                    public void run() {
+                        if (this.getResponse() == null) return;
+                        syncFriendInvitations(uid, this.getResponse());
+                    }
+                }, requestQueue, null).send();
+            }
+        }).start();
+    }
+
+    private void syncFriendInvitations(final long uid, final JSONObject response) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<FriendInvitationRecord> friendInvitationRecords = DataSyncServerParser.parseFriendInvitationResponse(response);
+                for (FriendInvitationRecord friendInvitationRecord : friendInvitationRecords) {
+                    Log.v("Data Sync Server", "friend invitation:" +
+                            " uid = " + friendInvitationRecord.uid +
+                            " fuid = " + friendInvitationRecord.fuid +
+                            " msg = " + friendInvitationRecord.msg +
+                            " createdtime = " + friendInvitationRecord.createdtime);
+                }
+
+                dbManager.getTableFriendInvitation().syncUser(uid, friendInvitationRecords);
+            }
+        }).start();
+    }
+
     public void syncFriends(final long uid) {
         new Thread(new Runnable() {
             @Override
@@ -114,7 +148,6 @@ public class DataSyncService extends Service {
                     @Override
                     public void run() {
                         if (this.getResponse() == null) return;
-                        Log.v("Data Sync Service", this.getResponse().toString());
                         syncFriends(uid, this.getResponse());
                     }
                 }, requestQueue, null).send();
@@ -129,7 +162,7 @@ public class DataSyncService extends Service {
                 List<FriendTagRecord> friendTagRecords = DataSyncServerParser.parseFriendResponseToFriendTag(uid, response);
                 List<FriendInfoRecord> friendInfoRecords = DataSyncServerParser.parseFriendResponseToFriendInfo(uid, response);
                 for (FriendTagRecord friendTagRecord : friendTagRecords) {
-                    Log.v("Data Sync Server", "friend tags: " + " rid = " + friendTagRecord.rid +
+                    Log.v("Data Sync Server", "friend tags:" +
                             " uid = " + friendTagRecord.uid +
                             " fuid = " + friendTagRecord.fuid +
                             " tagid = " + friendTagRecord.tagId +
@@ -137,7 +170,7 @@ public class DataSyncService extends Service {
                 }
 
                 for (FriendInfoRecord friendInfoRecord : friendInfoRecords) {
-                    Log.v("Data Sync Server", "friends info: " + " rid = " + friendInfoRecord.rid +
+                    Log.v("Data Sync Server", "friends info:" +
                             " uid = " + friendInfoRecord.uid +
                             " fuid = " + friendInfoRecord.fuid +
                             " email = " + friendInfoRecord.email +
