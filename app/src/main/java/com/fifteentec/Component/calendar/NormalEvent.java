@@ -30,7 +30,7 @@ import java.util.List;
  */
 public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureListener{
 
-    private int CellHeight;
+    public int CellHeight;
     private int EndY;
     private int ScrollEndY;
     private int ViewWidth;
@@ -172,8 +172,8 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
 
         CellHeight = height/mSurface.NormalEventViewDivid;
         ViewWidth =width;
-        EndY = height*3;
-        ScrollEndY =height*2;
+        EndY = CellHeight*24;
+        ScrollEndY =CellHeight*16;
         ViewHeight =height;
 
         if(mtempRectView !=null){
@@ -218,7 +218,10 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
      * 增加一个新的事件,通过算法计算新的事件所需要作画的位置.
      * @param eventItem 新的事件
      */
-    public void addNewEvent(EventItem eventItem) {
+    public void addNewEvent(EventItem eventItem){
+        addNewEvent(eventItem,-1);
+    }
+    public void addNewEvent(EventItem eventItem,int index) {
         List<Integer> ChangeList = new ArrayList<>();
 
         EventItem a =new EventItem();
@@ -227,8 +230,14 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
         a.right =eventItem.right;
         a.top = eventItem.top;
         a.botton =eventItem.botton;
-        NormalEvnetPosition.add(a);
-        ChangeList.add(NormalEvnetPosition.size() - 1);
+        if(index == -1) {
+            NormalEvnetPosition.add(a);
+            ChangeList.add(NormalEvnetPosition.size() - 1);
+        }else{
+            NormalEvnetPosition.add(index, a);
+            ChangeList.add(index);
+        }
+
         boolean isChanged ;
         int Head = a.botton;
         int Tail = a.top;
@@ -269,14 +278,15 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
      * @param rid 需要删除事件的RID
      * @return 是否正确删除
      */
-    private boolean deleteEvent(long rid){
+    private int deleteEvent(long rid){
         EventItem aim = null;
+        int index=-1;
         for (int i = 0; i <NormalEvnetPosition.size(); i++) {
             long a = NormalEvnetPosition.get(i).rid;
             if(a == rid){
                 aim = NormalEvnetPosition.get(i);
                 NormalEvnetPosition.remove(i);
-
+                index = i;
                 break;
             }
         }
@@ -312,8 +322,8 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
 
             RerangeList(ChangeList);
             invalidate();
-            return true;
-        }else return false;
+            return index;
+        }else return index;
 
     }
 
@@ -501,8 +511,8 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
     }
 
     private void UpdateTimeByMove() {
-        deleteEvent(existRect.rid);
-        addNewEvent(existRect);
+        int i =deleteEvent(existRect.rid);
+        addNewEvent(existRect,i);
         long timebegin =(long)(mEventManager.DayView_Date+(existRect.top/(float)(3*ViewHeight))*mEventManager.MillsInOneDay);
         long timeend = (long)(mEventManager.DayView_Date+(existRect.botton/(float)(3*ViewHeight))*mEventManager.MillsInOneDay);
         mEventManager.UpdateEvent(timebegin,timeend,existRect.rid);
@@ -524,11 +534,12 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
     @Override
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
         final int endy = (int) e2.getY();
+        int scrollY = endy+getScrollY();
         switch (OPERATIONMODE) {
             case SCREEN:
                 if (distanceY > 0) {
                     if (getScrollY() < ScrollEndY) {
-                        if (ScrollEndY - getScaleY() < Math.abs(distanceY)) scrollTo(0, ScrollEndY);
+                        if (ScrollEndY - getScrollY() < Math.abs(distanceY)) scrollTo(0, ScrollEndY);
                         else scrollBy(0, (int) distanceY);
                     } else scrollTo(0, ScrollEndY);
                 } else {
@@ -542,10 +553,13 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
                 OPERATIONMODE = EXIST;
                 gestureDetector.setIsLongpressEnabled(true);
             case EXIST:
-                if((((existRect.top - (int) distanceY)>0)||distanceY<0)&&(((existRect.botton - (int) distanceY)<EndY)||distanceY>0)) {
-                    ExistRectUpdate(existRect.top - (int) distanceY, existRect.botton - (int) distanceY);
+                int TimeHeight = existRect.botton-existRect.top;
+                if(scrollY-TimeHeight/2<0) ExistRectUpdate(0,TimeHeight);
+                else if(scrollY+TimeHeight/2 >EndY) ExistRectUpdate(EndY-TimeHeight,EndY);
+                else {
+                    ExistRectUpdate(scrollY - TimeHeight / 2, scrollY + TimeHeight / 2);
                     if (distanceY * AutoScrollEnd < 0) AutoScrollEnd = 0;
-                    if ((endy < 100 && getScrollY() > 0) || (endy > ViewHeight - 100 && getScrollY() < ScrollEndY)) {
+                    if ((endy < 100 && getScrollY() > 0) || (endy > ViewHeight - 100 && getScrollY() <ScrollEndY)) {
                         if (AutoScrollEnd == 0) {
                             if (endy < 100) AutoScrollEnd = -1;
                             if (endy > ViewHeight - 100) AutoScrollEnd = 1;
@@ -554,6 +568,7 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
                         }
                     }
                 }
+
                 return true;
             case EXIST_TOP:
                 if((existRect.botton-existRect.top>StrechMinHeight||distanceY>0)&& endy+getScrollY()<existRect.botton-StrechMinHeight) {
@@ -601,7 +616,7 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
             while (AutoScrollEnd != 0) {
                 if (AutoScrollEnd > 0) {
                     if (getScrollY() < ScrollEndY) {
-                        if (ScrollEndY - getScaleY() > AutoScrollMove) {
+                        if (ScrollEndY - getScrollY() > AutoScrollMove) {
                             scrollBy(0, AutoScrollMove);
                             if(AutoScrollEnd == 2) handler.sendEmptyMessage(AUTO_SCROLL_TOPDOWN);
                             else if(AutoScrollEnd == 3) handler.sendEmptyMessage(AUTO_SCROLL_BOTTONDOWN);
@@ -616,7 +631,7 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
                     }
                 } else {
                     if (getScrollY() > 0) {
-                        if (getScaleY() < AutoScrollMove) {
+                        if (getScrollY() > AutoScrollMove) {
                             scrollBy(0, -AutoScrollMove);
                             if(AutoScrollEnd == -2) handler.sendEmptyMessage(AUTO_SCROLL_TOPUP);
                             else if(AutoScrollEnd == -3) handler.sendEmptyMessage(AUTO_SCROLL_BOTTONUP);
@@ -632,7 +647,7 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
                 }
                 synchronized (this) {
                     try {
-                        wait(500000000);
+                        wait(50000000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

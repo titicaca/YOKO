@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.fifteentec.yoko.BaseActivity;
 import com.fifteentec.yoko.R;
 
 import java.util.ArrayList;
@@ -34,12 +35,14 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
     private GestureDetector mGesture;
     private EventListListener mEventListListener;
 
+    private EventManager mEventManager;
+
 
     /**
      * 通过滚动EventList来改变当前事件,通知CalViewFragment改变时间.
      */
     public interface EventListListener{
-        public void DateChange(ArrayList<Integer> list);
+        void DateChange(ArrayList<Integer> list);
     }
 
     public void setEvnetListDateChangeListener(EventListListener listener){
@@ -61,9 +64,10 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
         removeAllViews();
         ScreenWidth =(getResources().getDisplayMetrics().widthPixels);
         ScreenHeight = (getResources().getDisplayMetrics().heightPixels);
-        GregorianCalendar temp = new GregorianCalendar(date.get(0),date.get(1),date.get(2));
+        GregorianCalendar temp = new GregorianCalendar(date.get(0),date.get(1),date.get(2),0,0);
         mEvent = new EventController(temp);
         scrollTo(0, mEvent.initEventList());
+
     }
 
     @Override
@@ -166,7 +170,8 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
      */
     private class EventList extends View{
 
-        private ArrayList<String> mDate;
+        private ArrayList<String> mEvent;
+        private GregorianCalendar mDate;
         private int ItemHeight = 130;
         private int ItemWidth;
         private int mInterval = 30;
@@ -177,6 +182,7 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
         private Paint mRectPaint;
         private Paint mTextPaint;
         public int ViewHeight; // View高度
+        private EventManager mEventManager;
         public EventList(Context context) {
             this(context, null);
         }
@@ -189,7 +195,7 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
             super(context, attrs, defStyleAttr);
         }
 
-        public void initView(ArrayList<String> date,int ParentWidth){
+        public void initView(GregorianCalendar date,int ParentWidth){
 
             this.mDate = date;
             this.ItemWidth = ParentWidth;
@@ -200,7 +206,18 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
             mTextPaint.setColor(Color.WHITE);
             mTextPaint.setAntiAlias(true);
             mTextPaint.setTextSize(50);
-            ViewHeight = (ItemHeight+mInterval)*mDate.size()+mInterval;
+            mEvent = new ArrayList<>();
+            mEventManager = EventManager.newInstance(((BaseActivity)mcontext).getDBManager().getTableEvent(),EventManager.DAY_VIEW_EVENT_MANAGER,mDate.getTimeInMillis());
+            for (int i = 0; i < mEventManager.getAllDayEventCount(); i++) {
+                mEvent.add(mEventManager.getAllDayIntroduciton(i));
+            }
+            for (int i = 0; i < mEventManager.getNormalDayEventCount(); i++) {
+                mEvent.add(mEventManager.getNormalIntroduction(i));
+            }
+            if(mEvent.size()==0){
+                mEvent.add("无");
+            }
+            ViewHeight = (ItemHeight+mInterval)*mEvent.size()+mInterval;
         }
 
         @Override
@@ -222,7 +239,7 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
                 height = heightSize;
 
             }else{
-                height = (ItemHeight+mInterval)*mDate.size()+mInterval;
+                height = (ItemHeight+mInterval)*mEvent.size()+mInterval;
             }
             setMeasuredDimension(width,height);
 
@@ -231,12 +248,12 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
         @Override
         protected void onDraw(Canvas canvas) {
             int topItem = mInterval;
-            for(int i = 0; i <mDate.size();i++) {
+            for(int i = 0; i <mEvent.size();i++) {
                 RectF mRect = new RectF(0,topItem,ItemWidth-mPaddingRectRight,topItem+ItemHeight);
                 canvas.drawRoundRect(mRect, mRoundness, mRoundness, mRectPaint);
                 Paint.FontMetricsInt font = mTextPaint.getFontMetricsInt();
                 int baseline = (int)(mRect.top + (mRect.bottom - mRect.top - font.bottom + font.top) / 2 - font.top);
-                canvas.drawText(mDate.get(i),mPaddingLeft,baseline,mTextPaint);
+                canvas.drawText(mEvent.get(i),mPaddingLeft,baseline,mTextPaint);
                 topItem += (ItemHeight+mInterval);
 
             }
@@ -265,15 +282,16 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
             int result = 0;
             mBottonIndex = 0;
             mTopIndex=-1;
+
             do{
                 result += addHideViewList();
 
             }while (result<mShowHeight);
-            count =0;
             addViewList();
             do {
                 count += addViewList();
             }while(count<mShowHeight);
+
 
             return result;
 
@@ -285,7 +303,7 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
          */
         public int  addHideViewList(){
             mBottonIndex--;
-            GregorianCalendar tempDate = new GregorianCalendar(mCurDate.get(0),mCurDate.get(1),mCurDate.get(2));
+            GregorianCalendar tempDate = new GregorianCalendar(mCurDate.get(0),mCurDate.get(1),mCurDate.get(2),0,0);
             tempDate.add(Calendar.DAY_OF_MONTH, mBottonIndex);
             View temp = mInflater.inflate(R.layout.view_event_list_text_layout,null);
             TextView day = (TextView) temp.findViewById(R.id.id_event_list_day_text);
@@ -294,12 +312,13 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
             Week.setText(CalUtil.WEEK_NAME.get(tempDate.get(Calendar.DAY_OF_WEEK)));
             addView(temp, 0);
             EventList mEL = new EventList(mcontext);
-            mEL.initView(mEvent.getEvenet(CalUtil.CalToArray(tempDate)), (int) (ScreenWidth * (1 - mRatio)));
+            mEL.initView(tempDate, (int) (ScreenWidth * (1 - mRatio)));
             addView(mEL, 1);
             return mEL.ViewHeight;
 
 
         }
+
 
         /**
          * 加载下视图的View
@@ -317,10 +336,11 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
             addView(temp);
 
             EventList mEL = new EventList(mcontext);
-            mEL.initView(mEvent.getEvenet(CalUtil.CalToArray(tempDate)), (int) (ScreenWidth * (1 - mRatio)));
+            mEL.initView(tempDate, (int) (ScreenWidth * (1 - mRatio)));
             addView(mEL);
             return mEL.ViewHeight;
         }
+
 
         /**
          * 删除上页面的View
@@ -365,7 +385,7 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
         }
 
         private EventController(ArrayList<Integer> date){
-            mTodayDate = new GregorianCalendar(date.get(0),date.get(1),date.get(2));
+            mTodayDate = new GregorianCalendar(date.get(0),date.get(1),date.get(2),0,0);
             mCurDate = date;
         }
 
@@ -379,30 +399,6 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
 
         }
 
-        /**
-         * 得到数据库的事件
-         * @param date
-         * @return
-         */
-        public ArrayList<String> getEvenet(ArrayList<Integer> date){
-            String a = new String();
-            a= "year" +date.get(0) +"+month" +date.get(1)+ "+day"+date.get(2)+"+week"+date.get(3);
-            int b = (int)(Math.random()*10);
-            ArrayList<String> temp = new ArrayList<>();
-            temp.add(a);
-            for(int i = 0;i<b/3;i++){
-                temp.add("test:"+i);
-            }
-            return temp;
-        }
-
-        public int getColor() {
-            Random random =new Random();
-            int r = random.nextInt(256);
-            int g = random.nextInt(256);
-            int b = random.nextInt(256);
-            return Color.rgb(r,g,b);
-        }
 
         public int ViewScroll(int ScrollY) {
             if(ScrollY < ScreenHeight/2){
