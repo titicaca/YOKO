@@ -87,15 +87,13 @@ public class EventAdapter extends BaseAdapter{
 
         if (null != eventList.get(position).getLogoUri()
                 && !"".equals(eventList.get(position).getLogoUri())) {
-    //        item.logo.setVisibility(View.VISIBLE);
             imageLoader.displayImage(eventList.get(position).getLogoUri(), item.logo);
         } else {
             item.logo.setImageResource(R.drawable.logo_default);
         }
 
         if (null != eventList.get(position).getEventUri()
-                && !"".equals(eventList.get(position).getEventUri())) {
-            item.event.setVisibility(View.VISIBLE);
+                && !"".equals(eventList.get(position).getEventUri())&& !"null".equals(eventList.get(position).getEventUri())) {
             imageLoader.displayImage(eventList.get(position).getEventUri(),item.event);
         } else {
             item.event.setImageResource(R.drawable.event_eg);

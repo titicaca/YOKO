@@ -8,18 +8,27 @@ import android.os.Bundle;
 import android.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 
-import com.fifteentec.FoundAdapter.JoinedGroupAdapter;
-import com.fifteentec.FoundAdapter.RecommendedGroupAdapter;
+import com.API.APIJsonCallbackResponse;
+import com.API.APIUrl;
+import com.API.APIUserServer;
+import com.android.volley.RequestQueue;
+import com.fifteentec.Component.Parser.DataSyncServerParser;
+import com.fifteentec.FoundAdapter.GroupAdapter;
 import com.fifteentec.item.GroupBrief;
+import com.fifteentec.yoko.BaseActivity;
 import com.fifteentec.yoko.R;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,22 +42,83 @@ public class FoundGroup extends Fragment {
     private EditText etSearch;
     private List<GroupBrief> groupList = new ArrayList<GroupBrief>();
     private List<GroupBrief> groupListR = new ArrayList<GroupBrief>();
-    private ListView joined,recommeded;
-    private JoinedGroupAdapter joinedAdapter;
-    private RecommendedGroupAdapter recommendedAdapter;
+    private ListView mListView;
+    private GroupAdapter joinedAdapter,recommendedAdapter;
     private FragmentManager mFragmentManager;
     private FoundGroupItem groupItem;
-    private FoundGroupItemR groupItemR;
+    BaseActivity baseActivity;
+    RequestQueue mRequestQueue;
+    Button joined_btn;
+    Button reco_btn;
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         View view = inflater.inflate(R.layout.fragment_found_group, null);
-        initSearchFrame(view);
-        initListView(view);
 
+        initListView(view);
+        initDBfunctions();
+        initSearchFrame(view);
+        baseActivity = (BaseActivity)this.getActivity();
+        mRequestQueue = baseActivity.getRequestQueue();
+
+        joined_btn = (Button)view.findViewById(R.id.joined_btn);
+        reco_btn = (Button)view.findViewById(R.id.reco_btn);
+
+        joined_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                mListView.setAdapter(joinedAdapter);
+
+            }
+        });
+
+        reco_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListView.setAdapter(recommendedAdapter);
+            }
+        });
         return view;
     }
+    private void initDBfunctions()
+    {
+        baseActivity = (BaseActivity)this.getActivity();
+        mRequestQueue = baseActivity.getRequestQueue();
+
+        Log.e("initial DB", "get into function");
+
+
+        new APIUserServer.JsonGet(APIUrl.URL_JOINED_GROUP_GET,null , null, new APIJsonCallbackResponse() {
+            @Override
+            public void run() {
+                JSONObject object=this.getResponse();
+                Log.e("object", object.toString());
+
+                groupList = DataSyncServerParser.parseGroupBriefInfo(object);
+                if(groupList!=null){
+                    joinedAdapter = new GroupAdapter(getActivity().getLayoutInflater(),groupList,true);
+                    mListView.setAdapter(joinedAdapter);
+                }
+            }
+        }, mRequestQueue, null).send();
+
+//        new APIUserServer.JsonGet(APIUrl.URL_GROUP_GET,null , null, new APIJsonCallbackResponse() {
+//            @Override
+//            public void run() {
+//                JSONObject object=this.getResponse();
+//                Log.e("object", object.toString());
+//
+//                groupListR = DataSyncServerParser.parseGroupBriefInfo(object);
+//            }
+//        }, mRequestQueue, null).send();
+    }
+
+
+
     private void initSearchFrame(View parentView){
         ivDeleteText = (ImageView) parentView.findViewById(R.id.ivDeleteText);
         etSearch = (EditText) parentView.findViewById(R.id.etSearch);
@@ -82,14 +152,14 @@ public class FoundGroup extends Fragment {
             }
         });
     }
-    private void initListView(View parentView){
-        createGroupList(5,groupList);
-        createGroupList(6,groupListR);
-        joined = (ListView) parentView.findViewById(R.id.listView1);
-        joinedAdapter = new JoinedGroupAdapter(getActivity().getLayoutInflater(),groupList);
-        joined.setAdapter(joinedAdapter);
 
-        joined.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+    private void initListView(View parentView){
+        mListView = (ListView) parentView.findViewById(R.id.listView1);
+ //       joinedAdapter = new GroupAdapter(getActivity().getLayoutInflater(),groupList,true);
+ //       recommendedAdapter = new GroupAdapter(getActivity().getLayoutInflater(),groupListR,false);
+  //      mListView.setAdapter(joinedAdapter);
+
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @SuppressLint("NewApi")
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -116,50 +186,6 @@ public class FoundGroup extends Fragment {
                 mFmTrans.hide(FoundGroup.this.getParentFragment());
             }
         });
-
-        recommeded = (ListView) parentView.findViewById(R.id.listView2);
-        recommendedAdapter= new RecommendedGroupAdapter(getActivity().getLayoutInflater(),groupListR);
-        recommeded.setAdapter(recommendedAdapter);
-
-        recommeded.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @SuppressLint("NewApi")
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                mFragmentManager = FoundGroup.this.getParentFragment().getFragmentManager();
-                FragmentTransaction mFmTrans= mFragmentManager.beginTransaction();
-
-                if(groupItemR==null){
-                    groupItemR = new FoundGroupItemR();
-                }
-                if(mFragmentManager.findFragmentByTag("groupItemR")!=null){
-                    mFmTrans.remove(mFragmentManager.findFragmentByTag("groupItemR"));
-                }
-
-                Bundle args = new Bundle();
-                args.putString("name", groupListR.get(position).getGroupName());
-                args.putString("intro", groupListR.get(position).getGroupIntro());
-                args.putString("uri", groupListR.get(position).getLogoUri());
-                groupItemR.setArguments(args);
-
-                mFmTrans.add(R.id.id_content, groupItemR, "groupItemR");
-
-                mFmTrans.addToBackStack("groupItemR");
-                mFmTrans.commit();
-                mFmTrans.hide(FoundGroup.this.getParentFragment());
-
-            }
-        });
-    }
-
-    private void createGroupList(int groupNum,List<GroupBrief> list){
-        list.clear();
-        for(int i=0;i<groupNum;i++){
-            GroupBrief newItem = new GroupBrief();
-            newItem.setGroupIntro("default");
-            newItem.setGroupName("default");
-            list.add(newItem);
-        }
     }
 
 }

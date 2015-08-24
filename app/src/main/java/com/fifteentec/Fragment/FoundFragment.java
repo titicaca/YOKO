@@ -16,7 +16,9 @@ import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.RequestQueue;
 import com.fifteentec.Adapter.commonAdapter.MyFragmentPagerAdapter;
+import com.fifteentec.yoko.BaseActivity;
 import com.fifteentec.yoko.R;
 
 import java.util.ArrayList;
@@ -41,6 +43,7 @@ public class FoundFragment extends Fragment {
     Fragment favorite;
     Fragment msgbox;
     Resources resources;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

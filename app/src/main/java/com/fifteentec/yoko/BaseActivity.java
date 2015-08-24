@@ -69,14 +69,17 @@ public abstract class BaseActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if (getFragmentManager().getBackStackEntryCount() >0) super.onBackPressed();
+        else {
 
-        if ((this instanceof LoginActivity) || (this instanceof TestActivity)||
-                (this instanceof TabActivity)) {
-            Intent intent = new Intent(getCurrentActivity(), BlankActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
+            if ((this instanceof LoginActivity) || (this instanceof TestActivity) ||
+                    (this instanceof TabActivity)) {
+                Log.e("onBackPressed", "finish");
+                Intent intent = new Intent(getCurrentActivity(), BlankActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                finish();
+            }
         }
     }
 

@@ -8,6 +8,7 @@ import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,11 +17,19 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 
+import com.API.APIJsonCallbackResponse;
+import com.API.APIUrl;
+import com.API.APIUserServer;
+import com.android.volley.RequestQueue;
+import com.fifteentec.Component.Parser.DataSyncServerParser;
 import com.fifteentec.FoundAdapter.EventAdapter;
 import com.fifteentec.FoundAdapter.FavoriteAdapter;
 import com.fifteentec.item.EventBrief;
 import com.fifteentec.item.FavoriteBrief;
+import com.fifteentec.yoko.BaseActivity;
 import com.fifteentec.yoko.R;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +45,8 @@ public class FoundFavorite extends Fragment {
     private EditText etSearch;
     private FragmentManager mFragmentManager;
     private FoundFavoriteItem favoriteItem;
+    RequestQueue mRequestQueue;
+    BaseActivity baseActivity;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -46,6 +57,29 @@ public class FoundFavorite extends Fragment {
 
         return view;
     }
+
+    private void initDBfunctions() {
+        baseActivity = (BaseActivity) this.getActivity();
+        mRequestQueue = baseActivity.getRequestQueue();
+
+        Log.e("initial DB", "get into function");
+
+
+        new APIUserServer.JsonGet(APIUrl.URL_EVENTS_GET, null, null, new APIJsonCallbackResponse() {
+            @Override
+            public void run() {
+                JSONObject object = this.getResponse();
+                Log.e("Event object", object.toString());
+
+                eventList = DataSyncServerParser.parseFavoriteBriefInfo(object);
+//                if(groupList!=null){
+//                    joinedAdapter = new GroupAdapter(getActivity().getLayoutInflater(),groupList,true);
+//                    mListView.setAdapter(joinedAdapter);
+//                }
+            }
+        }, mRequestQueue, null).send();
+    }
+
     private void initSearchFrame(View parentView){
         ivDeleteText = (ImageView) parentView.findViewById(R.id.ivDeleteText2);
         etSearch = (EditText) parentView.findViewById(R.id.etSearch2);
