@@ -29,33 +29,26 @@ import com.fifteentec.Component.User.UserServer;
 import com.fifteentec.yoko.BaseActivity;
 import com.fifteentec.yoko.R;
 
-import org.apache.http.util.EncodingUtils;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class LabelActivity extends BaseActivity implements OnItemLongClickListener,
         OnClickListener, OnItemClickListener {
 
+    //标签列表listview
     private ListView lv;
+    //标签列表适配器
     private LabelItemAdapter liadapter;
-    private TextView label_create;
+    //新建标签的按钮
+    private TextView labelCreate;
+    //新建标签请求码
     public static int LABEL_REQUEST = 3;
-    private String json = "";
-    ArrayList<JsonFriendList> listNameid = new ArrayList<JsonFriendList>();
-    ArrayList<String> label = new ArrayList<String>();
-    Map<String, List<JsonFriendList>> labellist = new HashMap<String, List<JsonFriendList>>();
     private BaseActivity activity;
     private DBManager dbManager;
+    //getTableFriendTag
     private List<FriendTagRecord> list;
 
     @Override
@@ -65,17 +58,13 @@ public class LabelActivity extends BaseActivity implements OnItemLongClickListen
         this.activity = (BaseActivity) this;
         this.dbManager = this.activity.getDBManager();
         lv = (ListView) findViewById(R.id.label_lv);
-        label_create = (TextView) findViewById(R.id.label_create);
-
+        labelCreate = (TextView) findViewById(R.id.label_create);
         list = this.dbManager.getTableFriendTag().queryTag(UserServer.getInstance().getUserid());
-
         liadapter = new LabelItemAdapter(this, list);
         lv.setAdapter(liadapter);
         lv.setOnItemLongClickListener(this);
         lv.setOnItemClickListener(this);
-        label_create.setOnClickListener(this);
-
-
+        labelCreate.setOnClickListener(this);
     }
 
     @Override
@@ -113,48 +102,6 @@ public class LabelActivity extends BaseActivity implements OnItemLongClickListen
         return false;
     }
 
-    public void addlist() {
-        label = new ArrayList<String>();
-        try {
-            json = readSDFile(NewLabelActivity.labelstr);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            JSONArray jsonArray = new JSONArray(json);
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonObjs = (JSONObject) jsonArray.opt(i);
-                // 自定义json的bean文件
-
-                label.add(jsonObjs.optString("label"));
-
-                JSONArray jsonArraynameandid = jsonObjs
-                        .getJSONArray("labelnameAndId");
-
-                for (int j = 0; j < jsonArraynameandid.length(); j++) {
-
-                    JSONObject jsonObjs1 = (JSONObject) jsonArraynameandid
-                            .opt(j);
-
-                    JsonFriendList jp = new JsonFriendList();
-                    try {
-                        jp.parsingJson(jsonObjs1);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    listNameid.add(jp);
-                }
-
-                labellist.put(jsonObjs.optString("label"), listNameid);
-                listNameid = new ArrayList<JsonFriendList>();
-
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-    }
 
     /* 显示点击的内容 */
     private void showClickMessage(String message) {
@@ -162,6 +109,11 @@ public class LabelActivity extends BaseActivity implements OnItemLongClickListen
                 Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * 单击事件
+     *
+     * @param arg0
+     */
     @Override
     public void onClick(View arg0) {
         switch (arg0.getId()) {
@@ -195,30 +147,12 @@ public class LabelActivity extends BaseActivity implements OnItemLongClickListen
         startActivityForResult(in, LABEL_REQUEST);
     }
 
-    // 读文件
-    public String readSDFile(String fileName) throws IOException {
-
-        String res = "";
-
-        File file = new File(fileName);
-
-        FileInputStream fis = new FileInputStream(file);
-
-        int length = fis.available();
-
-        byte[] buffer = new byte[length];
-        fis.read(buffer);
-
-        res = EncodingUtils.getString(buffer, "UTF-8");
-
-        fis.close();
-        return res;
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        //getTableFriendTag
         list = dbManager.getTableFriendTag().queryTag(UserServer.getInstance().getUserid());
+        //加载适配器
         liadapter = new LabelItemAdapter(this, list);
         lv.setAdapter(liadapter);
     }
@@ -230,6 +164,7 @@ public class LabelActivity extends BaseActivity implements OnItemLongClickListen
                 JSONObject response = this.getResponse();
                 JsonFriendTagReturn jr = new JsonFriendTagReturn();
                 jr.JsonParsing(response);
+                //判断是否成功响应
                 if (jr.isAdd) {
                     dbManager.getTableFriendTag().deleteTag(UserServer.getInstance().getUserid(), list.get(position).tagId);
                     list.remove(position);

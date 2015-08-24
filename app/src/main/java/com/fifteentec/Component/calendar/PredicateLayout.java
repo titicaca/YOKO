@@ -9,6 +9,7 @@ import android.widget.LinearLayout;
 import java.util.Hashtable;
 
 /**
+ * 用来循环添加自动换行的viewgroup
  * Created by Administrator on 2015/8/19.
  */
 public class PredicateLayout extends LinearLayout {
@@ -31,7 +32,9 @@ public class PredicateLayout extends LinearLayout {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 
+        //宽度
         int mWidth = MeasureSpec.getSize(widthMeasureSpec) - 30;
+        //有几个viewgroup的子孩子
         int mCount = getChildCount();
         int mX = 0;
         int mY = 0;
@@ -39,7 +42,6 @@ public class PredicateLayout extends LinearLayout {
         mRight = 0;
         mTop = 20;
         mBottom = 0;
-
         int j = 0;
 
         View lastview = null;

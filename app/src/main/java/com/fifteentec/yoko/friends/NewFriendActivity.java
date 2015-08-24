@@ -23,7 +23,6 @@ import com.API.APIServer;
 import com.API.APIUrl;
 import com.fifteentec.Adapter.commonAdapter.NewFriendAdapter;
 import com.fifteentec.Component.Parser.JsonFriendAdd;
-import com.fifteentec.Component.Parser.JsonFriendList;
 import com.fifteentec.Component.User.UserServer;
 import com.fifteentec.Component.calendar.KeyboardLayout;
 import com.fifteentec.yoko.BaseActivity;
@@ -32,24 +31,32 @@ import com.fifteentec.yoko.R;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class NewFriendActivity extends BaseActivity implements OnClickListener {
 
-    private KeyboardLayout mainView; // 判断软键盘是否隐藏
-    private EditText search; // 输入框
-    private ListView new_friends_lv;
-    private ArrayList<JsonFriendList> list = new ArrayList<JsonFriendList>();
-    private ImageView new_friedns_tv_search;
-    private String number[] = new String[]{"110", "120", "119", "114"};
-    private NewFriendAdapter fadapter;
-    private RelativeLayout new_friends_rl_check;
-    private TextView new_friends_tv_send;
-    private EditText new_friends_et_check_gone;
-    private TextView new_friedns_back;
-    private ImageView new_friedns_back_iv;
+    // 判断软键盘是否隐藏
+    private KeyboardLayout mainView;
+    // 手机号输入框
+    private EditText search;
+    //搜索后显示的好友信息列表
+    private ListView newFriendsLv;
+    //输入框右面的放大镜，提供点击后搜索输入框的内容
+    private ImageView newFriednsTvSearch;
+    //搜索后显示的好友信息列表的适配器
+    private NewFriendAdapter newFriendAdapter;
+    //点击添加好友时，显示下方验证信息的输入框
+    private RelativeLayout newFriendsRlCheck;
+    //验证信息的发送按钮
+    private TextView newFriendsTvSend;
+    //验证信息的输入框
+    private EditText newFriendsEtCheckGone;
+    //title的返回按钮
+    private TextView newFriednsBack;
+    //title的返回按钮
+    private ImageView newFriednsBackIv;
+    //发送好友请求时好友的id
     private String id;
 
     @Override
@@ -57,14 +64,14 @@ public class NewFriendActivity extends BaseActivity implements OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.new_friends);
         mainView = (KeyboardLayout) findViewById(R.id.keyboardLayout_new_friends);
-        new_friends_rl_check = (RelativeLayout) findViewById(R.id.new_friends_rl_check);
-        new_friedns_tv_search = (ImageView) findViewById(R.id.new_friends_iv_search);
+        newFriendsRlCheck = (RelativeLayout) findViewById(R.id.new_friends_rl_check);
+        newFriednsTvSearch = (ImageView) findViewById(R.id.new_friends_iv_search);
         search = (EditText) findViewById(R.id.new_friedns_et_search);
-        new_friends_tv_send = (TextView) findViewById(R.id.new_friends_tv_send);
-        new_friends_lv = (ListView) findViewById(R.id.new_friends_lv);
-        new_friends_et_check_gone = (EditText) findViewById(R.id.new_friends_et_check_gone);
-        new_friedns_back = (TextView) findViewById(R.id.new_friedns_back);
-        new_friedns_back_iv = (ImageView) findViewById(R.id.new_friedns_back_iv);
+        newFriendsTvSend = (TextView) findViewById(R.id.new_friends_tv_send);
+        newFriendsLv = (ListView) findViewById(R.id.new_friends_lv);
+        newFriendsEtCheckGone = (EditText) findViewById(R.id.new_friends_et_check_gone);
+        newFriednsBack = (TextView) findViewById(R.id.new_friedns_back);
+        newFriednsBackIv = (ImageView) findViewById(R.id.new_friedns_back_iv);
 
         mainView.setOnkbdStateListener(new KeyboardLayout.onKybdsChangeListener() {
 
@@ -83,14 +90,17 @@ public class NewFriendActivity extends BaseActivity implements OnClickListener {
                 }
             }
         });
-        new_friedns_tv_search.setOnClickListener(this);
-        new_friends_tv_send.setOnClickListener(this);
-        new_friedns_back.setOnClickListener(this);
-        new_friedns_back_iv.setOnClickListener(this);
-        setListViewHeightBasedOnChildren(new_friends_lv);
+        newFriednsTvSearch.setOnClickListener(this);
+        newFriendsTvSend.setOnClickListener(this);
+        newFriednsBack.setOnClickListener(this);
+        newFriednsBackIv.setOnClickListener(this);
+        setListViewHeightBasedOnChildren(newFriendsLv);
         search.setOnFocusChangeListener(onFocusAutoClearHintListener);
     }
 
+    /**
+     * 输入框的焦点监听
+     */
     private OnFocusChangeListener onFocusAutoClearHintListener = new OnFocusChangeListener() {
         @Override
         public void onFocusChange(View v, boolean hasFocus) {
@@ -103,11 +113,6 @@ public class NewFriendActivity extends BaseActivity implements OnClickListener {
             } else {
                 hint = textView.getTag().toString();
                 textView.setHint(hint);
-                // if (textView.getText().toString().equals("")) {
-                // textView.setGravity(Gravity.CENTER);
-                // } else {
-                // textView.setGravity(Gravity.LEFT);
-                // }
             }
         }
     };
@@ -150,10 +155,10 @@ public class NewFriendActivity extends BaseActivity implements OnClickListener {
                 }
                 break;
             case R.id.new_friends_tv_send:
-                if (!new_friends_et_check_gone.getText().toString().trim().equals("")) {
-                    new_friends_rl_check.setVisibility(View.GONE);
-                    SendCheckInfo(new_friends_et_check_gone.getText().toString());
-                    new_friends_et_check_gone.setText("");
+                if (!newFriendsEtCheckGone.getText().toString().trim().equals("")) {
+                    newFriendsRlCheck.setVisibility(View.GONE);
+                    SendCheckInfo(newFriendsEtCheckGone.getText().toString());
+                    newFriendsEtCheckGone.setText("");
 
                 }
                 break;
@@ -187,8 +192,8 @@ public class NewFriendActivity extends BaseActivity implements OnClickListener {
             public void run() {
                 JSONObject response = this.getResponse();
                 if (response == null) {
-                    new_friends_lv.setVisibility(View.INVISIBLE);
-                    new_friends_rl_check.setVisibility(View.INVISIBLE);
+                    newFriendsLv.setVisibility(View.INVISIBLE);
+                    newFriendsRlCheck.setVisibility(View.INVISIBLE);
                     Toast.makeText(NewFriendActivity.this, "没有此用户", Toast.LENGTH_SHORT).show();
                 } else {
                     JsonFriendAdd jp = new JsonFriendAdd();
@@ -198,15 +203,18 @@ public class NewFriendActivity extends BaseActivity implements OnClickListener {
                         e.printStackTrace();
                     }
                     id = jp.list.get(0).id + "";
-                    fadapter = new NewFriendAdapter(NewFriendActivity.this, jp.list, new_friends_rl_check);
-                    new_friends_lv.setAdapter(fadapter);
-                    new_friends_lv.setVisibility(View.VISIBLE);
+                    newFriendAdapter = new NewFriendAdapter(NewFriendActivity.this, jp.list, newFriendsRlCheck);
+                    newFriendsLv.setAdapter(newFriendAdapter);
+                    newFriendsLv.setVisibility(View.VISIBLE);
 
                 }
             }
         }, this.getRequestQueue(), null).send();
     }
 
+    /**
+     * @param strEdit 输入框的内容
+     */
     private void SendCheckInfo(String strEdit) {
         Map<String, String> headers = new HashMap<String, String>();
         try {

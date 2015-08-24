@@ -10,9 +10,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
-import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,33 +25,41 @@ import com.fifteentec.Component.calendar.KeyboardLayout;
 import com.fifteentec.yoko.BaseActivity;
 import com.fifteentec.yoko.R;
 
-import org.apache.http.util.EncodingUtils;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 public class NewLabelGvAddActivity extends BaseActivity implements OnClickListener {
 
-    private ListView lv;
-    private KeyboardLayout mainView; // 判断软键盘是否隐藏
-    private EditText search; // 输入框
-    private NewLabelGvAddAdapter nlgaadapter;
-    // private ArrayList<String> list = new ArrayList<String>();
+    //标签添加朋友的选择列表
+    private ListView lvNewLabelGvAdd;
+    // 判断软键盘是否隐藏
+    private KeyboardLayout mainView;
+    // 输入框  暂未使用
+    private EditText search;
+    //选择列表的适配器
+    private NewLabelGvAddAdapter newLabelGvAddAdapter;
+    //标签添加朋友的选择列表的好友数据
     private ArrayList<JsonFriendList> jsonData = new ArrayList<JsonFriendList>();
+    //用来传输的数据，随后将其返回到newlabel的页面
     private ArrayList<JsonFriendList> jsonTrans = new ArrayList<JsonFriendList>();
+    //从newlabel传入的好友数据，用来比对是否需要选中用的
     private ArrayList<JsonFriendList> jsonTransModified = new ArrayList<JsonFriendList>();
-    private TextView new_label_gvadd_tv_sure;
+    //确定添加的按钮
+    private TextView newLabelGvaddTvSure;
     private BaseActivity activity;
     private DBManager dbManager;
-    private com.fifteentec.Component.calendar.PredicateLayout new_label_gvadd_pop_linearlayout;
+    //添加view的viewgroup，用来控制宽度，不够时会换行到控件高度的下一行
+    private com.fifteentec.Component.calendar.PredicateLayout newLabelGvaddPopLinearlayout;
+    //getTableFriendTag list数据
     private List<FriendTagRecord> listTag;
+    //用来判断输入框pop的view只添加一次数据
     private boolean isAddView = true;
+    //用来显示列表的好友数据
     private ArrayList<JsonFriendList> listData = new ArrayList<JsonFriendList>();
+    //用来接收newlabe页面传来的listtrans，用来返回到newlabel来显示好友组
     private List<FriendTagRecord> listTrans;
+    //修改标签内容时，本地查询的好友数据list
     private List<FriendInfoRecord> friendInfoRecords;
 
     @SuppressWarnings("unchecked")
@@ -63,15 +69,12 @@ public class NewLabelGvAddActivity extends BaseActivity implements OnClickListen
         setContentView(R.layout.new_label_gvadd);
         this.activity = (BaseActivity) this;
         this.dbManager = this.activity.getDBManager();
-
         listTag = this.dbManager.getTableFriendTag().queryTag(UserServer.getInstance().getUserid());
-
-
-        new_label_gvadd_pop_linearlayout = (com.fifteentec.Component.calendar.PredicateLayout) findViewById(R.id.new_label_gvadd_pop_linearlayout);
-        lv = (ListView) findViewById(R.id.new_label_gvadd_lv);
+        newLabelGvaddPopLinearlayout = (com.fifteentec.Component.calendar.PredicateLayout) findViewById(R.id.new_label_gvadd_pop_linearlayout);
+        lvNewLabelGvAdd = (ListView) findViewById(R.id.new_label_gvadd_lv);
         mainView = (KeyboardLayout) findViewById(R.id.keyboardLayout_new_label_gvadd);
         search = (EditText) findViewById(R.id.new_label_gvadd_et_search);
-        new_label_gvadd_tv_sure = (TextView) findViewById(R.id.new_label_gvadd_tv_sure);
+        newLabelGvaddTvSure = (TextView) findViewById(R.id.new_label_gvadd_tv_sure);
         Intent in = getIntent();
 
         jsonTransModified = (ArrayList<JsonFriendList>) in
@@ -98,12 +101,12 @@ public class NewLabelGvAddActivity extends BaseActivity implements OnClickListen
             }
         });
         search.setOnFocusChangeListener(onFocusAutoClearHintListener);
+        //   getTableFriendInfo    getTableFriendInfo
         friendInfoRecords = this.dbManager.getTableFriendInfo().queryFriendsInfo(UserServer.getInstance().getUserid());
-        nlgaadapter = new NewLabelGvAddAdapter(this, friendInfoRecords, jsonTrans,
+        newLabelGvAddAdapter = new NewLabelGvAddAdapter(this, friendInfoRecords, jsonTrans,
                 jsonTransModified);
-        lv.setAdapter(nlgaadapter);
-        // setListViewHeightBasedOnChildren(lv);
-        new_label_gvadd_tv_sure.setOnClickListener(this);
+        lvNewLabelGvAdd.setAdapter(newLabelGvAddAdapter);
+        newLabelGvaddTvSure.setOnClickListener(this);
     }
 
     private OnFocusChangeListener onFocusAutoClearHintListener = new OnFocusChangeListener() {
@@ -116,6 +119,7 @@ public class NewLabelGvAddActivity extends BaseActivity implements OnClickListen
                 textView.setTag(hint);
                 textView.setHint("");
                 if (isAddView) {
+                    //动态添加label中的list数据，并且设置了5种背景色
                     for (int i = 0; i < listTag.size(); i++) {
                         TextView tv = new TextView(NewLabelGvAddActivity.this);
                         tv.setTag(i);
@@ -141,13 +145,14 @@ public class NewLabelGvAddActivity extends BaseActivity implements OnClickListen
                                 break;
                         }
 
-                        new_label_gvadd_pop_linearlayout.addView(tv);
+                        newLabelGvaddPopLinearlayout.addView(tv);
                         tv.setOnClickListener(new OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 Toast.makeText(NewLabelGvAddActivity.this, v.getTag() + "", Toast.LENGTH_SHORT).show();
                                 long id = listTag.get((Integer) v.getTag()).tagId;
                                 listData = new ArrayList<JsonFriendList>();
+                                //查询本地数据，并且添加到list中
                                 listTrans = dbManager.getTableFriendTag().queryFriendsByTag(UserServer.getInstance().getUserid(), id);
                                 for (FriendTagRecord friendTagRecord : listTrans) {
                                     JsonFriendList item = new JsonFriendList();
@@ -159,129 +164,24 @@ public class NewLabelGvAddActivity extends BaseActivity implements OnClickListen
                                 }
                                 jsonTransModified = listData;
                                 jsonTrans = listData;
-                                nlgaadapter = new NewLabelGvAddAdapter(NewLabelGvAddActivity.this, friendInfoRecords, jsonTrans,
+                                newLabelGvAddAdapter = new NewLabelGvAddAdapter(NewLabelGvAddActivity.this, friendInfoRecords, jsonTrans,
                                         jsonTransModified);
-                                lv.setAdapter(nlgaadapter);
-                                new_label_gvadd_pop_linearlayout.setVisibility(View.GONE);
+                                lvNewLabelGvAdd.setAdapter(newLabelGvAddAdapter);
+                                //点击pop中的view时，将整个popview都隐藏
+                                newLabelGvaddPopLinearlayout.setVisibility(View.GONE);
                             }
                         });
                     }
                     isAddView = false;
                 }
-                int w = View.MeasureSpec.makeMeasureSpec(0,
-                        View.MeasureSpec.UNSPECIFIED);
-                int h = View.MeasureSpec.makeMeasureSpec(0,
-                        View.MeasureSpec.UNSPECIFIED);
-                new_label_gvadd_pop_linearlayout.measure(w, h);
-                int height = new_label_gvadd_pop_linearlayout.getMeasuredHeight();
-                int width = new_label_gvadd_pop_linearlayout.getMeasuredWidth();
-                new_label_gvadd_pop_linearlayout.setVisibility(View.VISIBLE);
+                newLabelGvaddPopLinearlayout.setVisibility(View.VISIBLE);
             } else {
                 hint = textView.getTag().toString();
                 textView.setHint(hint);
-                new_label_gvadd_pop_linearlayout.setVisibility(View.GONE);
+                newLabelGvaddPopLinearlayout.setVisibility(View.GONE);
             }
         }
     };
-
-    /**
-     * 设置listview定高
-     *
-     * @param listView
-     */
-    public static void setListViewHeightBasedOnChildren(ListView listView) {
-        if (listView == null)
-            return;
-        ListAdapter listAdapter = listView.getAdapter();
-        if (listAdapter == null) {
-            return;
-        }
-        int totalHeight = 0;
-        for (int i = 0; i < listAdapter.getCount(); i++) {
-            View listItem = listAdapter.getView(i, null, listView);
-            listItem.measure(0, 0);
-            totalHeight += listItem.getMeasuredHeight();
-        }
-        ViewGroup.LayoutParams params = listView.getLayoutParams();
-        params.height = totalHeight
-                + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
-        listView.setLayoutParams(params);
-    }
-
-    // private void setDatas() {
-    // list = new ArrayList<String>();
-    // list.add("1");
-    // list.add("2");
-    // list.add("3");
-    // list.add("4");
-    // list.add("5");
-    // list.add("6");
-    // list.add("7");
-    // list.add("8");
-    // list.add("11");
-    // list.add("21");
-    // list.add("31");
-    // list.add("41");
-    // list.add("51");
-    // list.add("61");
-    // list.add("71");
-    // list.add("81");
-    // }
-
-    private void readDatas() {
-//        String str = Environment.getExternalStorageDirectory() + File.separator
-//                + "mldndata" + File.separator + "json.txt";
-//        String json = "";
-//        try {
-//            json = readSDFile(str);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        Log.e("json", json);
-//        try {
-//            JSONArray jsonArray = new JSONObject(json).getJSONArray("urldata");
-//            for (int i = 0; i < jsonArray.length(); i++) {
-//                JSONObject jsonObjs = (JSONObject) jsonArray.opt(i);
-//                // 自定义json的bean文件
-//                JsonFriendList jp = new JsonFriendList();
-//                try {
-//                    jp.parsingJson(jsonObjs);
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//                jsonData.add(jp);
-//            }
-//
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-        for (int i = 0; i < 12; i++) {
-            JsonFriendList j = new JsonFriendList();
-            j.id = i;
-            jsonData.add(j);
-        }
-
-    }
-
-    // 读文件
-    public String readSDFile(String fileName) throws IOException {
-
-        String res = "";
-
-        File file = new File(fileName);
-
-        FileInputStream fis = new FileInputStream(file);
-
-        int length = fis.available();
-
-        byte[] buffer = new byte[length];
-        fis.read(buffer);
-
-        res = EncodingUtils.getString(buffer, "UTF-8");
-
-        fis.close();
-        return res;
-    }
 
     @Override
     public void onClick(View arg0) {
@@ -289,11 +189,8 @@ public class NewLabelGvAddActivity extends BaseActivity implements OnClickListen
             case R.id.new_label_gvadd_tv_sure:
                 Intent intent = new Intent();
                 intent.setClass(NewLabelGvAddActivity.this, NewLabelActivity.class);
-                // intent.putExtra("position", arg2);
                 // 传递集合数据时，需要将bean文件实现Serializable接口才能正常传递
-
                 intent.putExtra("jsonTrans", (Serializable) jsonTrans);
-
                 intent.putExtra("flag", "1");
                 setResult(NewLabelActivity.ADD_RESULT, intent);
                 finish();

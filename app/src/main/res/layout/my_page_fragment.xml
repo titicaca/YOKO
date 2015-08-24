@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
-                android:background="#fff"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:background="#fff">
 
     <RelativeLayout
         android:id="@+id/mypage_adapter_rl"
@@ -16,7 +16,8 @@
             android:layout_height="30dp"
             android:layout_centerVertical="true"
             android:layout_marginLeft="10dp"
-            android:src="@drawable/ic_keyboard_arrow_left_black"/>
+            android:src="@drawable/ic_keyboard_arrow_left_black"
+            android:visibility="gone"/>
 
         <ImageView
             android:id="@+id/mypage_adapter_iv_set"
@@ -37,6 +38,7 @@
             android:textSize="20sp"/>
 
         <ImageView
+            android:id="@+id/mypage_adapter_set"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_alignParentRight="true"

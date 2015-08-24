@@ -7,11 +7,10 @@ import android.widget.RelativeLayout;
 
 
 /**
- * 监听键盘弹起落下
+ * 监听键盘弹起落下,通过判断控件的高度
  * <p/>
  * <p/>
  * <p/>
- * 需要在内层添加scorllview才能正常使用
  *
  * @author Administrator
  */
