@@ -56,4 +56,12 @@ public class APIUrl {
     public final static String URL_CONTENT_DOWNLOAD = URL_DOWNLOAD_BASE + "/" + "";
 
     public final static String URL_TOPIC_INFO_DOWNLOAD = URL_DOWNLOAD_BASE + "/" + "";
+
+    public final static String URL_JOINED_GROUP_GET = URL_BASE_USER+"/myactivity/watch/orgs";
+
+    public final static String URL_EVENTS_GET = URL_BASE_USER+"/myactivity/activities";
+
+    public final static String URL_JOINED_EVENTS_GET = URL_BASE_USER+"/myactivity/collect/activities";
+
+    public final static String URL_SINGLE_EVENTS_GET = URL_BASE+"/public/activity/"+"";
 }
