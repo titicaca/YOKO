@@ -11,6 +11,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.fifteentec.Component.User.UserServer;
+import com.fifteentec.FoundFragment.FoundFragment;
 import com.fifteentec.Fragment.FriendsFragment;
 import com.fifteentec.Fragment.MyPageFragment;
 import com.fifteentec.Fragment.CalViewFragment;
@@ -26,6 +27,7 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
     private MyPageFragment myPageFragment;
     private TestFragment tf;
     private CalViewFragment mCalViewFragment;
+    private FoundFragment mFoundFragment;
 
     @SuppressLint("NewApi")
     @Override
@@ -82,6 +84,13 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
                 }
                 break;
             case R.integer.SelectorFrd:
+                if(mFoundFragment == null){
+                    mFoundFragment = new FoundFragment();
+                    mFmTrans.add(R.id.id_content, mFoundFragment,"found");
+                }
+                else{
+                    mFmTrans.show(mFoundFragment);
+                }
                 Toast a = Toast.makeText(this, "Found",
                         Toast.LENGTH_SHORT);
                 a.setDuration(Toast.LENGTH_SHORT);
