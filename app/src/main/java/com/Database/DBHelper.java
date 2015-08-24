@@ -27,7 +27,7 @@ public class DBHelper extends SQLiteOpenHelper {
          */
         db.execSQL("CREATE TABLE IF NOT EXISTS " + DBConstants.TABLE_FRIEND_TAG +
                 "(" + DBConstants.COLUMN_FRIEND_TAG_RID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                DBConstants.COLUMN_FRIEND_TAG_UID + " INT8, " +
+                DBConstants.COLUMN_FRIEND_TAG_UID + " INT8 NOT NULL, " +
                 DBConstants.COLUMN_FRIEND_TAG_FUID + " INT8, " +
                 DBConstants.COLUMN_FRIEND_TAG_TAGID + " INT8," +
                 DBConstants.COLUMN_FRIEND_TAG_TAGNAME + " CHAR(255)" +
@@ -54,7 +54,7 @@ public class DBHelper extends SQLiteOpenHelper {
          */
         db.execSQL("CREATE TABLE IF NOT EXISTS " + DBConstants.TABLE_FRIEND_INFO +
                 "(" + DBConstants.COLUMN_FRIEND_INFO_RID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                DBConstants.COLUMN_FRIEND_INFO_UID + " INT8, " +
+                DBConstants.COLUMN_FRIEND_INFO_UID + " INT8 NOT NULL, " +
                 DBConstants.COLUMN_FRIEND_INFO_FUID + " INT8, " +
                 DBConstants.COLUMN_FRIEND_INFO_EMAIL + " CHAR(255), " +
                 DBConstants.COLUMN_FRIEND_INFO_LOCATION + " CHAR(255), " +
@@ -81,10 +81,30 @@ public class DBHelper extends SQLiteOpenHelper {
          */
         db.execSQL("CREATE TABLE IF NOT EXISTS " + DBConstants.TABLE_FRIEND_INVITATION +
                 "(" + DBConstants.COLUMN_FRIEND_INVITATION_RID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                DBConstants.COLUMN_FRIEND_INVITATION_UID + " INT8, " +
+                DBConstants.COLUMN_FRIEND_INVITATION_UID + " INT8 NOT NULL, " +
                 DBConstants.COLUMN_FRIEND_INVITATION_FUID + " INT8, " +
                 DBConstants.COLUMN_FRIEND_INVITATION_MSG + " CHAR(255), " +
                 DBConstants.COLUMN_FRIEND_INVITATION_CREATETIME + " INT8" +
+                ")");
+
+        /**
+         * 这张表存储用户时间邀请
+         * 第一列是_id，为record的id
+         * 第二列是uid，为发起邀请的用户id
+         * 第三列是fuid，为被邀请的用户id
+         * 第四列是msg，为邀请的留言信息
+         * 第五列是type，表明事件的类型
+         * 第六列是eventId，表明事件的id
+         * 第五列是createtime，为邀请创建时间
+         */
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + DBConstants.TABLE_EVENT_INVITATION +
+                "(" + DBConstants.COLUMN_EVENT_INVITATION_RID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                DBConstants.COLUMN_EVENT_INVITATION_UID + " INT8 NOT NULL, " +
+                DBConstants.COLUMN_EVENT_INVITATION_FUID + " INT8, " +
+                DBConstants.COLUMN_EVENT_INVITATION_MSG + " CHAR(255), " +
+                DBConstants.COLUMN_EVENT_INVITATION_TYPE + " INT1, " +
+                DBConstants.COLUMN_EVENT_INVITATION_EVENTID + " INT8, " +
+                DBConstants.COLUMN_EVENT_INVITATION_CREATETIME + "INT8" +
                 ")");
 
         /**
@@ -107,7 +127,7 @@ public class DBHelper extends SQLiteOpenHelper {
          */
         db.execSQL("CREATE TABLE IF NOT EXISTS " + DBConstants.TABLE_EVENT +
                 "(" + DBConstants.COLUMN_EVENT_RID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                DBConstants.COLUMN_EVENT_UID + " INT8, " +
+                DBConstants.COLUMN_EVENT_UID + " INT8 NOT NULL, " +
                 DBConstants.COLUMN_EVENT_SEVERID + " INT8, " +
                 DBConstants.COLUMN_EVENT_INTRODUCTION + " TEXT, " +
                 DBConstants.COLUMN_EVENT_LOCALPICTURELINK + " CHAR(255), " +

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/newfriend_add_iv_icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/ic"/>
+
+    <TextView
+        android:id="@+id/newfriend_add_tv_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/newfriend_add_iv_icon"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp"
+        android:text="Lay.Q"
+        android:textSize="18sp"
+        android:textStyle="bold"/>
+
+    <View
+        android:id="@+id/newfriend_add_view_1"
+        android:layout_width="100dp"
+        android:layout_height="0.1dp"
+        android:layout_below="@+id/newfriend_add_tv_name"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp"
+        android:background="#ABE0BD"
+        />
+
+    <TextView
+        android:id="@+id/newfriend_add_tv_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/newfriend_add_view_1"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp"
+        android:text="宁波"
+        android:textColor="#B1B1B1"
+        />
+
+    <View
+        android:id="@+id/newfriend_add_view_2"
+        android:layout_width="100dp"
+        android:layout_height="0.1dp"
+        android:layout_below="@+id/newfriend_add_tv_location"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp"
+        android:background="#ABE0BD"
+        />
+
+    <TextView
+        android:id="@+id/newfriend_add_tv_addbutton"
+        android:layout_width="fill_parent"
+        android:layout_height="40dp"
+        android:layout_below="@+id/newfriend_add_view_2"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/add_friends_addbutton_background"
+        android:gravity="center"
+        android:text="添加好友"
+        android:textColor="#fff"
+        android:textSize="17sp"/>
+</RelativeLayout>

@@ -10,10 +10,10 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.Database.DBManager;
+import com.Service.DataSyncService.DataSyncServiceBinder;
 import com.Service.DataSyncService;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
-import com.Service.DataSyncService.DataSyncServiceBinder;
 
 public abstract class BaseActivity extends Activity {
     protected RequestQueue requestQueue;
@@ -77,7 +77,7 @@ public abstract class BaseActivity extends Activity {
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 finish();
-            }
+            } else super.onBackPressed();
         }
     }
 
@@ -116,5 +116,5 @@ public abstract class BaseActivity extends Activity {
     public static void setCurrentActivity(BaseActivity activity) {
         curActivity = activity;
     }
-
 }
+

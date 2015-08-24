@@ -1,5 +1,6 @@
 package com.Database;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -61,29 +62,39 @@ public class TableFriendInvitation extends DBTable {
         }
     }
 
-    public void addFriendInvitation(FriendInvitationRecord friendInvitationRecord) {
+    public long addFriendInvitation(FriendInvitationRecord friendInvitationRecord) {
+        long rid;
+
         db.beginTransaction();
 
         try {
-            db.execSQL("INSERT OR IGNORE INTO " + tableName + " VALUES(NULL, ?, ?, ?, ?)",
-                    new Object[]{friendInvitationRecord.uid, friendInvitationRecord.fuid, friendInvitationRecord.msg, System.currentTimeMillis()}
-            );
+            ContentValues cv = new ContentValues();
+            cv.put(DBConstants.COLUMN_FRIEND_INVITATION_UID, friendInvitationRecord.uid);
+            cv.put(DBConstants.COLUMN_FRIEND_INVITATION_FUID, friendInvitationRecord.fuid);
+            cv.put(DBConstants.COLUMN_FRIEND_INVITATION_MSG, friendInvitationRecord.msg);
+            cv.put(DBConstants.COLUMN_FRIEND_INVITATION_CREATETIME, System.currentTimeMillis());
+
+            rid = db.insert(tableName, null, cv);
             db.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
+            rid = -1;
         } finally {
             db.endTransaction();
         }
+
+        return rid;
     }
 
     public List<FriendInvitationRecord> queryFriendInvitation(long fuid) {
         List<FriendInvitationRecord> friendInvitationRecords = null;
         Cursor cs = null;
+
         try {
             cs = db.query(tableName, null,
                     DBConstants.COLUMN_FRIEND_INVITATION_FUID + " = ?",
                     new String[]{String.valueOf(fuid)},
-                    null, null, DBConstants.COLUMN_FRIEND_INVITATION_CREATETIME + "DESC");
+                    null, null, DBConstants.COLUMN_FRIEND_INVITATION_CREATETIME + " DESC ");
             friendInvitationRecords = cursorToList(cs);
         } catch (Exception e) {
             e.printStackTrace();

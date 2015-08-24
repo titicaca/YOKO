@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.fifteentec.Component.calendar.KeyboardLayout
+    android:id="@+id/keyboardLayout_friends"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#fff"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/new_friedns_rl"
+            android:layout_width="fill_parent"
+            android:layout_height="60dp"
+            android:background="#EEEEEE">
+
+            <ImageView
+                android:id="@+id/friedns_back_iv"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                android:src="@drawable/ic_keyboard_arrow_left_black"/>
+
+            <TextView
+                android:id="@+id/friedns_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20dp"
+                android:layout_toRightOf="@id/friedns_back_iv"
+                android:text="好友"
+                android:textSize="20sp"/>
+        </RelativeLayout>
+
+        <ScrollView
+            android:id="@+id/friends_sv1"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+            <LinearLayout
+                android:id="@+id/friends_search_ll"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:id="@+id/new_friedns_ll_search"
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginBottom="5dip"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginTop="5dip"
+                    android:background="@drawable/add_friends_background_search">
+
+                    <EditText
+                        android:id="@+id/friends_search_et"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_toLeftOf="@+id/friends_iv_search"
+                        android:background="@null"
+                        android:gravity="center"
+                        android:hint="手机号"
+                        android:paddingLeft="10dp"
+                        android:singleLine="true"
+                        android:textSize="16sp"/>
+
+                    <ImageView
+                        android:id="@+id/friends_iv_search"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:layout_gravity="center_vertical"
+                        android:src="@drawable/search"/>
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal">
+
+                    <RelativeLayout
+                        android:id="@+id/friends_rl_newfriend_button"
+                        android:layout_width="0dp"
+                        android:layout_height="100dp"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/friends_button_background">
+
+                        <ImageView
+                            android:id="@+id/friends_iv_newfriend_button"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_centerInParent="true"
+                            android:src="@drawable/ic"/>
+
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/friends_iv_newfriend_button"
+                            android:layout_centerHorizontal="true"
+                            android:layout_marginTop="5dp"
+                            android:text="新的朋友"/>
+
+                        <ImageView
+                            android:id="@+id/friends_iv_add_newfriend"
+                            android:layout_width="10dp"
+                            android:layout_height="10dp"
+                            android:layout_alignParentBottom="true"
+                            android:layout_alignParentRight="true"
+                            android:background="@drawable/ic"
+                            android:visibility="gone"/>
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/friends_rl_label_button"
+                        android:layout_width="0dp"
+                        android:layout_height="100dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/friends_button_background">
+
+                        <ImageView
+                            android:id="@+id/friends_iv_label_button"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_centerInParent="true"
+                            android:src="@drawable/ic"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/friends_iv_label_button"
+                            android:layout_centerHorizontal="true"
+                            android:layout_marginTop="5dp"
+                            android:text="标签"/>
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/friends_rl_add_button"
+                        android:layout_width="0dp"
+                        android:layout_height="100dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/friends_button_background">
+
+                        <ImageView
+                            android:id="@+id/friends_iv_add_button"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_centerInParent="true"
+                            android:src="@drawable/ic"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/friends_iv_add_button"
+                            android:layout_centerHorizontal="true"
+                            android:layout_marginTop="5dp"
+                            android:text="添加"/>
+                    </RelativeLayout>
+
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:background="#000"/>
+
+                <ListView
+                    android:id="@+id/friends_lv2"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"></ListView>
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+
+</com.fifteentec.Component.calendar.KeyboardLayout>
