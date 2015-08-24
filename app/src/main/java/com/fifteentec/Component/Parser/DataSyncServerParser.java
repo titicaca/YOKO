@@ -2,6 +2,7 @@ package com.fifteentec.Component.Parser;
 
 import com.Database.FriendInfoRecord;
 import com.Database.FriendTagRecord;
+import com.Service.DataSyncService;
 import com.fifteentec.FoundItems.EventBrief;
 import com.fifteentec.FoundItems.FavoriteBrief;
 import com.fifteentec.FoundItems.GroupBrief;
@@ -82,6 +83,7 @@ public class DataSyncServerParser {
 
         return friendInfoRecords;
     }
+
     public static List<GroupBrief> parseGroupBriefInfo(final JSONObject response) {
         List<GroupBrief> groupBriefs = new ArrayList<GroupBrief>();
 
@@ -119,7 +121,7 @@ public class DataSyncServerParser {
                 String groupIntro=group.getString("introduction");
                 String PicUrl = group.getString("picturelink");
 
-                EventBrief briefItem = new EventBrief ();
+                EventBrief briefItem = new EventBrief();
                 briefItem.setGroupName(groupName);
                 briefItem.setEventIntro(groupIntro);
                 briefItem.setEventUri(PicUrl);
@@ -144,7 +146,7 @@ public class DataSyncServerParser {
                 String groupIntro=group.getString("introduction");
                 String PicUrl = group.getString("picturelink");
 
-                FavoriteBrief briefItem = new FavoriteBrief ();
+                FavoriteBrief briefItem = new FavoriteBrief();
                 briefItem.setGroupName(groupName);
                 briefItem.setEventIntro(groupIntro);
                 briefItem.setEventUri(PicUrl);

@@ -91,6 +91,10 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
                 else{
                     mFmTrans.show(mFoundFragment);
                 }
+                Toast a = Toast.makeText(this, "Found",
+                        Toast.LENGTH_SHORT);
+                a.setDuration(Toast.LENGTH_SHORT);
+                a.show();
 
 
                 break;
