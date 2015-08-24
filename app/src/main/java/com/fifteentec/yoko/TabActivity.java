@@ -11,7 +11,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.fifteentec.Component.User.UserServer;
-import com.fifteentec.FoundFragment.FoundFragment;
+import com.fifteentec.Fragment.FoundFragment.FoundFragment;
 import com.fifteentec.Fragment.FriendsFragment;
 import com.fifteentec.Fragment.MyPageFragment;
 import com.fifteentec.Fragment.CalViewFragment;

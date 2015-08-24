@@ -7,7 +7,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.fifteentec.FoundItems.EventBrief;
+import com.fifteentec.Component.FoundItems.EventBrief;
 import com.fifteentec.yoko.R;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;

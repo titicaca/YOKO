@@ -1,8 +1,8 @@
 package com.fifteentec.Component.Parser;
 
-import com.fifteentec.FoundItems.EventBrief;
-import com.fifteentec.FoundItems.FavoriteBrief;
-import com.fifteentec.FoundItems.GroupBrief;
+import com.fifteentec.Component.FoundItems.EventBrief;
+import com.fifteentec.Component.FoundItems.FavoriteBrief;
+import com.fifteentec.Component.FoundItems.GroupBrief;
 
 import org.json.JSONArray;
 import org.json.JSONException;

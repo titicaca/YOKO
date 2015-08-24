@@ -8,7 +8,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.fifteentec.FoundItems.InvitingBrief;
+import com.fifteentec.Component.FoundItems.InvitingBrief;
 import com.fifteentec.yoko.R;
 import com.nostra13.universalimageloader.core.ImageLoader;
 

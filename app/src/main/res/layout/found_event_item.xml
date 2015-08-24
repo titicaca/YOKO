@@ -22,7 +22,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginLeft="8dp"
             />
-        <com.fifteentec.FoundItems.CircularImage
+        <com.fifteentec.Component.FoundItems.CircularImage
             android:id="@+id/cover_group_logo3"
             android:layout_width="60dp"
             android:layout_height="60dp"

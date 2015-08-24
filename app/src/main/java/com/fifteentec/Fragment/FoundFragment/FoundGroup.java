@@ -1,4 +1,4 @@
-package com.fifteentec.FoundFragment;
+package com.fifteentec.Fragment.FoundFragment;
 
 import android.annotation.SuppressLint;
 import android.app.Fragment;
@@ -23,7 +23,7 @@ import com.API.APIUserServer;
 import com.android.volley.RequestQueue;
 import com.fifteentec.Component.Parser.FoundDataParser;
 import com.fifteentec.FoundAdapter.GroupAdapter;
-import com.fifteentec.FoundItems.GroupBrief;
+import com.fifteentec.Component.FoundItems.GroupBrief;
 import com.fifteentec.yoko.BaseActivity;
 import com.fifteentec.yoko.R;
 
