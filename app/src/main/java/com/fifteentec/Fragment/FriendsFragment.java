@@ -11,7 +11,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,7 +25,6 @@ import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.API.APIJsonCallbackResponse;
@@ -47,46 +45,46 @@ import com.fifteentec.yoko.friends.LabelActivity;
 import com.fifteentec.yoko.friends.NewFriendActivity;
 import com.fifteentec.yoko.friends.NewFriendsListActivity;
 
-import org.apache.http.util.EncodingUtils;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 public class FriendsFragment extends Fragment implements OnItemClickListener,
         OnClickListener, OnItemLongClickListener {
-    private ListView lv1; // 好友和标签;
-    private ListView lv2; // 好友列表
-    private EditText search; // 输入框
-    private KeyboardLayout mainView; // 判断软键盘是否隐藏
+    // 好友列表listview
+    private ListView friendsfragmentListview;
+    // 手机号输入框，暂未使用
+    private EditText search;
+    // 判断软键盘是否隐藏
+    private KeyboardLayout mainView;
+    //好友列表数据
     private ArrayList<JsonFriendList> jsonData = new ArrayList<JsonFriendList>();
+    //传入一个view，用来判断是否隐藏
     private View v;
-    private TextView friends_tv_addfriends;
-    private FriendsAdapter fAdapter;
+    //好友列表适配器
+    private FriendsAdapter friendsAdapter;
     private BaseActivity activity;
     private DBManager dbManager;
-    private ArrayList<JsonFriendList> list = new ArrayList<JsonFriendList>();
-    private JsonFriendList jp;
-    private RelativeLayout friends_rl_newfriend_button;
-    private RelativeLayout friends_rl_label_button;
-    private RelativeLayout friends_rl_add_button;
+    //新的朋友按钮
+    private RelativeLayout friendsRlnewfriendbutton;
+    //标签按钮
+    private RelativeLayout friendsRllabelbutton;
+    //添加按钮
+    private RelativeLayout friendsRladdbutton;
+    //好友列表数据list
     private List<FriendInfoRecord> friendInfoRecords = null;
-    private ImageView friends_iv_add_newfriend;
+    //动态显示的红点，用来提示消息来了
+    private ImageView friendsIvaddnewfriend;
+    //用来判断的startactivity的请求码
     public static final int FRIENDINVICODE = 6;
 
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == FRIENDINVICODE) {
+            //返回时，更新数据
             LoadFriendsList();
         }
 
@@ -108,14 +106,13 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
 
 
         View view = inflater.inflate(R.layout.friends, container, false);
-        friends_rl_add_button = (RelativeLayout) view.findViewById(R.id.friends_rl_add_button);
-        friends_iv_add_newfriend = (ImageView) view.findViewById(R.id.friends_iv_add_newfriend);
-        friends_rl_label_button = (RelativeLayout) view.findViewById(R.id.friends_rl_label_button);
-        friends_rl_newfriend_button = (RelativeLayout) view.findViewById(R.id.friends_rl_newfriend_button);
-        lv2 = (ListView) view.findViewById(R.id.friends_lv2);
+        friendsRladdbutton = (RelativeLayout) view.findViewById(R.id.friends_rl_add_button);
+        friendsIvaddnewfriend = (ImageView) view.findViewById(R.id.friends_iv_add_newfriend);
+        friendsRllabelbutton = (RelativeLayout) view.findViewById(R.id.friends_rl_label_button);
+        friendsRlnewfriendbutton = (RelativeLayout) view.findViewById(R.id.friends_rl_newfriend_button);
+        friendsfragmentListview = (ListView) view.findViewById(R.id.friends_lv2);
         search = (EditText) view.findViewById(R.id.friends_search_et);
         this.activity = (BaseActivity) this.getActivity();
-        jp = new JsonFriendList();
         mainView = (KeyboardLayout) view.findViewById(R.id.keyboardLayout_friends);
         mainView.setOnkbdStateListener(new KeyboardLayout.onKybdsChangeListener() {
 
@@ -133,11 +130,11 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
                 }
             }
         });
-        lv2.setOnItemClickListener(this);
-        lv2.setOnItemLongClickListener(this);
-        friends_rl_add_button.setOnClickListener(this);
-        friends_rl_label_button.setOnClickListener(this);
-        friends_rl_newfriend_button.setOnClickListener(this);
+        friendsfragmentListview.setOnItemClickListener(this);
+        friendsfragmentListview.setOnItemLongClickListener(this);
+        friendsRladdbutton.setOnClickListener(this);
+        friendsRllabelbutton.setOnClickListener(this);
+        friendsRlnewfriendbutton.setOnClickListener(this);
         //加载好友列表
         LoadFriendsList();
         search.setOnFocusChangeListener(onFocusAutoClearHintListener);
@@ -187,112 +184,6 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
         }
     };
 
-    /**
-     * 假数据json，写入file中
-     */
-    private void initDatas() {
-        String id[] = new String[]{"1", "2", "3", "4", "5", "6", "7"};
-        String name[] = new String[]{"大白", "二白", "三白", "四白", "5白", "6白", "7白"};// 要输出的数据
-        JSONObject allData = new JSONObject();// 建立最外面的节点对象
-        JSONArray sing = new JSONArray();// 定义数组
-        for (int x = 0; x < id.length; x++) {// 将数组内容配置到相应的节点
-            JSONObject temp = new JSONObject();// JSONObject包装数据,而JSONArray包含多个JSONObject
-            try {
-                temp.put("id", id[x]); // JSONObject是按照key:value形式保存
-                temp.put("name", name[x]);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            sing.put(temp);// 保存多个JSONObject
-        }
-        try {
-            allData.put("urldata", sing);// 把JSONArray用最外面JSONObject包装起来
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        if (!Environment.getExternalStorageState().equals(
-                Environment.MEDIA_MOUNTED)) {// SD卡不存在则不操作
-            return;// 返回到程序的被调用处
-        }
-        String str = Environment.getExternalStorageDirectory() + File.separator
-                + "mldndata" + File.separator + "json.txt";
-        File file = new File(Environment.getExternalStorageDirectory()
-                + File.separator + "mldndata" + File.separator + "json.txt");// 要输出的文件路径
-        if (!file.getParentFile().exists()) {// 文件不存在
-            file.getParentFile().mkdirs();// 创建文件夹
-        }
-        // PrintStream 和 PrintWriter
-        PrintWriter out = null;
-        try {
-            out = new PrintWriter(new FileOutputStream(file));
-            out.print(allData.toString());// 将数据变为字符串后保存
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } finally {
-            if (out != null) {
-                out.close();// 关闭输出
-            }
-        }
-        String json = "";
-        try {
-            json = readSDFile(str);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Log.e("json", json);
-        try {
-            JSONArray jsonArray = new JSONObject(json).getJSONArray("urldata");
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonObjs = (JSONObject) jsonArray.opt(i);
-                // 自定义json的bean文件
-                JsonFriendList jp = new JsonFriendList();
-                try {
-                    jp.parsingJson(jsonObjs);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                jsonData.add(jp);
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // 读文件
-    public String readSDFile(String fileName) throws IOException {
-
-        String res = "";
-
-        File file = new File(fileName);
-
-        FileInputStream fis = new FileInputStream(file);
-
-        int length = fis.available();
-
-        byte[] buffer = new byte[length];
-        fis.read(buffer);
-
-        res = EncodingUtils.getString(buffer, "UTF-8");
-
-        fis.close();
-        return res;
-    }
-
-    // 写文件
-    public void writeSDFile(String fileName, String write_str)
-            throws IOException {
-
-        File file = new File(fileName);
-
-        FileOutputStream fos = new FileOutputStream(file);
-
-        byte[] bytes = write_str.getBytes();
-
-        fos.write(bytes);
-
-        fos.close();
-    }
 
     @Override
     public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
@@ -324,7 +215,7 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
                 startActivity(inn);
                 break;
             case R.id.friends_rl_newfriend_button:
-                friends_iv_add_newfriend.setVisibility(View.GONE);
+                friendsIvaddnewfriend.setVisibility(View.GONE);
                 Intent ine = new Intent();
                 ine.setClass(getActivity(), NewFriendsListActivity.class);
 //                startActivity(ine);
@@ -353,7 +244,7 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                // showClickMessage("确定");
+                                //删除固定位置的好友
                                 deleteFriends(position);
                             }
                         });
@@ -361,7 +252,6 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                // showClickMessage("取消");
                             }
                         });
                 normalDia.create().show();
@@ -373,13 +263,21 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
         return false;
     }
 
+    /**
+     * 加载好友数据
+     */
     private void LoadFriendsList() {
         friendInfoRecords = this.dbManager.getTableFriendInfo().queryFriendsInfo(UserServer.getInstance().getUserid());
-        fAdapter = new FriendsAdapter(activity, friendInfoRecords, "0", v);
-        lv2.setAdapter(fAdapter);
-        setListViewHeightBasedOnChildren(lv2);
+        friendsAdapter = new FriendsAdapter(activity, friendInfoRecords, "0", v);
+        friendsfragmentListview.setAdapter(friendsAdapter);
+        setListViewHeightBasedOnChildren(friendsfragmentListview);
     }
 
+    /**
+     * 删除position位置的好友
+     *
+     * @param position
+     */
     private void deleteFriends(final int position) {
         new APIUserServer.JsonDel(APIUrl.URL_DELETE_FRIENDS + friendInfoRecords.get(position).fuid, null, null, new APIJsonCallbackResponse() {
             @Override
@@ -387,12 +285,13 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
                 JSONObject response = this.getResponse();
                 JsonFriendTagReturn jr = new JsonFriendTagReturn();
                 jr.JsonParsing(response);
+                //返回成功时，执行删除操作
                 if (jr.isAdd) {
                     dbManager.getTableFriendInfo().deleteFriendInfo(UserServer.getInstance().getUserid(), friendInfoRecords.get(position).fuid);
                     friendInfoRecords.remove(position);
-                    fAdapter.notifyDataSetChanged();
+                    friendsAdapter.notifyDataSetChanged();
                     // 因为之前listview已经固定高度，所以删除后，需重新定高
-                    setListViewHeightBasedOnChildren(lv2);
+                    setListViewHeightBasedOnChildren(friendsfragmentListview);
                 } else {
                     Toast.makeText(getActivity(), "删除失败", Toast.LENGTH_SHORT).show();
                 }
@@ -400,6 +299,9 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
         }, this.activity.getRequestQueue(), null).send();
     }
 
+    /**
+     * 推送来时，响应广播的接收器
+     */
     private InvitationReceiver friendInvitationReceiver = new InvitationReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -409,7 +311,7 @@ public class FriendsFragment extends Fragment implements OnItemClickListener,
             Log.v("Invitation", "msg: " + msg);
             int action_code = intent.getExtras().getInt(InvitationReceiver.ACTION_KEY_ACTION_CODE);
             Log.v("Invitation", "code: " + action_code);
-            friends_iv_add_newfriend.setVisibility(View.VISIBLE);
+            friendsIvaddnewfriend.setVisibility(View.VISIBLE);
         }
     };
 

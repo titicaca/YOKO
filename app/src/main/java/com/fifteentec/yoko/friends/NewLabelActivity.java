@@ -49,12 +49,14 @@ import java.util.Map;
 
 public class NewLabelActivity extends BaseActivity implements OnItemClickListener,
         OnClickListener {
-
-    private KeyboardLayout mainView; // 判断软键盘是否隐藏
-    private EditText search; // 输入框
-    private GridView new_label_gv;
-    private NewLabelGvAdapter nlgvadapter;
-    private ArrayList<String> list = new ArrayList<String>();
+    // 判断软键盘是否隐藏
+    private KeyboardLayout mainView;
+    // 标签名输入框
+    private EditText editNewLabel;
+    //好友列表gridview和添加删除好友按钮
+    private GridView newLabelGv;
+    //好友列表的适配器
+    private NewLabelGvAdapter newLabelGvAdapter;
     private Boolean isClickDelelte = false;
     private ArrayList<JsonFriendList> jsonData = new ArrayList<JsonFriendList>();
     private List<FriendTagRecord> jsonTrans;
@@ -80,8 +82,8 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
         setContentView(R.layout.new_label);
         this.dbManager = this.getDBManager();
         mainView = (KeyboardLayout) findViewById(R.id.keyboardLayout_new_label);
-        search = (EditText) findViewById(R.id.new_label_et_search);
-        new_label_gv = (GridView) findViewById(R.id.new_label_gv);
+        editNewLabel = (EditText) findViewById(R.id.new_label_et_search);
+        newLabelGv = (GridView) findViewById(R.id.new_label_gv);
         new_label_tv = (TextView) findViewById(R.id.new_label_tv);
         new_label_et_search = (EditText) findViewById(R.id.new_label_et_search);
 
@@ -90,8 +92,8 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
         labelindex = intent.getIntExtra("labelindex", -1);
         labaltrans = intent.getStringExtra("isLabelTrans");
         if (flag.equals("0")) {
-            nlgvadapter = new NewLabelGvAdapter(this, jsonData, "0");
-            new_label_gv.setAdapter(nlgvadapter);
+            newLabelGvAdapter = new NewLabelGvAdapter(this, jsonData, "0");
+            newLabelGv.setAdapter(newLabelGvAdapter);
         } else {
             id = intent.getLongExtra("tagId", 0);
             String tagName = dbManager.getTableFriendTag().queryTagName(UserServer.getInstance().getUserid(), id);
@@ -106,11 +108,11 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
                 item.picturelink = friendInfoRecord.picturelink;
                 jsonData.add(item);
             }
-            nlgvadapter = new NewLabelGvAdapter(this, jsonData, "0");
-            new_label_gv.setAdapter(nlgvadapter);
+            newLabelGvAdapter = new NewLabelGvAdapter(this, jsonData, "0");
+            newLabelGv.setAdapter(newLabelGvAdapter);
         }
 
-        new_label_gv.setOnItemClickListener(this);
+        newLabelGv.setOnItemClickListener(this);
 
         mainView.setOnkbdStateListener(new KeyboardLayout.onKybdsChangeListener() {
 
@@ -129,7 +131,7 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
                 }
             }
         });
-        search.setOnFocusChangeListener(onFocusAutoClearHintListener);
+        editNewLabel.setOnFocusChangeListener(onFocusAutoClearHintListener);
         new_label_tv.setOnClickListener(this);
     }
 
@@ -154,7 +156,7 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
         switch (arg0.getId()) {
             case R.id.new_label_gv:
                 if (jsonData.size() == 0) {
-                    if (arg2 == list.size()) {
+                    if (arg2 == 0) {
                         Intent in = new Intent();
                         in.setClass(NewLabelActivity.this,
                                 NewLabelGvAddActivity.class);
@@ -177,9 +179,9 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
                                 intent.putExtra("json", (Serializable) jsonData);
                                 startActivity(intent);
                             } else {
-                                nlgvadapter = new NewLabelGvAdapter(this,
+                                newLabelGvAdapter = new NewLabelGvAdapter(this,
                                         jsonData, "0");
-                                new_label_gv.setAdapter(nlgvadapter);
+                                newLabelGv.setAdapter(newLabelGvAdapter);
                                 Toast.makeText(NewLabelActivity.this, "隐藏控件1",
                                         Toast.LENGTH_SHORT).show();
                             }
@@ -203,9 +205,9 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
                                         (Serializable) jsonData);
                                 startActivityForResult(in, ADD_REQUEST);
                             } else {
-                                nlgvadapter = new NewLabelGvAdapter(this,
+                                newLabelGvAdapter = new NewLabelGvAdapter(this,
                                         jsonData, "0");
-                                new_label_gv.setAdapter(nlgvadapter);
+                                newLabelGv.setAdapter(newLabelGvAdapter);
                                 Toast.makeText(NewLabelActivity.this, "隐藏控件2",
                                         Toast.LENGTH_SHORT).show();
                             }
@@ -228,22 +230,22 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
                             if (NewLabelGvAdapter.ivDeleteIsVisiable == 0) {
                                 Toast.makeText(NewLabelActivity.this, "显示控件3",
                                         Toast.LENGTH_SHORT).show();
-                                nlgvadapter = new NewLabelGvAdapter(this,
+                                newLabelGvAdapter = new NewLabelGvAdapter(this,
                                         jsonData, "1");
-                                new_label_gv.setAdapter(nlgvadapter);
+                                newLabelGv.setAdapter(newLabelGvAdapter);
                             } else {
-                                nlgvadapter = new NewLabelGvAdapter(this,
+                                newLabelGvAdapter = new NewLabelGvAdapter(this,
                                         jsonData, "0");
-                                new_label_gv.setAdapter(nlgvadapter);
+                                newLabelGv.setAdapter(newLabelGvAdapter);
                                 Toast.makeText(NewLabelActivity.this, "隐藏控件3",
                                         Toast.LENGTH_SHORT).show();
                             }
                         } else {
                             Toast.makeText(NewLabelActivity.this, "显示控件3",
                                     Toast.LENGTH_SHORT).show();
-                            nlgvadapter = new NewLabelGvAdapter(this, jsonData,
+                            newLabelGvAdapter = new NewLabelGvAdapter(this, jsonData,
                                     "1");
-                            new_label_gv.setAdapter(nlgvadapter);
+                            newLabelGv.setAdapter(newLabelGvAdapter);
                         }
 
                     }
@@ -318,8 +320,8 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
                     .getSerializableExtra("jsonTrans");
 
 
-            nlgvadapter = new NewLabelGvAdapter(this, jsonData, "0");
-            new_label_gv.setAdapter(nlgvadapter);
+            newLabelGvAdapter = new NewLabelGvAdapter(this, jsonData, "0");
+            newLabelGv.setAdapter(newLabelGvAdapter);
         }
     }
 
@@ -327,297 +329,12 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
     public void onClick(View arg0) {
         switch (arg0.getId()) {
             case R.id.new_label_tv:
-                if (!search.getText().toString().equals("")) {
+                if (!editNewLabel.getText().toString().equals("")) {
                     try {
                         PostTagInfor();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-//                    File file = new File(Environment.getExternalStorageDirectory()
-//                            + File.separator + "label" + File.separator
-//                            + "json.txt");// 要输出的文件路径
-//                    if (!file.getParentFile().exists()) {// 文件不存在
-//                        file.getParentFile().mkdirs();// 创建文件夹
-//                    }
-//                    String json = "";
-//                    try {
-//                        json = readSDFile(labelstr);
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//                    if (json.toString().equals("")) {
-//                        // 直接写入数据，是第一次
-//                        if (jsonTrans.size() == 0) {
-//                            JSONObject allData = new JSONObject();// 建立最外面的节点对象
-//                            JSONArray sing = new JSONArray();// 定义数组
-//                            JSONArray all = new JSONArray();
-//                            for (int x = 0; x < 1; x++) {// 将数组内容配置到相应的节点
-//                                JSONObject temp = new JSONObject();// JSONObject包装数据,而JSONArray包含多个JSONObject
-//                                try {
-//                                    // temp.put("labelName",
-//                                    // search.getText().toString()); //
-//                                    // JSONObject是按照key:value形式保存
-//                                    temp.put("name", "");
-//                                    temp.put("id", "");
-//                                } catch (JSONException e) {
-//                                    e.printStackTrace();
-//                                }
-//                                sing.put(temp);// 保存多个JSONObject
-//                            }
-//                            try {
-//                                for (int i = 0; i < 1; i++) {
-//                                    allData.put("labelnameAndId", sing);// 把JSONArray用最外面JSONObject包装起来
-//                                    allData.put("label", search.getText()
-//                                            .toString());
-//                                    all.put(allData);
-//                                }
-//
-//                            } catch (JSONException e) {
-//                                e.printStackTrace();
-//                            }
-//
-//                            PrintWriter out = null;
-//                            try {
-//                                out = new PrintWriter(new FileOutputStream(file));
-//                                out.print(all.toString());// 将数据变为字符串后保存
-//                            } catch (FileNotFoundException e) {
-//                                e.printStackTrace();
-//                            } finally {
-//                                if (out != null) {
-//                                    out.close();// 关闭输出
-//                                }
-//                            }
-//
-//                        } else {
-//                            JSONObject allData = new JSONObject();// 建立最外面的节点对象
-//                            JSONArray sing = new JSONArray();// 定义数组
-//                            JSONArray all = new JSONArray();
-//                            for (int x = 0; x < jsonTrans.size(); x++) {// 将数组内容配置到相应的节点
-//                                JSONObject temp = new JSONObject();// JSONObject包装数据,而JSONArray包含多个JSONObject
-//                                try {
-//                                    // temp.put("labelName",
-//                                    // search.getText().toString()); //
-//                                    // JSONObject是按照key:value形式保存
-////                                    temp.put("name", jsonTrans.get(x).name);
-//                                    temp.put("id", jsonTrans.get(x).id);
-//                                } catch (JSONException e) {
-//                                    e.printStackTrace();
-//                                }
-//                                sing.put(temp);// 保存多个JSONObject
-//                            }
-//                            try {
-//                                for (int i = 0; i < 1; i++) {
-//                                    allData.put("labelnameAndId", sing);// 把JSONArray用最外面JSONObject包装起来
-//                                    allData.put("label", search.getText()
-//                                            .toString());
-//                                    all.put(allData);
-//                                }
-//
-//                            } catch (JSONException e) {
-//                                e.printStackTrace();
-//                            }
-//                            PrintWriter out = null;
-//                            try {
-//                                out = new PrintWriter(new FileOutputStream(file));
-//                                out.print(all.toString());// 将数据变为字符串后保存
-//                            } catch (FileNotFoundException e) {
-//                                e.printStackTrace();
-//                            } finally {
-//                                if (out != null) {
-//                                    out.close();// 关闭输出
-//                                }
-//                            }
-//                        }
-//
-//                    } else {
-//                        String jsonstra = "";
-//                        ArrayList<JsonFriendList> listNameid = new ArrayList<JsonFriendList>();
-//                        ArrayList<String> label = new ArrayList<String>();
-//                        Map<String, List<JsonFriendList>> labellist = new HashMap<String, List<JsonFriendList>>();
-//                        // 先读出数据，再整合，再写入输入
-//                        // 如果file中有数据，说明是第二次新建，所以需要先读取，再添加
-//                        if (labaltrans.equals("labalnews")) {
-//                            try {
-//                                jsonstra = readSDFile(labelstr);
-//                            } catch (IOException e) {
-//                                e.printStackTrace();
-//                            }
-//
-//                            try {
-//                                JSONArray jsonArray = new JSONArray(jsonstra);
-//                                for (int i = 0; i < jsonArray.length(); i++) {
-//                                    JSONObject jsonObjs = (JSONObject) jsonArray
-//                                            .opt(i);
-//                                    // 自定义json的bean文件
-//
-//                                    label.add(jsonObjs.optString("label"));
-//
-//                                    JSONArray jsonArraynameandid = jsonObjs
-//                                            .getJSONArray("labelnameAndId");
-//
-//                                    for (int j = 0; j < jsonArraynameandid.length(); j++) {
-//
-//                                        JSONObject jsonObjs1 = (JSONObject) jsonArraynameandid
-//                                                .opt(j);
-//
-//                                        JsonFriendList jp = new JsonFriendList();
-//                                        try {
-//                                            jp.parsingJson(jsonObjs1);
-//                                        } catch (Exception e) {
-//                                            e.printStackTrace();
-//                                        }
-//                                        listNameid.add(jp);
-//                                    }
-//
-//                                    labellist.put(jsonObjs.optString("label"),
-//                                            listNameid);
-//                                    listNameid = new ArrayList<JsonFriendList>();
-//
-//                                }
-//                            } catch (JSONException e) {
-//                                e.printStackTrace();
-//                            }
-//                            if (jsonTrans.size() == 0) {
-//                                listNameid = new ArrayList<JsonFriendList>();
-//                                JsonFriendList jps = new JsonFriendList();
-////                                jps.id = "";
-////                                jps.name = "";
-//                                listNameid.add(jps);
-//                                label.add(search.getText().toString());
-//
-//                                labellist.put(search.getText().toString(),
-//                                        listNameid);
-//
-//                            } else {
-//                                listNameid = new ArrayList<JsonFriendList>();
-//                                for (int i = 0; i < jsonTrans.size(); i++) {
-//                                    JsonFriendList jps = new JsonFriendList();
-//                                    jps.id = jsonTrans.get(i).id;
-////                                    jps.name = jsonTrans.get(i).name;
-//                                    listNameid.add(jps);
-//                                }
-//                                Log.e("123", listNameid + "");
-//                                label.add(search.getText().toString());
-//                                labellist.put(search.getText().toString(),
-//                                        listNameid);
-//                                Log.e("123", labellist + "");
-//                                Log.e("123", labellist + "");
-//                            }
-//
-//                            JSONObject allData = new JSONObject();// 建立最外面的节点对象
-//                            JSONArray all = new JSONArray();
-//                            JSONArray sing = new JSONArray();// 定义数组
-//                            List<JsonFriendList> jsonLabelListData = new ArrayList<JsonFriendList>();
-//
-//                            try {
-//                                for (int i = 0; i < label.size(); i++) {
-//                                    jsonLabelListData = labellist.get(label.get(i));
-//                                    for (int x = 0; x < jsonLabelListData.size(); x++) {// 将数组内容配置到相应的节点
-//                                        JSONObject temp = new JSONObject();// JSONObject包装数据,而JSONArray包含多个JSONObject
-//                                        try {
-//                                            // temp.put("labelName",
-//                                            // search.getText().toString()); //
-//                                            // JSONObject是按照key:value形式保存
-//
-////                                            temp.put("name",
-////                                                    jsonLabelListData.get(x).name);
-//                                            temp.put("id",
-//                                                    jsonLabelListData.get(x).id);
-//                                        } catch (JSONException e) {
-//                                            e.printStackTrace();
-//                                        }
-//
-//                                        sing.put(temp);// 保存多个JSONObject
-//                                    }
-//
-//                                    allData.put("labelnameAndId", sing);// 把JSONArray用最外面JSONObject包装起来
-//                                    allData.put("label", label.get(i));
-//                                    all.put(allData);
-//                                    allData = new JSONObject();
-//                                    sing = new JSONArray();// 定义数组
-//                                }
-//
-//                            } catch (JSONException e) {
-//                                e.printStackTrace();
-//                            }
-//
-//                            PrintWriter out = null;
-//                            try {
-//                                out = new PrintWriter(new FileOutputStream(file));
-//                                out.print(all.toString());// 将数据变为字符串后保存
-//                            } catch (FileNotFoundException e) {
-//                                e.printStackTrace();
-//                            } finally {
-//                                if (out != null) {
-//                                    out.close();// 关闭输出
-//                                }
-//                            }
-//
-//                        }
-//                        // 这是修改数据，需要先传入定位的数据，然后在修改这条数据，并保存在file中
-//
-//                        else {
-//                            try {
-//                                jsonstra = readSDFile(labelstr);
-//                            } catch (IOException e) {
-//                                e.printStackTrace();
-//                            }
-//
-//                            try {
-//                                JSONArray jsonArray = new JSONArray(jsonstra);
-//                                for (int i = 0; i < jsonArray.length(); i++) {
-//                                    JSONObject jsonObjs = (JSONObject) jsonArray
-//                                            .opt(i);
-//                                    // 自定义json的bean文件
-//
-//                                    label.add(jsonObjs.optString("label"));
-//
-//                                    JSONArray jsonArraynameandid = jsonObjs
-//                                            .getJSONArray("labelnameAndId");
-//
-//                                    for (int j = 0; j < jsonArraynameandid.length(); j++) {
-//
-//                                        JSONObject jsonObjs1 = (JSONObject) jsonArraynameandid
-//                                                .opt(j);
-//
-//                                        JsonFriendList jp = new JsonFriendList();
-//                                        try {
-//                                            jp.parsingJson(jsonObjs1);
-//                                        } catch (Exception e) {
-//                                            e.printStackTrace();
-//                                        }
-//                                        listNameid.add(jp);
-//                                    }
-//
-//                                    labellist.put(jsonObjs.optString("label"),
-//                                            listNameid);
-//
-//                                }
-//                            } catch (JSONException e) {
-//                                e.printStackTrace();
-//                            }
-////                            Set keyset = labellist.keySet();
-////                            for (Object labename : keyset) {
-////                                if (label.get(labelindex).equals(labename)) {
-////                                    Toast.makeText(NewLabelActivity.this,"123",Toast.LENGTH_SHORT).show();
-////
-////                                }
-////                            }
-//
-//
-////                            for (int i = 0; i < listNameid.size(); i++) {
-////                                if (label.get(labelindex).equals(labellist.get(labelname).get(i).name)) {
-////
-////                                }
-////                            }
-////                            for (int i = 0; i < ; i++) {
-////
-////                            }
-//
-//
-//                        }
-//
-//                    }
                 } else {
                     Toast.makeText(NewLabelActivity.this, "请填写一个标签名~",
                             Toast.LENGTH_SHORT).show();
@@ -638,7 +355,7 @@ public class NewLabelActivity extends BaseActivity implements OnItemClickListene
             e.printStackTrace();
         }
 
-        final String tagName = search.getText().toString();
+        final String tagName = editNewLabel.getText().toString();
         JSONObject jsono = new JSONObject();
         final JSONArray jsonarray = new JSONArray();
         for (int i = 0; i < jsonData.size(); i++) {

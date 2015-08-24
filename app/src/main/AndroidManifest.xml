@@ -94,6 +94,7 @@
         <activity android:name="com.fifteentec.yoko.friends.NewFriendsListActivity"></activity>
         <activity android:name="com.fifteentec.yoko.friends.NewLabelActivity"></activity>
         <activity android:name="com.fifteentec.yoko.friends.NewLabelGvAddActivity"></activity>
+        <activity android:name="com.fifteentec.yoko.SetupMyInfoActivity"></activity>
 
 
         <service
