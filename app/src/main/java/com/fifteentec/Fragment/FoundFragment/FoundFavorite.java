@@ -20,6 +20,7 @@ import com.API.APIJsonCallbackResponse;
 import com.API.APIUrl;
 import com.API.APIUserServer;
 import com.android.volley.RequestQueue;
+import com.fifteentec.Component.FoundItems.PullToRefresh;
 import com.fifteentec.Component.Parser.FoundDataParser;
 import com.fifteentec.FoundAdapter.FavoriteAdapter;
 import com.fifteentec.Component.FoundItems.FavoriteBrief;
@@ -44,13 +45,35 @@ public class FoundFavorite extends Fragment {
     private FoundFavoriteItem favoriteItem;
     RequestQueue mRequestQueue;
     BaseActivity baseActivity;
+    PullToRefresh refreshableView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         View view = inflater.inflate(R.layout.fragment_found_favorite, null);
+        favorites = (ListView) view.findViewById(R.id.listView_favorite);
+        refreshableView = (PullToRefresh) view.findViewById(R.id.refreshable_view3);
+        initDBfunctions();
         initListView(view);
+        refreshableView.setOnRefreshListener(new PullToRefresh.PullToRefreshListener() {
+            @Override
+            public void onRefresh() {
+                new APIUserServer.JsonGet(APIUrl.URL_JOINED_EVENTS_GET, null, null, new APIJsonCallbackResponse() {
+                    @Override
+                    public void run() {
+                        JSONObject object = this.getResponse();
+                        Log.e("object", object.toString());
+                        eventList = FoundDataParser.parseFavoriteBriefInfo(object);
+                        if (eventList != null) {
+                            favoriteAdapter.setList(eventList);
+                            favoriteAdapter.notifyDataSetChanged();
+                        }
+                    }
+                }, mRequestQueue, null).send();
+                refreshableView.finishRefreshing();
+            }
+        }, 0);
 
         return view;
     }
@@ -62,17 +85,17 @@ public class FoundFavorite extends Fragment {
         Log.e("initial DB", "get into function");
 
 
-        new APIUserServer.JsonGet(APIUrl.URL_EVENTS_GET, null, null, new APIJsonCallbackResponse() {
+        new APIUserServer.JsonGet(APIUrl.URL_JOINED_EVENTS_GET, null, null, new APIJsonCallbackResponse() {
             @Override
             public void run() {
                 JSONObject object = this.getResponse();
                 Log.e("Event object", object.toString());
 
                 eventList = FoundDataParser.parseFavoriteBriefInfo(object);
-//                if(groupList!=null){
-//                    joinedAdapter = new GroupAdapter(getActivity().getLayoutInflater(),groupList,true);
-//                    mListView.setAdapter(joinedAdapter);
-//                }
+                if(eventList!=null){
+                    favoriteAdapter = new FavoriteAdapter(getActivity().getLayoutInflater(),eventList);
+                    favorites.setAdapter(favoriteAdapter);
+                }
             }
         }, mRequestQueue, null).send();
     }
@@ -112,10 +135,10 @@ public class FoundFavorite extends Fragment {
     }
 
     private void initListView(View parentView){
-        createEventList(5, eventList);
-        favorites = (ListView) parentView.findViewById(R.id.listView_favorite);
-        favoriteAdapter = new FavoriteAdapter(getActivity().getLayoutInflater(),eventList);
-        favorites.setAdapter(favoriteAdapter);
+        //createEventList(5, eventList);
+
+//        favoriteAdapter = new FavoriteAdapter(getActivity().getLayoutInflater(),eventList);
+//        favorites.setAdapter(favoriteAdapter);
 
         favorites.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @SuppressLint("NewApi")

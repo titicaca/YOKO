@@ -61,6 +61,10 @@ public class GroupAdapter extends BaseAdapter{
         return 0;
     }
 
+    public void setList(List<GroupBrief> groupData){
+        this.groupList = groupData;
+    }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ListItemView item = null;

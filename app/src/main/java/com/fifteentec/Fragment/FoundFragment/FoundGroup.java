@@ -21,6 +21,7 @@ import com.API.APIJsonCallbackResponse;
 import com.API.APIUrl;
 import com.API.APIUserServer;
 import com.android.volley.RequestQueue;
+import com.fifteentec.Component.FoundItems.PullToRefresh;
 import com.fifteentec.Component.Parser.FoundDataParser;
 import com.fifteentec.FoundAdapter.GroupAdapter;
 import com.fifteentec.Component.FoundItems.GroupBrief;
@@ -49,6 +50,7 @@ public class FoundGroup extends Fragment {
     RequestQueue mRequestQueue;
     Button joined_btn;
     Button reco_btn;
+    PullToRefresh refreshableView;
 
 
     @Override
@@ -56,6 +58,7 @@ public class FoundGroup extends Fragment {
                              Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         View view = inflater.inflate(R.layout.fragment_found_group, null);
+        mListView = (ListView) view.findViewById(R.id.listView1);
 
         initListView(view);
         initDBfunctions();
@@ -65,6 +68,7 @@ public class FoundGroup extends Fragment {
 
         joined_btn = (Button)view.findViewById(R.id.joined_btn);
         reco_btn = (Button)view.findViewById(R.id.reco_btn);
+        refreshableView = (PullToRefresh) view.findViewById(R.id.refreshable_view);
 
         joined_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,6 +85,27 @@ public class FoundGroup extends Fragment {
                 mListView.setAdapter(recommendedAdapter);
             }
         });
+
+        refreshableView.setOnRefreshListener(new PullToRefresh.PullToRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if (mListView.getAdapter() == joinedAdapter) {
+                    new APIUserServer.JsonGet(APIUrl.URL_JOINED_GROUP_GET,null , null, new APIJsonCallbackResponse() {
+                        @Override
+                        public void run() {
+                            JSONObject object=this.getResponse();
+                            Log.e("object", object.toString());
+                            groupList = FoundDataParser.parseGroupBriefInfo(object);
+                            if(groupList!=null) {
+                                joinedAdapter.setList(groupList);
+                                joinedAdapter.notifyDataSetChanged();
+                            }
+                        }
+                    }, mRequestQueue, null).send();
+                }
+                refreshableView.finishRefreshing();
+            }
+        }, 0);
         return view;
     }
     private void initDBfunctions()
@@ -96,10 +121,9 @@ public class FoundGroup extends Fragment {
             public void run() {
                 JSONObject object=this.getResponse();
                 Log.e("object", object.toString());
-
                 groupList = FoundDataParser.parseGroupBriefInfo(object);
-                if(groupList!=null){
-                    joinedAdapter = new GroupAdapter(getActivity().getLayoutInflater(),groupList,true);
+                if(groupList!=null) {
+                    joinedAdapter = new GroupAdapter(getActivity().getLayoutInflater(), groupList, true);
                     mListView.setAdapter(joinedAdapter);
                 }
             }
@@ -153,10 +177,9 @@ public class FoundGroup extends Fragment {
     }
 
     private void initListView(View parentView){
-        mListView = (ListView) parentView.findViewById(R.id.listView1);
- //       joinedAdapter = new GroupAdapter(getActivity().getLayoutInflater(),groupList,true);
- //       recommendedAdapter = new GroupAdapter(getActivity().getLayoutInflater(),groupListR,false);
-  //      mListView.setAdapter(joinedAdapter);
+//        joinedAdapter = new GroupAdapter(getActivity().getLayoutInflater(),groupList,true);
+        recommendedAdapter = new GroupAdapter(getActivity().getLayoutInflater(),groupListR,false);
+//        mListView.setAdapter(joinedAdapter);
 
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @SuppressLint("NewApi")

@@ -55,6 +55,9 @@ public class EventAdapter extends BaseAdapter{
         return 0;
     }
 
+    public void setList(List<EventBrief> groupData){
+        this.eventList = groupData;
+    }
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ListItemView item = null;

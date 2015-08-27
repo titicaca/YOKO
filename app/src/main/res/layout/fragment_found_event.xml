@@ -4,7 +4,15 @@
     android:layout_height="match_parent"
     android:gravity="top"
     android:orientation="vertical" >
-
+    <com.fifteentec.Component.FoundItems.PullToRefresh
+        android:id="@+id/refreshable_view2"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:paddingTop="10dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingBottom="10dp"
+        >
     <ListView
         android:id="@+id/listView_event"
         android:layout_width="fill_parent"
@@ -12,5 +20,5 @@
         android:layout_marginRight="20dp"
         android:layout_marginLeft="20dp">
     </ListView>
-
+    </com.fifteentec.Component.FoundItems.PullToRefresh>
 </LinearLayout>

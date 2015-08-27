@@ -56,14 +56,19 @@
             android:text="@string/recommended"
             />
     </LinearLayout>
-
-    <ListView
-        android:id="@+id/listView1"
+    <com.fifteentec.Component.FoundItems.PullToRefresh
+        android:id="@+id/refreshable_view"
         android:layout_width="fill_parent"
-        android:layout_height="match_parent"
+        android:layout_height="fill_parent"
         android:paddingTop="10dp"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
-        android:paddingBottom="10dp">
-    </ListView>
+        android:paddingBottom="10dp"
+        >
+        <ListView
+            android:id="@+id/listView1"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent">
+        </ListView>
+    </com.fifteentec.Component.FoundItems.PullToRefresh>
 </LinearLayout>

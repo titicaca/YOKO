@@ -16,6 +16,7 @@ import com.API.APIJsonCallbackResponse;
 import com.API.APIUrl;
 import com.API.APIUserServer;
 import com.android.volley.RequestQueue;
+import com.fifteentec.Component.FoundItems.PullToRefresh;
 import com.fifteentec.Component.Parser.FoundDataParser;
 import com.fifteentec.FoundAdapter.EventAdapter;
 import com.fifteentec.Component.FoundItems.EventBrief;
@@ -37,6 +38,7 @@ public class FoundEvent extends Fragment {
     private FoundEventItem eventItem;
     RequestQueue mRequestQueue;
     BaseActivity baseActivity;
+    PullToRefresh refreshableView;
 
     private FragmentManager mFragmentManager;
         @Override
@@ -44,8 +46,29 @@ public class FoundEvent extends Fragment {
                                  Bundle savedInstanceState) {
             // TODO Auto-generated method stub
             View view = inflater.inflate(R.layout.fragment_found_event, null);
+            events = (ListView) view.findViewById(R.id.listView_event);
+            refreshableView = (PullToRefresh) view.findViewById(R.id.refreshable_view2);
             initDBfunctions();
             initListView(view);
+
+            refreshableView.setOnRefreshListener(new PullToRefresh.PullToRefreshListener() {
+                @Override
+                public void onRefresh() {
+                    new APIUserServer.JsonGet(APIUrl.URL_EVENTS_GET, null, null, new APIJsonCallbackResponse() {
+                        @Override
+                        public void run() {
+                            JSONObject object = this.getResponse();
+                            Log.e("object", object.toString());
+                            eventList = FoundDataParser.parseEventBriefInfo(object);
+                            if (eventList != null) {
+                                eventAdapter.setList(eventList);
+                                eventAdapter.notifyDataSetChanged();
+                            }
+                        }
+                    }, mRequestQueue, null).send();
+                    refreshableView.finishRefreshing();
+                }
+            }, 0);
 
             return view;
         }
@@ -64,15 +87,17 @@ public class FoundEvent extends Fragment {
                 Log.e("Event object", object.toString());
 
                 eventList = FoundDataParser.parseEventBriefInfo(object);
-                eventAdapter = new EventAdapter(getActivity().getLayoutInflater(),eventList);
-                events.setAdapter(eventAdapter);
+                if(eventList!=null){
+                    eventAdapter = new EventAdapter(getActivity().getLayoutInflater(),eventList);
+                    events.setAdapter(eventAdapter);
+                }
             }
         }, mRequestQueue, null).send();
     }
 
         private void initListView(View parentView){
             //createEventList(5,eventList);
-            events = (ListView) parentView.findViewById(R.id.listView_event);
+
             //eventAdapter = new EventAdapter(getActivity().getLayoutInflater(),eventList);
             //events.setAdapter(eventAdapter);
 
