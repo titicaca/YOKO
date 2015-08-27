@@ -101,7 +101,7 @@ public class TableEventInvitation extends DBTable {
             cv.put(DBConstants.COLUMN_EVENT_INVITATION_MSG, eventInvitationRecord.msg);
             cv.put(DBConstants.COLUMN_EVENT_INVITATION_TYPE, eventInvitationRecord.type);
             cv.put(DBConstants.COLUMN_EVENT_INVITATION_EVENTID, eventInvitationRecord.eventId);
-            cv.put(DBConstants.COLUMN_EVENT_INVITATION_CREATETIME, System.currentTimeMillis());
+            cv.put(DBConstants.COLUMN_EVENT_INVITATION_CREATEDTIME, System.currentTimeMillis());
 
             rid = db.insert(tableName, null, cv);
             db.setTransactionSuccessful();
@@ -123,7 +123,7 @@ public class TableEventInvitation extends DBTable {
             cs = db.query(tableName, null,
                     DBConstants.COLUMN_EVENT_INVITATION_UID + " = ?",
                     new String[]{String.valueOf(uid)},
-                    null, null, DBConstants.COLUMN_EVENT_INVITATION_CREATETIME + "DESC");
+                    null, null, DBConstants.COLUMN_EVENT_INVITATION_CREATEDTIME + "DESC");
             eventInvitationRecords = cursorToList(cs);
         } catch (Exception e) {
             e.printStackTrace();
@@ -142,7 +142,7 @@ public class TableEventInvitation extends DBTable {
             cs = db.query(tableName, null,
                     DBConstants.COLUMN_EVENT_INVITATION_FUID + " = ?",
                     new String[]{String.valueOf(fuid)},
-                    null, null, DBConstants.COLUMN_EVENT_INVITATION_CREATETIME + "DESC");
+                    null, null, DBConstants.COLUMN_EVENT_INVITATION_CREATEDTIME + "DESC");
             eventInvitationRecords = cursorToList(cs);
         } catch (Exception e) {
             e.printStackTrace();
@@ -162,7 +162,7 @@ public class TableEventInvitation extends DBTable {
         int column_index_msg = cs.getColumnIndex(DBConstants.COLUMN_EVENT_INVITATION_MSG);
         int column_index_type = cs.getColumnIndex(DBConstants.COLUMN_EVENT_INVITATION_TYPE);
         int column_index_eventId = cs.getColumnIndex(DBConstants.COLUMN_EVENT_INVITATION_EVENTID);
-        int column_index_createtime = cs.getColumnIndex(DBConstants.COLUMN_EVENT_INVITATION_CREATETIME);
+        int column_index_createdtime = cs.getColumnIndex(DBConstants.COLUMN_EVENT_INVITATION_CREATEDTIME);
 
         try {
             while (cs.moveToNext()) {
@@ -173,7 +173,7 @@ public class TableEventInvitation extends DBTable {
                 eventInvitationRecord.msg = cs.getString(column_index_msg);
                 eventInvitationRecord.type = cs.getInt(column_index_type);
                 eventInvitationRecord.eventId = cs.getLong(column_index_eventId);
-                eventInvitationRecord.createtime = cs.getLong(column_index_createtime);
+                eventInvitationRecord.createdtime = cs.getLong(column_index_createdtime);
                 eventInvitationRecords.add(eventInvitationRecord);
             }
         } catch (Exception e) {

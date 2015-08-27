@@ -72,7 +72,7 @@ public class TableFriendInvitation extends DBTable {
             cv.put(DBConstants.COLUMN_FRIEND_INVITATION_UID, friendInvitationRecord.uid);
             cv.put(DBConstants.COLUMN_FRIEND_INVITATION_FUID, friendInvitationRecord.fuid);
             cv.put(DBConstants.COLUMN_FRIEND_INVITATION_MSG, friendInvitationRecord.msg);
-            cv.put(DBConstants.COLUMN_FRIEND_INVITATION_CREATETIME, System.currentTimeMillis());
+            cv.put(DBConstants.COLUMN_FRIEND_INVITATION_CREATEDTIME, System.currentTimeMillis());
 
             rid = db.insert(tableName, null, cv);
             db.setTransactionSuccessful();
@@ -94,7 +94,7 @@ public class TableFriendInvitation extends DBTable {
             cs = db.query(tableName, null,
                     DBConstants.COLUMN_FRIEND_INVITATION_FUID + " = ?",
                     new String[]{String.valueOf(fuid)},
-                    null, null, DBConstants.COLUMN_FRIEND_INVITATION_CREATETIME + " DESC ");
+                    null, null, DBConstants.COLUMN_FRIEND_INVITATION_CREATEDTIME + " DESC ");
             friendInvitationRecords = cursorToList(cs);
         } catch (Exception e) {
             e.printStackTrace();
@@ -112,7 +112,7 @@ public class TableFriendInvitation extends DBTable {
         int column_index_uid = cs.getColumnIndex(DBConstants.COLUMN_FRIEND_INVITATION_UID);
         int column_index_fuid = cs.getColumnIndex(DBConstants.COLUMN_FRIEND_INVITATION_FUID);
         int column_index_msg = cs.getColumnIndex(DBConstants.COLUMN_FRIEND_INVITATION_MSG);
-        int column_index_createtime = cs.getColumnIndex(DBConstants.COLUMN_FRIEND_INVITATION_CREATETIME);
+        int column_index_createdtime = cs.getColumnIndex(DBConstants.COLUMN_FRIEND_INVITATION_CREATEDTIME);
 
         try {
             while (cs.moveToNext()) {
@@ -121,7 +121,7 @@ public class TableFriendInvitation extends DBTable {
                 friendInvitationRecord.uid = cs.getLong(column_index_uid);
                 friendInvitationRecord.fuid = cs.getLong(column_index_fuid);
                 friendInvitationRecord.msg = cs.getString(column_index_msg);
-                friendInvitationRecord.createtime = cs.getLong(column_index_createtime);
+                friendInvitationRecord.createdtime = cs.getLong(column_index_createdtime);
                 friendInvitationRecords.add(friendInvitationRecord);
             }
         } catch (Exception e) {
@@ -129,5 +129,28 @@ public class TableFriendInvitation extends DBTable {
         }
 
         return friendInvitationRecords;
+    }
+
+    public void syncUser(final long uid, List<FriendInvitationRecord> friendInvitationRecords) {
+        db.beginTransaction();
+
+        try {
+            db.delete(tableName,
+                    DBConstants.COLUMN_FRIEND_INVITATION_UID + " = ?" + " OR " +
+                    DBConstants.COLUMN_FRIEND_INVITATION_FUID + " = ?",
+                    new String[]{String.valueOf(uid), String.valueOf(uid)});
+
+            for (FriendInvitationRecord friendInvitationRecord : friendInvitationRecords) {
+                db.execSQL("INSERT OR IGNORE INTO " + tableName + " VALUES(NULL, ?, ?, ?, ?)",
+                        new Object[]{friendInvitationRecord.uid, friendInvitationRecord.fuid, friendInvitationRecord.msg, friendInvitationRecord.createdtime}
+                );
+            }
+
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.endTransaction();
+        }
     }
 }

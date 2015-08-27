@@ -12,7 +12,7 @@ public class EventInvitationRecord extends DBRecord{
     public String msg;
     public int type;
     public long eventId;
-    public long createtime;
+    public long createdtime;
 
     public EventInvitationRecord() {
 
@@ -25,7 +25,7 @@ public class EventInvitationRecord extends DBRecord{
         this.msg = eventInvitationRecord.msg;
         this.type = eventInvitationRecord.type;
         this.eventId = eventInvitationRecord.eventId;
-        this.createtime = eventInvitationRecord.createtime;
+        this.createdtime = eventInvitationRecord.createdtime;
     }
 
     public EventInvitationRecord(long uid, long fuid, String msg, int type, long eventId) {

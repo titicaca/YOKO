@@ -13,6 +13,7 @@ import com.API.APIKey;
 import com.API.APIServer;
 import com.API.APIUrl;
 import com.API.APIUserServer;
+import com.Service.DataSyncService;
 import com.fifteentec.yoko.BaseActivity;
 import com.fifteentec.yoko.LoginActivity;
 import com.fifteentec.yoko.TabActivity;
@@ -628,8 +629,10 @@ public class UserServer {
                 }
 
                 //上报服务器后与服务器同步用户数据
-                BaseActivity.getDataSyncService().syncFriends(UserServer.getInstance().getUserid());
-                BaseActivity.getDataSyncService().getEvents(UserServer.getInstance().getUserid());
+                DataSyncService dataSyncService = BaseActivity.getDataSyncService();
+                dataSyncService.syncFriends(UserServer.getInstance().getUserid());
+                dataSyncService.syncFriendInvitations(UserServer.getInstance().getUserid());
+                dataSyncService.getEvents(UserServer.getInstance().getUserid());
             }
         }, activity.getRequestQueue(), null).send();
 

@@ -7,7 +7,7 @@ public class FriendInvitationRecord extends DBRecord{
     public long uid;
     public long fuid;
     public String msg;
-    public long createtime;
+    public long createdtime;
 
     public FriendInvitationRecord() {
 
@@ -18,7 +18,7 @@ public class FriendInvitationRecord extends DBRecord{
         this.uid = friendInvitationRecord.uid;
         this.fuid = friendInvitationRecord.fuid;
         this.msg = friendInvitationRecord.msg;
-        this.createtime = friendInvitationRecord.createtime;
+        this.createdtime = friendInvitationRecord.createdtime;
     }
 
     public FriendInvitationRecord(long uid, long fuid, String msg) {

@@ -1,4 +1,4 @@
-package com.fifteentec.FoundFragment;
+package com.fifteentec.Fragment.FoundFragment;
 
 
 import android.annotation.SuppressLint;
@@ -13,7 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.fifteentec.FoundAdapter.InvitingAdapter;
-import com.fifteentec.FoundItems.InvitingBrief;
+import com.fifteentec.Component.FoundItems.InvitingBrief;
 import com.fifteentec.yoko.R;
 
 import java.util.ArrayList;

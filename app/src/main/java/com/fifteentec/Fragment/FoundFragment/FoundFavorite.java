@@ -1,5 +1,4 @@
-package com.fifteentec.FoundFragment;
-
+package com.fifteentec.Fragment.FoundFragment;
 
 import android.annotation.SuppressLint;
 import android.app.Fragment;
@@ -21,9 +20,9 @@ import com.API.APIJsonCallbackResponse;
 import com.API.APIUrl;
 import com.API.APIUserServer;
 import com.android.volley.RequestQueue;
-import com.fifteentec.Component.Parser.DataSyncServerParser;
+import com.fifteentec.Component.Parser.FoundDataParser;
 import com.fifteentec.FoundAdapter.FavoriteAdapter;
-import com.fifteentec.FoundItems.FavoriteBrief;
+import com.fifteentec.Component.FoundItems.FavoriteBrief;
 import com.fifteentec.yoko.BaseActivity;
 import com.fifteentec.yoko.R;
 
@@ -69,7 +68,7 @@ public class FoundFavorite extends Fragment {
                 JSONObject object = this.getResponse();
                 Log.e("Event object", object.toString());
 
-                eventList = DataSyncServerParser.parseFavoriteBriefInfo(object);
+                eventList = FoundDataParser.parseFavoriteBriefInfo(object);
 //                if(groupList!=null){
 //                    joinedAdapter = new GroupAdapter(getActivity().getLayoutInflater(),groupList,true);
 //                    mListView.setAdapter(joinedAdapter);

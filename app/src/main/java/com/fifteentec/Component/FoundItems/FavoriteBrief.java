@@ -1,9 +1,9 @@
-package com.fifteentec.FoundItems;
+package com.fifteentec.Component.FoundItems;
 
 /**
  * Created by cj on 2015/8/12.
  */
-public class EventBrief {
+public class FavoriteBrief {
     private String groupName="";
     private String eventIntro="";
     private String logoUri="";

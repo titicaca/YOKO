@@ -1,9 +1,9 @@
-package com.fifteentec.FoundItems;
+package com.fifteentec.Component.FoundItems;
 
 /**
  * Created by cj on 2015/8/12.
  */
-public class InvitingBrief {
+public class InvitedBrief {
     private String friendName="";
     private String invitedContent="";
     private String logoUri="";

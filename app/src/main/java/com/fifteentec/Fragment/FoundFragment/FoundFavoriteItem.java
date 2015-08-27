@@ -1,4 +1,4 @@
-package com.fifteentec.FoundFragment;
+package com.fifteentec.Fragment.FoundFragment;
 
 
 import android.app.Fragment;
@@ -18,24 +18,35 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 /**
  * Created by cj on 2015/8/7.
  */
-public class FoundGroupItem extends Fragment {
+public class FoundFavoriteItem extends Fragment {
     private ImageView logo;
     private TextView name;
+    private TextView time;
+    private TextView location;
     private TextView intro;
+    private TextView tags;
+    private ImageView event;
     protected ImageLoader imageLoader = ImageLoader.getInstance();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
         // TODO Auto-generated method stub
-        View view = inflater.inflate(R.layout.found_group_item_detail, null);
-        logo = (ImageView)view.findViewById(R.id.group_detail_logo);
-        intro = (TextView)view.findViewById(R.id.intro_content);
-        name = (TextView)view.findViewById(R.id.group_detail_name);
+        View view = inflater.inflate(R.layout.found_favorite_item_detail, null);
+        logo = (ImageView)view.findViewById(R.id.group_detail_event_logo2);
+        intro = (TextView)view.findViewById(R.id.event_detail_content2);
+        name = (TextView)view.findViewById(R.id.group_detail_event_name2);
+        time = (TextView)view.findViewById(R.id.event_set_time2);
+        location = (TextView)view.findViewById(R.id.event_set_location2);
 
         name.setText(getArguments().getString("name"));
         intro.setText(getArguments().getString("intro"));
+        time.setText(getArguments().getString("time"));
+        location.setText(getArguments().getString("location"));
 
+        if(null!=getArguments().getString("tags")&&!"".equals(getArguments().getString("tags"))){
+            tags.setText("");
+        }
         if(null!=getArguments().getString("intro")&&!"".equals(getArguments().getString("intro"))){
             imageLoader.displayImage(getArguments().getString("intro"),logo);
         }

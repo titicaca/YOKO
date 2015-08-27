@@ -1,4 +1,4 @@
-package com.fifteentec.FoundItems;
+package com.fifteentec.Component.FoundItems;
 
 import android.content.Context;
 import android.graphics.Bitmap;

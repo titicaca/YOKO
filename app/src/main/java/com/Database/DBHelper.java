@@ -84,7 +84,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 DBConstants.COLUMN_FRIEND_INVITATION_UID + " INT8 NOT NULL, " +
                 DBConstants.COLUMN_FRIEND_INVITATION_FUID + " INT8, " +
                 DBConstants.COLUMN_FRIEND_INVITATION_MSG + " CHAR(255), " +
-                DBConstants.COLUMN_FRIEND_INVITATION_CREATETIME + " INT8" +
+                DBConstants.COLUMN_FRIEND_INVITATION_CREATEDTIME + " INT8" +
                 ")");
 
         /**
@@ -104,7 +104,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 DBConstants.COLUMN_EVENT_INVITATION_MSG + " CHAR(255), " +
                 DBConstants.COLUMN_EVENT_INVITATION_TYPE + " INT1, " +
                 DBConstants.COLUMN_EVENT_INVITATION_EVENTID + " INT8, " +
-                DBConstants.COLUMN_EVENT_INVITATION_CREATETIME + "INT8" +
+                DBConstants.COLUMN_EVENT_INVITATION_CREATEDTIME + "INT8" +
                 ")");
 
         /**
