@@ -25,6 +25,8 @@ import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.core.decode.BaseImageDecoder;
 import com.nostra13.universalimageloader.core.display.SimpleBitmapDisplayer;
 import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
+import com.qiniu.android.storage.UploadManager;
+import com.qiniu.android.storage.Zone;
 
 import java.io.File;
 
@@ -32,6 +34,8 @@ public class YOKOApplication extends Application {
     private static Intent dataSyncServiceIntent;
     public final static String ApplicationName = "YOKO";
     private final static String BaiduPushApiKey = "DktSnpqB2wljcjOeIYW4f2BI";
+
+    private static UploadManager uploadManager;
 
     @Override
     public void onCreate() {
@@ -45,6 +49,23 @@ public class YOKOApplication extends Application {
         UserServer.getInstance().setSharedPreferences(sp);
         UserServer.getInstance().loadSharedPreferences();
         UserServer.getInstance().setApplication(this);
+
+        /**
+         * 七牛SDK的configuration
+         */
+        com.qiniu.android.storage.Configuration qiniuConfiguration = new com.qiniu.android.storage.Configuration.Builder()
+                .chunkSize(256 * 1024)  //分片上传时，每片的大小。 默认 256K
+                .putThreshhold(512 * 1024)  // 启用分片上传阀值。默认 512K
+                .connectTimeout(10) // 链接超时。默认 10秒
+                .responseTimeout(60) // 服务器响应超时。默认 60秒
+                //.recorder(recorder)  // recorder 分片上传时，已上传片记录器。默认 null
+                //.recorder(recorder, keyGen)  // keyGen 分片上传时，生成标识符，用于片记录器区分是那个文件的上传记录
+                .zone(Zone.zone0) // 设置区域，指定不同区域的上传域名、备用域名、备用IP。默认 Zone.zone0
+                .build();
+        /**
+         * 初始化七牛上传服务器
+         */
+        uploadManager = new UploadManager(qiniuConfiguration);
 
         /**
          * 设定universalImageLoader的configuration
@@ -123,4 +144,8 @@ public class YOKOApplication extends Application {
             .imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2)
             .bitmapConfig(Bitmap.Config.ARGB_8888)
             .build();
+
+    public static UploadManager getQiniuUploadManager() {
+        return uploadManager;
+    }
 }
