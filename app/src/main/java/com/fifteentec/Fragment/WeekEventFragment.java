@@ -6,11 +6,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.Database.EventRecord;
+import com.fifteentec.Component.calendar.CalendarView;
 import com.fifteentec.Component.calendar.WeekEventView;
+import com.fifteentec.yoko.R;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 
 public class WeekEventFragment extends Fragment {
@@ -21,6 +26,7 @@ public class WeekEventFragment extends Fragment {
 
     private WeekViewFragmentLinstener mWeekViewFragmentLinstener;
     private WeekEventView weekEventView;
+    private CalendarView calendarView;
 
     public interface WeekViewFragmentLinstener{
         void CheckExist(long rid);
@@ -67,7 +73,9 @@ public class WeekEventFragment extends Fragment {
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        weekEventView = WeekEventView.newInstance(getActivity(),mCurDate);
+        View view = inflater.inflate(R.layout.fragment_calendar_weekevent,container,false);
+        weekEventView = (WeekEventView)view.findViewById(R.id.id_week_event);
+        weekEventView.initView(mCurDate);
         weekEventView.setmWeekViewListener(new WeekEventView.WeekViewListener() {
             @Override
             public void CheckExistItem(long rid) {
@@ -76,9 +84,24 @@ public class WeekEventFragment extends Fragment {
 
             @Override
             public void CreatRecord(int Type, EventRecord eventRecord) {
-                mWeekViewFragmentLinstener.CreateRecord(Type,eventRecord);
+                mWeekViewFragmentLinstener.CreateRecord(Type, eventRecord);
             }
         });
-        return weekEventView;
+        calendarView = (CalendarView)view.findViewById(R.id.id_cal_view);
+        calendarView.initView(mCurDate);
+        calendarView.setmCalendarListener(new CalendarView.CalendarListener() {
+            @Override
+            public void UpdateTime(GregorianCalendar time) {
+                //mDate.UpdateCur(time);
+            }
+
+            @Override
+            public void ShowDayDetail(GregorianCalendar time) {
+                String text = "Year:" + time.get(Calendar.YEAR) + " Month:" + time.get(Calendar.MONTH) + " Day:" + time.get(Calendar.DAY_OF_MONTH);
+                Toast.makeText(getActivity(), text, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        return view;
     }
 }

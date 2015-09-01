@@ -102,12 +102,12 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
 //                    mFmTrans.show(tf);
 //                }
 
-                if (friendsFragment == null) {
-                    friendsFragment = new FriendsFragment();
-                     mFmTrans.add(R.id.id_content, friendsFragment, "friend");
-                }else {
-                    mFmTrans.show( friendsFragment);
-                }
+     //           if (friendsFragment == null) {
+       //             friendsFragment = new FriendsFragment();
+         //            mFmTrans.add(R.id.id_content, friendsFragment, "friend");
+           //     }else {
+             //       mFmTrans.show( friendsFragment);
+               // }
 //                    mFmTrans.show(friendsFragment);
 
 
@@ -118,12 +118,12 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
                         Toast.LENGTH_SHORT);
                 c.setDuration(Toast.LENGTH_SHORT);
                 c.show();
-                if (myPageFragment == null) {
+               /* if (myPageFragment == null) {
                     myPageFragment = new MyPageFragment();
                     mFmTrans.add(R.id.id_content, myPageFragment, "home");
                 } else {
                     mFmTrans.show(myPageFragment);
-                }
+                }*/
                 break;
             default:
                 Log.e("Error", "Wrong TabActivity Selector");
