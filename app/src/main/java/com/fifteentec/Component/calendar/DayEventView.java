@@ -2,8 +2,11 @@ package com.fifteentec.Component.calendar;
 
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.GestureDetector;
@@ -17,6 +20,7 @@ import android.widget.Toast;
 
 import com.Database.EventRecord;
 import com.fifteentec.yoko.BaseActivity;
+import com.fifteentec.yoko.R;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,6 +39,7 @@ public class DayEventView extends ViewGroup {
     private AllDayView mAllDayView;
     private NormalEvent mNormalEvent;
     private EventManager mEventManager;
+    private TitleView mTitleBackGroud;
 
     private Context mcontext;
     private GregorianCalendar mDate;
@@ -42,6 +47,8 @@ public class DayEventView extends ViewGroup {
     private int mScreenWidth;
     private int mScreenHeight;
     private DayEventViewListener dayEventViewListener;
+
+    private boolean firstEntry = true;
 
 
     /**
@@ -117,10 +124,13 @@ public class DayEventView extends ViewGroup {
         mPageView.setBackgroundColor(mSurface.PageColor);
         addView(mPageView);
 
+        mTitleBackGroud = new TitleView(mcontext);
+
+        addView(mTitleBackGroud);
+
         mDateView = new TextView(mcontext);
         String dateShow = mDate.get(Calendar.YEAR) + "年" + (mDate.get(Calendar.MONTH) + 1) + "月" + mDate.get(Calendar.DAY_OF_MONTH) + "日";
         mDateView.setText(dateShow);
-        mDateView.setTextSize(TypedValue.COMPLEX_UNIT_SP, mSurface.TextSize);
         addView(mDateView);
 
         mAllDayView = new AllDayView(mcontext);
@@ -153,10 +163,16 @@ public class DayEventView extends ViewGroup {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 
-        mScreenWidth = getResources().getDisplayMetrics().widthPixels;
+        mScreenWidth = MeasureSpec.getSize(widthMeasureSpec);
         mScreenHeight = MeasureSpec.getSize(heightMeasureSpec);
 
 
+        if(firstEntry) {
+            mSurface.initSurface();
+            firstEntry = false;
+            mDateView.setTextSize(TypedValue.COMPLEX_UNIT_SP, mSurface.TextSize);
+
+        }
         int SidePadding = (int) (mScreenWidth * mSurface.SidePadding);
         int UpdownPadding = (int) (mScreenHeight * mSurface.UpdownPadding);
 
@@ -167,9 +183,9 @@ public class DayEventView extends ViewGroup {
             mBackgroundView.measure(widthSpec, heightSpec);
         }
 
+        int DateWidth = (int) ((mScreenWidth - 2 * (SidePadding + mSurface.PageSidePadding)));
         if (mDateView != null) {
-            LayoutParams lp = mDateView.getLayoutParams();
-            int widthSpec = MeasureSpec.makeMeasureSpec(lp.height, MeasureSpec.EXACTLY);
+            int widthSpec = MeasureSpec.makeMeasureSpec(DateWidth, MeasureSpec.EXACTLY);
             int heightSpec = MeasureSpec.makeMeasureSpec(mSurface.TextHeight, MeasureSpec.EXACTLY);
             mDateView.measure(widthSpec, heightSpec);
         }
@@ -182,7 +198,7 @@ public class DayEventView extends ViewGroup {
         }
 
         int AllDayWidth = (int) ((mScreenWidth - 2 * (SidePadding + mSurface.PageSidePadding)) * mSurface.AllDayViewWidth);
-        int AllDayHeight = mScreenHeight - 2 * (UpdownPadding + mSurface.PageUpdownPadding) - mSurface.TextHeight - mSurface.AllDayViewPadding;
+        int AllDayHeight = mScreenHeight - 2 * (UpdownPadding + mSurface.PageUpdownPadding) - mSurface.TextHeight- mSurface.AllDayViewPadding;
 
         if (mAllDayView != null) {
 
@@ -197,10 +213,13 @@ public class DayEventView extends ViewGroup {
             int heightSpec = MeasureSpec.makeMeasureSpec(AllDayHeight, MeasureSpec.EXACTLY);
             mNormalEvent.measure(widthSpec, heightSpec);
         }
-               /*if(!= null){
-            int widthSpec = MeasureSpec.makeMeasureSpec();
-            int heightSpec = MeasureSpec.makeMeasureSpec();
-            .measure(widthSpec,heightSpec);
+
+        int Title =  ((mScreenWidth - 2 * (SidePadding)) );
+
+        if(mTitleBackGroud!= null){
+            int widthSpec = MeasureSpec.makeMeasureSpec(Title,MeasureSpec.EXACTLY);
+            int heightSpec = MeasureSpec.makeMeasureSpec(mSurface.TextHeight+mSurface.PageUpdownPadding,MeasureSpec.EXACTLY);
+            mTitleBackGroud.measure(widthSpec, heightSpec);
         }
                /*if(!= null){
             int widthSpec = MeasureSpec.makeMeasureSpec();
@@ -219,13 +238,14 @@ public class DayEventView extends ViewGroup {
 
         if (mBackgroundView != null) mBackgroundView.layout(l, t, r, b);
 
+        /*
         if (mDateView != null) mDateView.layout(
                 l + SidePadding + mSurface.PageSidePadding,
                 t + UpdownPadding + mSurface.PageUpdownPadding,
                 l + SidePadding + mSurface.PageSidePadding + mDateView.getMeasuredWidth(),
                 t + UpdownPadding + mSurface.PageUpdownPadding + mDateView.getMeasuredHeight());
 
-
+*/
         if (mPageView != null) {
 
             int left = l + SidePadding;
@@ -252,14 +272,14 @@ public class DayEventView extends ViewGroup {
             int botton = top + mNormalEvent.getMeasuredHeight();
             mNormalEvent.layout(left, top, right, botton);
         }
-                /*
-        if( != null) {
 
-            int left =;
-            int top =;
-            int right =;
-            int botton =;
-            .layout(left,top,right,botton);
+        if(mTitleBackGroud != null) {
+
+            int left =l+SidePadding;
+            int top =t+UpdownPadding;
+            int right =left +mTitleBackGroud.getMeasuredWidth();
+            int botton =top+mTitleBackGroud.getMeasuredHeight();
+            mTitleBackGroud.layout(left, top, right, botton);
         }
                 /*
         if( != null) {
@@ -284,6 +304,11 @@ public class DayEventView extends ViewGroup {
 
     }
 
+    public void deleteView(long rid){
+        mEventManager.deleteByRid(rid);
+        invalidate();
+    }
+
     private class Surface {
 
 
@@ -293,16 +318,27 @@ public class DayEventView extends ViewGroup {
         int BackgoundColor = Color.BLACK;
         float BackgroundAlpha = 0.5f;
 
-        int TextHeight = 100;
+        float TextHeightRatio= 1/12f;
+        int TextHeight;
         int TextSize = 25;
 
-        int PageSidePadding = 50;
-        int PageUpdownPadding = 50;
+        float PageSidePaddingRatio = 1/30f;
+        int PageSidePadding ;
+        float PageUpdownPaddingRatio = 1/40f;
+        int PageUpdownPadding;
         int PageColor = Color.WHITE;
 
-        float AllDayViewWidth = (1 / 4f);
+        Paint TitleDatePaint = new Paint();
+        float TitleDatePaintRatio = 1/12f;
+        Paint TitleSmallPaint = new Paint();
+        float TitleSmallPaintRatio = 1/30f;
+        float TitleTextPaddingRatio = 1/60f;
+        int TitleTextPadding;
+
+        float AllDayViewWidth = (5/ 16f);
         int AllDayItemHeight = 100;
-        int AllDayViewPadding = 50;
+        int AllDayViewPadding;
+        float AllDayViewPaddingRatio = 1/40f;
 
         Paint LinePaint;
         int LineColor = Color.BLACK;
@@ -310,7 +346,7 @@ public class DayEventView extends ViewGroup {
         int LinePadding = 80;
 
         Paint NormalText;
-        int NormalEventViewDivid = 8;
+        int NormalEventViewDivid = 12;
         int NormalEvnetLineLength = 100;
         int NormalEvnetTextColor = Color.BLACK;
         int NormalEvnetTextSize = 50;
@@ -325,7 +361,8 @@ public class DayEventView extends ViewGroup {
         Paint NormalEventPaint;
         int NormalEventColor = Color.GRAY;
 
-        public Surface() {
+
+        void initSurface(){
             LinePaint = new Paint();
             LinePaint.setColor(LineColor);
             LinePaint.setStrokeWidth(LineWidth);
@@ -339,6 +376,18 @@ public class DayEventView extends ViewGroup {
             NormalEventPaint.setColor(NormalEventColor);
             ExistRectPaint = new Paint();
             ExistRectPaint.setColor(ExistRectColor);
+            PageSidePadding = (int)(mScreenWidth*PageSidePaddingRatio);
+            PageUpdownPadding= (int)(mScreenHeight*PageUpdownPaddingRatio);
+            AllDayViewPadding = (int)(mScreenHeight*AllDayViewPaddingRatio);
+            TextHeight = (int)(mScreenHeight*TextHeightRatio);
+            TitleDatePaint.setTextSize(mScreenWidth * TitleDatePaintRatio);
+            TitleDatePaint.setAntiAlias(true);
+            TitleDatePaint.setColor(Color.WHITE);
+            TitleDatePaint.setFakeBoldText(true);
+            TitleSmallPaint.setTextSize(mScreenWidth * TitleSmallPaintRatio);
+            TitleSmallPaint.setAntiAlias(true);
+            TitleSmallPaint.setColor(Color.WHITE);
+            TitleTextPadding = (int)(mScreenWidth*TitleTextPaddingRatio);
         }
 
     }
@@ -373,6 +422,7 @@ public class DayEventView extends ViewGroup {
                 tx.setTag(mEventManager.getAllDayEventRid(i));
                 addView(tx);
             }
+            setBackgroundColor(Color.parseColor("#a3a3a3"));
         }
 
 
@@ -431,6 +481,7 @@ public class DayEventView extends ViewGroup {
             return false;
         }
 
+
         @Override
         public void onLongPress(MotionEvent e) {
             if (mEventManager.removeEvent(DownChildId)) {
@@ -484,6 +535,42 @@ public class DayEventView extends ViewGroup {
                 }
                 return false;
             }
+        }
+    }
+
+    private class TitleView extends ImageView{
+
+        public TitleView(Context context) {
+            this(context, null);
+        }
+
+        public TitleView(Context context, AttributeSet attrs) {
+            this(context, attrs, 0);
+        }
+
+        public TitleView(Context context, AttributeSet attrs, int defStyleAttr) {
+            super(context, attrs, defStyleAttr);
+            initTitleView();
+
+        }
+
+        private void initTitleView(){
+            this.setImageResource(R.drawable.cat);
+            this.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        }
+
+        @Override
+        protected void onDraw(Canvas canvas) {
+            super.onDraw(canvas);
+            Rect rect = new Rect();
+            String date = mDate.get(Calendar.DAY_OF_MONTH)+"";
+            mSurface.TitleDatePaint.getTextBounds(date,0,date.length(),rect);
+            int height = rect.height();
+            canvas.drawText(date, mSurface.TitleTextPadding, mSurface.TitleTextPadding + rect.height(), mSurface.TitleDatePaint);
+            String week = CalUtil.WEEK_NAME.get(mDate.get(Calendar.DAY_OF_WEEK));
+            mSurface.TitleSmallPaint.getTextBounds(week,0,week.length(),rect);
+            canvas.drawText(week,mSurface.TitleTextPadding*3/2,2*mSurface.TitleTextPadding+rect.height()+height,mSurface.TitleSmallPaint);
+
         }
     }
 }

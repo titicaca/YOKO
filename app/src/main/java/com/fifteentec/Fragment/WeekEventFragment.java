@@ -31,6 +31,8 @@ public class WeekEventFragment extends Fragment {
     public interface WeekViewFragmentLinstener{
         void CheckExist(long rid);
         void CreateRecord(int TYPE,EventRecord eventRecord);
+        void UpdateTime(ArrayList<Integer> Date);
+        void ShowDetailView(GregorianCalendar date);
     }
 
     public void setmWeekViewFragmentLinstener(WeekViewFragmentLinstener mWeekViewFragmentLinstener) {
@@ -54,18 +56,27 @@ public class WeekEventFragment extends Fragment {
         }
     }
 
-    public void UpdateViewTime(ArrayList<Integer> date){
-        mCurDate.clear();
-        mCurDate.add(date.get(0));
-        mCurDate.add(date.get(1));
-        mCurDate.add(date.get(2));
-        mCurDate.add(date.get(3));
-        weekEventView.UpdateViewByTime(mCurDate);
-    }
 
     public void EventRecordUpdate(long rid,boolean exist){
-        weekEventView.UpdateView(rid,exist);
+        weekEventView.UpdateView(rid, exist);
 
+    }
+
+    private void UpdateFragmentTime(GregorianCalendar gregorianCalendar){
+        mCurDate.clear();
+        mCurDate.add(gregorianCalendar.get(Calendar.YEAR));
+        mCurDate.add(gregorianCalendar.get(Calendar.MONTH));
+        mCurDate.add(gregorianCalendar.get(Calendar.DAY_OF_MONTH));
+        mCurDate.add(gregorianCalendar.get(Calendar.DAY_OF_WEEK));
+        mWeekViewFragmentLinstener.UpdateTime(mCurDate);
+        weekEventView.UpdateViewByTime(mCurDate);
+
+    }
+
+    public void deleteRecord(long rid){
+        if(weekEventView!=null){
+            weekEventView.UpdateView(rid);
+        }
     }
 
     public void UpdateScale(){
@@ -86,19 +97,28 @@ public class WeekEventFragment extends Fragment {
             public void CreatRecord(int Type, EventRecord eventRecord) {
                 mWeekViewFragmentLinstener.CreateRecord(Type, eventRecord);
             }
+
+            @Override
+            public void CalEnable(boolean enable) {
+                calendarView.TouchEnable(enable);
+            }
         });
         calendarView = (CalendarView)view.findViewById(R.id.id_cal_view);
         calendarView.initView(mCurDate);
         calendarView.setmCalendarListener(new CalendarView.CalendarListener() {
             @Override
             public void UpdateTime(GregorianCalendar time) {
-                //mDate.UpdateCur(time);
+                UpdateFragmentTime(time);
             }
 
             @Override
             public void ShowDayDetail(GregorianCalendar time) {
-                String text = "Year:" + time.get(Calendar.YEAR) + " Month:" + time.get(Calendar.MONTH) + " Day:" + time.get(Calendar.DAY_OF_MONTH);
-                Toast.makeText(getActivity(), text, Toast.LENGTH_SHORT).show();
+                mWeekViewFragmentLinstener.ShowDetailView(time);
+            }
+
+            @Override
+            public void ModeSwitch(boolean isWeek) {
+                weekEventView.setViewEnable(isWeek);
             }
         });
 

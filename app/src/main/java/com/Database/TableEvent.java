@@ -242,7 +242,7 @@ public class TableEvent extends DBTable {
         try {
             cs = db.query(tableName, null,
                     DBConstants.COLUMN_EVENT_UID + " = ?" + " AND " +
-                            DBConstants.COLUMN_EVENT_TIMEBEGIN + " >= ?" + " AND " +
+                            DBConstants.COLUMN_EVENT_TIMEEND + " > ?" + " AND " +
                             DBConstants.COLUMN_EVENT_TIMEBEGIN + " < ?" + " AND " +
                             DBConstants.COLUMN_EVENT_STATUS + " <= ?" + " AND " +
                             DBConstants.COLUMN_EVENT_MODIFIED + " <= ?",

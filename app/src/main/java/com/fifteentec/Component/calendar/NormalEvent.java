@@ -120,10 +120,12 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
         for (int i = 0; i < mEventManager.getNormalDayEventCount(); i++) {
             EventItem eventItem = new EventItem();
             eventItem.rid = mEventManager.getNormalEventByIndex(i).rid;
-            eventItem.left = mSurface.LinePadding;
+            eventItem.left = mSurface.LinePadding+mSurface.LineRighePadding;
             eventItem.right = ViewWidth;
-            eventItem.top = (int)(3*ViewHeight*mEventManager.getPositionRatioByTime(mEventManager.getNormalEventByIndex(i).timebegin));
-            eventItem.botton= (int)(3*ViewHeight*mEventManager.getPositionRatioByTime(mEventManager.getNormalEventByIndex(i).timeend));
+            eventItem.top = (int)(EndY * mEventManager.getPositionRatioByTime(mEventManager.getNormalEventByIndex(i).timebegin));
+            eventItem.botton= (int)(EndY * mEventManager.getPositionRatioByTime(mEventManager.getNormalEventByIndex(i).timeend));
+            eventItem.starttime = mEventManager.getEventRecordByRid(eventItem.rid).timebegin;
+            eventItem.endtime = mEventManager.getEventRecordByRid(eventItem.rid).timeend;
             addNewEvent(eventItem);
         }
     }
@@ -159,6 +161,7 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
         gestureDetector = new GestureDetector(getContext(),this);
         mSurface =new Surface();
         mEventManager =eventManager;
+        setBackgroundColor(Color.parseColor("#c9c9c9"));
 
 
     }
@@ -170,18 +173,24 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
         int width = MeasureSpec.getSize(widthMeasureSpec);
         int height =MeasureSpec.getSize(heightMeasureSpec);
 
-        CellHeight = height/mSurface.NormalEventViewDivid;
-        ViewWidth =width;
-        EndY = CellHeight*24;
-        ScrollEndY =CellHeight*16;
-        ViewHeight =height;
+        if(firstEntry){
+            CellHeight = height/mSurface.NormalEventViewDivid;
+            ViewWidth =width;
+            EndY = CellHeight*24;
+            ViewHeight =height;
+            ScrollEndY =EndY-ViewHeight;
+
+            mSurface.initSurface();
+            UpdateNormalPosition();
+        }
+
+
 
         if(mtempRectView !=null){
             int widthSpec = MeasureSpec.makeMeasureSpec(width,MeasureSpec.EXACTLY);
             int heightSpec = MeasureSpec.makeMeasureSpec(EndY,MeasureSpec.EXACTLY);
-            mtempRectView.measure(widthSpec,heightSpec);
+            mtempRectView.measure(widthSpec, heightSpec);
         }
-        if(firstEntry) UpdateNormalPosition();
         setMeasuredDimension(width, height);
     }
 
@@ -190,27 +199,35 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
     @Override
     protected void onDraw(Canvas canvas) {
 
+        int tempheight = CellHeight;
+
+        for (int i = 0; i < 24; i++) {
+            canvas.drawLine(0, tempheight, ViewWidth,tempheight,mSurface.HorizonLinePaint);
+            tempheight+=CellHeight;
+        }
+
         canvas.drawLine(mSurface.LinePadding, 0, mSurface.LinePadding, EndY, mSurface.LinePaint);
         for(int i = 0;i<mEventManager.getNormalDayEventCount();i++){
             EventItem eventItem = NormalEvnetPosition.get(i);
             canvas.drawRect(eventItem.left, eventItem.top, eventItem.right, eventItem.botton, mSurface.NormalEventPaint);
+            drawCircle(canvas,eventItem.top);
             canvas.drawText(mEventManager.getNormalIntroduction(i), (eventItem.left+ eventItem.right) / 2, (eventItem.top + eventItem.botton) / 2, mSurface.NormalText);
 
         }
-        int tempheight = CellHeight;
-        Rect TextRect =new Rect();
-        mSurface.NormalText.getTextBounds("8", 0, 1, TextRect);
-        for (int i = 0; i < 24; i++) {
-            canvas.drawLine(mSurface.LinePadding, tempheight, mSurface.LinePadding + mSurface.NormalEvnetLineLength,tempheight,mSurface.LinePaint);
-            String a = i+"";
-            canvas.drawText(a,mSurface.LinePadding-a.length()*TextRect.width()-15,tempheight,mSurface.NormalText);
-            tempheight +=CellHeight;
-        }
+
     }
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         if(mtempRectView !=null) mtempRectView.layout(0,0,mtempRectView.getMeasuredWidth(),mtempRectView.getMeasuredHeight());
+    }
+
+    private void drawCircle(Canvas canvas,float y){
+        canvas.drawCircle(mSurface.LinePadding,y,mSurface.CircleOneRadiusRatio*ViewWidth,mSurface.pencase(mSurface.CircleOnePaint));
+        canvas.drawCircle(mSurface.LinePadding,y,mSurface.CircleOneRadiusRatio*ViewWidth,mSurface.pencase(mSurface.CircleTwoPaint));
+        canvas.drawCircle(mSurface.LinePadding,y,mSurface.CircleTwoRadiusRatio*ViewWidth,mSurface.pencase(mSurface.CircleThreePaint));
+        canvas.drawLine(mSurface.LinePadding+mSurface.CirclePadding,y,mSurface.LineRighePadding,y,mSurface.LinePaint);
+
     }
 
 
@@ -357,14 +374,14 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
 
             if(behind == -1){
                 divide ++;
-                int dividePart = (ViewWidth-mSurface.LinePadding)/divide;
+                int dividePart = (ViewWidth-mSurface.LinePadding-mSurface.LineRighePadding)/divide;
                 for(int i =0;i<ModifList.size()/2;i++){
                     EventItem temp = NormalEvnetPosition.get(ModifList.get(i*2));
-                    temp.left = mSurface.LinePadding+dividePart*(ModifList.get(i*2+1)-1);
+                    temp.left = mSurface.LineRighePadding+mSurface.LinePadding+dividePart*(ModifList.get(i*2+1)-1);
                     temp.right = temp.left +dividePart;
                 }
 
-                hand.left = mSurface.LinePadding+dividePart*(divide-1);
+                hand.left = mSurface.LineRighePadding+mSurface.LinePadding+dividePart*(divide-1);
                 hand.right = hand.left +dividePart;
 
                 ModifList.add(ChangeList.get(getIndex));
@@ -399,7 +416,7 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
 
     private void tempRectUpdate(float y) {
         int head = findIndex(y);
-        tempRect.left = mSurface.LinePadding;
+        tempRect.left = mSurface.LineRighePadding+mSurface.LinePadding;
         tempRect.top = head*CellHeight;
         tempRect.right = ViewWidth;
         tempRect.botton = (head+1)*CellHeight;
@@ -418,7 +435,7 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
     }
 
     private void ExistRectUpdate(int start,int end){
-        existRect.left = mSurface.LinePadding;
+        existRect.left = mSurface.LineRighePadding+mSurface.LinePadding;
         existRect.top = start;
         existRect.right = ViewWidth;
         existRect.botton = end;
@@ -494,8 +511,8 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
         }else if(OPERATIONMODE==TEMPRECT){
             int positionTop = tempRect.top;
             int positionBotton = tempRect.botton;
-            long offsetTop = (long)((positionTop/(float)(ViewHeight*3))*mEventManager.MillsInOneDay);
-            long offsetBotton = (long)((positionBotton/((float)ViewHeight*3))*mEventManager.MillsInOneDay);
+            long offsetTop = Math.round((positionTop / (double) (EndY)) * mEventManager.MillsInOneDay);
+            long offsetBotton = Math.round((positionBotton / ((double) EndY)) * mEventManager.MillsInOneDay);
             EventRecord eventRecord = new EventRecord();
             eventRecord.timebegin = mEventManager.DayView_Date+offsetTop;
             eventRecord.timeend = mEventManager.DayView_Date+offsetBotton;
@@ -513,8 +530,8 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
     private void UpdateTimeByMove() {
         int i =deleteEvent(existRect.rid);
         addNewEvent(existRect,i);
-        long timebegin =(long)(mEventManager.DayView_Date+(existRect.top/(float)(3*ViewHeight))*mEventManager.MillsInOneDay);
-        long timeend = (long)(mEventManager.DayView_Date+(existRect.botton/(float)(3*ViewHeight))*mEventManager.MillsInOneDay);
+        long timebegin =(mEventManager.DayView_Date+Math.round((existRect.top / (double) (EndY))*mEventManager.MillsInOneDay));
+        long timeend = (mEventManager.DayView_Date+Math.round((existRect.botton/(double)(EndY))*mEventManager.MillsInOneDay));
         mEventManager.UpdateEvent(timebegin,timeend,existRect.rid);
         ClearExistRect();
     }
@@ -686,15 +703,15 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
 
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-        if(OPERATIONMODE == EXIST || OPERATIONMODE == CONSUME_EXIST ||OPERATIONMODE ==EXIST_DOWN ||OPERATIONMODE ==EXIST_TOP){
+        /*if(OPERATIONMODE == EXIST || OPERATIONMODE == CONSUME_EXIST ||OPERATIONMODE ==EXIST_DOWN ||OPERATIONMODE ==EXIST_TOP){
             if(Math.abs(velocityX)>3000 ||Math.abs(velocityY)>3000 ){
                 deleteEvent(existRect.rid);
                 mEventManager.removeEvent(existRect.rid);
                 normalEventListener.deleteRecord(existRect.rid);
                 ClearExistRect();
             }
-        }
-        return true;
+        }*/
+        return false;
     }
 
     @Override
@@ -741,11 +758,16 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
 
         Paint LinePaint;
         int LineColor = Color.BLACK;
-        int LineWidth = 3;
-        int LinePadding = 80;
+        int LineWidth;
+        float LineWidthRatio = 1/120f;
+        float LinePaddingRatio = 1/20f;
+        int LinePadding;
+
+        int LineRighePadding;
+        float LineRighePaddingRatio = 1/4f;
 
         Paint NormalText;
-        int NormalEventViewDivid = 8;
+        int NormalEventViewDivid = 12;
         int NormalEvnetLineLength = 100;
         int NormalEvnetTextColor = Color.BLACK;
         int NormalEvnetTextSize = 50;
@@ -760,9 +782,23 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
         Paint NormalEventPaint;
         int NormalEventColor = Color.GRAY;
 
-        public Surface() {
+        Paint HorizonLinePaint = new Paint();
+        int HorizonLinePaintColor = Color.parseColor("#d4d4d4");
+
+        float CirclePadding;
+
+        float CircleOneRadiusRatio = 1/50f;
+        float CircleTwoRadiusRatio = 1/80f;
+        float CircleWidth  = 1/200f;
+
+        final int CircleOnePaint = 0x00;
+        final int CircleTwoPaint = 0x01;
+        final int CircleThreePaint = 0x02;
+
+        void initSurface(){
             LinePaint = new Paint();
             LinePaint.setColor(LineColor);
+            LineWidth = (int)(ViewWidth*LineWidthRatio);
             LinePaint.setStrokeWidth(LineWidth);
             NormalText = new Paint();
             NormalText.setColor(NormalEvnetTextColor);
@@ -774,6 +810,33 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
             NormalEventPaint.setColor(NormalEventColor);
             ExistRectPaint = new Paint();
             ExistRectPaint.setColor(ExistRectColor);
+            LinePadding= (int)(ViewWidth*LinePaddingRatio);
+            LineRighePadding =(int)(ViewWidth*LineRighePaddingRatio);
+            HorizonLinePaint.setColor(HorizonLinePaintColor);
+            HorizonLinePaint.setAntiAlias(true);
+            HorizonLinePaint.setStrokeWidth(LineWidth);
+            CirclePadding = CircleOneRadiusRatio*ViewWidth*3/2;
+
+        }
+
+        Paint pencase(int Type){
+            Paint paint = new Paint();
+            paint.setAntiAlias(true);
+            switch (Type){
+                case CircleOnePaint:
+                    paint.setColor(Color.WHITE);
+                    break;
+                case CircleTwoPaint:
+                    paint.setColor(Color.BLACK);
+                    paint.setStyle(Paint.Style.STROKE);
+                    paint.setStrokeWidth(ViewWidth*CircleWidth);
+                    break;
+                case CircleThreePaint:
+                    paint.setColor(Color.BLACK);
+                    break;
+
+            }
+            return paint;
         }
 
     }
@@ -790,6 +853,8 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
         int right=0;
         int top=0;
         int botton=0;
+        long starttime = 0;
+        long endtime = 0;
         long rid=0;
         boolean exist=true;
     }

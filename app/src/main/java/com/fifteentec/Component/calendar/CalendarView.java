@@ -14,6 +14,7 @@ import android.graphics.Rect;
 import android.media.Image;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -28,6 +29,7 @@ import com.Database.TableEvent;
 import com.fifteentec.yoko.BaseActivity;
 import com.fifteentec.yoko.R;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -58,7 +60,7 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
     private TextView textViewFri;
     private TextView textViewSat;
     //以上为周一到周日的Text
-    private View backGound;
+    private ShadowView backGound;
     //展开的背景颜色
     private ImageView puller;
     //展开后的下拉拉手
@@ -72,6 +74,8 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
     private final int WEEK_VERTICAL= 0x03;
     private int OPERATION= WEEK;
     //操作状态,在不同的状态提供不同的手势控制
+
+    private boolean ViewEnable =true;
 
     private CalendarListener mCalendarListener;
 
@@ -91,10 +95,15 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
     public interface CalendarListener{
         void UpdateTime(GregorianCalendar time);
         void ShowDayDetail(GregorianCalendar time);
+        void ModeSwitch(boolean isWeek);
     }
 
     public void setmCalendarListener(CalendarListener mCalendarListener) {
         this.mCalendarListener = mCalendarListener;
+    }
+
+    public void TouchEnable(boolean Enable){
+        ViewEnable = Enable;
     }
 
     public void initView(ArrayList<Integer> date) {
@@ -107,8 +116,7 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
 
 
         mSurface = new Surface();
-        backGound = new View(mContext);
-        backGound.setBackgroundColor(Color.WHITE);
+        backGound = new ShadowView(mContext);
 
         addView(backGound, 0);
         mViewController =new ViewController(mContext);
@@ -144,10 +152,11 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
         puller.setImageResource(R.drawable.puller);
         addView(mViewController);
 
-        addView(puller,0);
+        addView(puller,1);
 
 
     }
+
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -172,43 +181,44 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
 
         if(textViewSun !=null){
             int widthSpec = MeasureSpec.makeMeasureSpec(mSurface.ViewCellWidth,MeasureSpec.EXACTLY);
-            textViewSun.setTextSize(mSurface.WeekTextSize);
+            textViewSun.setTextSize(TypedValue.COMPLEX_UNIT_PX,mSurface.WeekTextSize);
             textViewSun.measure(widthSpec, heightSpec);
         }
         if( textViewMon !=null){
             int widthSpec = MeasureSpec.makeMeasureSpec(mSurface.ViewCellWidth,MeasureSpec.EXACTLY);
-            textViewMon.setTextSize(mSurface.WeekTextSize);
+            textViewMon.setTextSize(TypedValue.COMPLEX_UNIT_PX,mSurface.WeekTextSize);
             textViewMon.measure(widthSpec, heightSpec);
         }
         if(textViewTues !=null){
             int widthSpec = MeasureSpec.makeMeasureSpec(mSurface.ViewCellWidth,MeasureSpec.EXACTLY);
-            textViewTues.setTextSize(mSurface.WeekTextSize);
+            textViewTues.setTextSize(TypedValue.COMPLEX_UNIT_PX,mSurface.WeekTextSize);
             textViewTues.measure(widthSpec, heightSpec);
         }
         if( textViewWed!=null){
             int widthSpec = MeasureSpec.makeMeasureSpec(mSurface.ViewCellWidth,MeasureSpec.EXACTLY);
-            textViewWed.setTextSize(mSurface.WeekTextSize);
+            textViewWed.setTextSize(TypedValue.COMPLEX_UNIT_PX,mSurface.WeekTextSize);
             textViewWed.measure(widthSpec, heightSpec);
         }
         if( textViewThr!=null){
             int widthSpec = MeasureSpec.makeMeasureSpec(mSurface.ViewCellWidth,MeasureSpec.EXACTLY);
-            textViewThr.setTextSize(mSurface.WeekTextSize);
+            textViewThr.setTextSize(TypedValue.COMPLEX_UNIT_PX,mSurface.WeekTextSize);
             textViewThr.measure(widthSpec, heightSpec);
         }
         if( textViewFri!=null){
             int widthSpec = MeasureSpec.makeMeasureSpec(mSurface.ViewCellWidth,MeasureSpec.EXACTLY);
-            textViewFri.setTextSize(mSurface.WeekTextSize);
+            textViewFri.setTextSize(TypedValue.COMPLEX_UNIT_PX,mSurface.WeekTextSize);
             textViewFri.measure(widthSpec, heightSpec);
         }
         if( textViewSat!=null){
             int widthSpec = MeasureSpec.makeMeasureSpec(mSurface.ViewCellWidth,MeasureSpec.EXACTLY);
-            textViewSat.setTextSize(mSurface.WeekTextSize);
+            textViewSat.setTextSize(TypedValue.COMPLEX_UNIT_PX,mSurface.WeekTextSize);
             textViewSat.measure(widthSpec, heightSpec);
         }
 
         if(backGound != null){
+            int mheightSpec = MeasureSpec.makeMeasureSpec(ViewHeight,MeasureSpec.EXACTLY);
             int widthSpec = MeasureSpec.makeMeasureSpec(ViewWidth,MeasureSpec.EXACTLY);
-            backGound.measure(widthSpec,heightSpec);
+            backGound.measure(widthSpec,mheightSpec);
         }
 
         if(puller != null){
@@ -223,7 +233,7 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        if(backGound != null) backGound.layout(0,0,backGound.getMeasuredWidth(),backGound.getMeasuredHeight());
+            if(backGound != null) backGound.layout(0,0,backGound.getMeasuredWidth(),backGound.getMeasuredHeight());
         if(mViewController != null&&textViewSun != null){
             mViewController.layout(0, textViewSun.getMeasuredHeight(), mViewController.getMeasuredWidth(), textViewSun.getMeasuredHeight() + mViewController.getMeasuredHeight());
         }
@@ -266,6 +276,7 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
                 if(mSurface.ViewMeasureHeight-mSurface.fullViewHeight>mSurface.ScrollMinDistanceTrager){
                     CurrentWeekBegin.add(Calendar.DAY_OF_MONTH, -CurrentWeekBegin.get(Calendar.DAY_OF_WEEK) + 1);
                     mAnimatorController.ScrollToWeekAnimation(mSurface.ViewCellHeight);
+                    mCalendarListener.ModeSwitch(true);
                     OPERATION = WEEK;
 
 
@@ -332,7 +343,13 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
         float MonthGapRatio = (1/20f);
         int MonthGap;
 
-        float WeekTextSizeRatio= 1/18f;
+        Paint whitePaint = new Paint();
+
+        Paint MonthShadowPaint = new Paint();
+        int ShadowColor =getResources().getColor(R.color.ShadowColor);
+        float ShadowSize = 1/50f;
+
+        float WeekTextSizeRatio= 1/4f;
         float WeekTextSize;
         int MonthTextSize;
         float MonthTextSizeRatio = 1/3f;
@@ -344,7 +361,7 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
         int MonthTodayTextColor = Color.WHITE;
         Paint MonthTodayChineseText = new Paint();
         Paint MonthTodayCircle = new Paint();
-        int MonthTodayCircleColor= Color.parseColor("#11AA00");
+        int MonthTodayCircleColor= getResources().getColor(R.color.appMainColor);
 
         int MonthIconWidth;
         float MonthIconWidthRatio = 1/7f;
@@ -353,7 +370,7 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
 
         Paint MonthIconMonthTextPaint = new Paint();
         int MonthIconMonthTextSize;
-        int MonthIconMonthTextColor = Color.parseColor("#11AA00");
+        int MonthIconMonthTextColor = getResources().getColor(R.color.appMainColor);
         Paint MonthIconYearTextPaint = new Paint();
         int MonthIconYearTextSize;
         int MonthIconYearTextColor = Color.parseColor("#555555");
@@ -369,6 +386,7 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
 
         void initSurface(){
 
+            whitePaint.setColor(Color.WHITE);
             MonthGap = (int)(ViewHeight*MonthGapRatio*(1-ScreenStrinkRatio));
             MonthIconWidth = (int)(ViewWidth*MonthIconWidthRatio);
             ViewCellWidth = (int)((1-ViewWidthRightPadding)*ViewWidth-MonthIconWidth)/7;
@@ -379,7 +397,7 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
             ScrollMinDistanceTrager = (ViewHeight-fullViewHeight)/3;
             pullerSize = (int)(ViewWidth*pullerSizeRatio);
 
-            WeekTextSize = ViewCellHeight*WeekTextSizeRatio;
+            WeekTextSize = ViewCellWidth*WeekTextSizeRatio;
 
             MonthIconPadding = (int)(ViewCellHeight*MonthIconPaddingRatio);
             MonthTextSize = (int) (ViewCellWidth * MonthTextSizeRatio);
@@ -397,6 +415,8 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
             MonthIconYearTextPaint.setColor(MonthIconYearTextColor);
             MonthIconYearTextPaint.setAntiAlias(true);
 
+            MonthShadowPaint.setAntiAlias(true);
+            MonthShadowPaint.setShadowLayer(ViewMeasureHeight * ShadowSize,ViewMeasureHeight*ShadowSize,ViewMeasureHeight*ShadowSize,ShadowColor );
 
             MonthChineseTextInt =MonthTextSize/2;
             MonthChineseText.setTextSize(MonthChineseTextInt);
@@ -416,7 +436,6 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
 
             MonthCurrentWeek.setColor(MonthCurrentWeekColor);
             MonthCurrentWeek.setAntiAlias(true);
-
 
         }
 
@@ -464,7 +483,7 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
                     monthView.circleAnimaitionHolders.get(index).initHolder(color);
 
                     ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(monthView, "HJQ", 0, 12);
-                    objectAnimator.setDuration(400);
+                    objectAnimator.setDuration(200);
                     objectAnimator.setInterpolator(new TimeInterpolator() {
 
                          @Override
@@ -481,7 +500,7 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
                             monthView.invalidate();
                         }
                     });
-                    set.play(objectAnimator).after(i * 100);
+                    set.play(objectAnimator).after(i * 60);
                 }
 
                 MonthView Current = null;
@@ -492,7 +511,7 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
                     }
                 }
                 ObjectAnimator objectAnimator = ObjectAnimator.ofInt(mSurface, "HJQ", 255, 0);
-                objectAnimator.setDuration(600);
+                objectAnimator.setDuration(300);
                 final MonthView finalCurrent = Current;
                 objectAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
@@ -521,6 +540,10 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
                         mViewController.UpdateDrawCurrent();
                         mSurface.MonthCurrentWeek.setAlpha(255);
                         set = null;
+                        CurrentWeekBegin.add(Calendar.DAY_OF_MONTH, -CurrentWeekBegin.get(Calendar.DAY_OF_WEEK) + 1);
+                        mAnimatorController.ScrollToWeekAnimation(mSurface.ViewCellHeight);
+                        mCalendarListener.ModeSwitch(true);
+                        OPERATION = WEEK;
                     }
 
                     @Override
@@ -533,6 +556,10 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
                             View view = mViewController.getChildAt(i);
                             view.invalidate();
                         }
+                        CurrentWeekBegin.add(Calendar.DAY_OF_MONTH, -CurrentWeekBegin.get(Calendar.DAY_OF_WEEK) + 1);
+                        mAnimatorController.ScrollToWeekAnimation(mSurface.ViewCellHeight);
+                        mCalendarListener.ModeSwitch(true);
+                        OPERATION = WEEK;
                     }
 
                     @Override
@@ -581,7 +608,7 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
 
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    if ((mSurface.ViewMeasureHeight < mSurface.fullViewHeight&&startheight>mSurface.fullViewHeight)) {
+                    if ((mSurface.ViewMeasureHeight < mSurface.fullViewHeight&&startheight>=mSurface.fullViewHeight)) {
                         mViewController.GoToCurrent(CurrentWeekBegin.get(Calendar.YEAR) * 12 + CurrentWeekBegin.get(Calendar.MONTH) - (today.get(0) * 12 + today.get(1)));
                     }
                 }
@@ -837,8 +864,8 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
 
             ScrollTo += index + mSurface.MonthGap;
 
-            this.scrollTo(0, ScrollTo);
-
+            //this.scrollTo(0, ScrollTo);
+            mViewController.GoToCurrent(CurrentWeekBegin.get(Calendar.YEAR) * 12 + CurrentWeekBegin.get(Calendar.MONTH) - (today.get(0) * 12 + today.get(1)));
             setBackgroundColor(Color.rgb(245,245,245));
 
         }
@@ -1025,6 +1052,8 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
 
         @Override
         public boolean onTouchEvent(MotionEvent event) {
+
+            if(!ViewEnable) return false;
             if(event.getAction() == MotionEvent.ACTION_DOWN){
                 LongEnough = false;
                 isScrolled = false;
@@ -1045,6 +1074,7 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
                     case WEEK_VERTICAL:
                         if(mSurface.ViewMeasureHeight>(mSurface.fullViewHeight+mSurface.ViewCellHeight)/2){
                             mAnimatorController.ScrollToWeekAnimation(mSurface.fullViewHeight);
+                            mCalendarListener.ModeSwitch(false);
                             OPERATION=MONTH;
                             return true;
                         }else{
@@ -1070,7 +1100,7 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
                                 height -= mSurface.MonthGap;
                                 int offset = height % mSurface.ViewCellHeight;
                                 if (offset < mSurface.ViewCellHeight / 2)
-                                    mAnimatorController.ScrollToCurrenAnimation(ScrollY - offset, 0, true);//mViewController.scrollBy(0, -offset);
+                                    mAnimatorController.ScrollToCurrenAnimation(ScrollY - offset, 0, true);
                                 else
                                     mAnimatorController.ScrollToCurrenAnimation(ScrollY + mSurface.ViewCellHeight-offset, 0, true);
                             }
@@ -1097,9 +1127,10 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
                 mAnimatorController.CircleAnimation(SelectedMonthView);
                 CurrentWeekBegin.set(SelectedTime.get(Calendar.YEAR), SelectedTime.get(Calendar.MONTH), SelectedTime.get(Calendar.DAY_OF_MONTH), 0, 0);
                 mCalendarListener.UpdateTime(CurrentWeekBegin);
-            }else if(SelectedTime!=null&&!LongEnough&&OPERATION==WEEK){
+            }else if(SelectedTime != null && !LongEnough && OPERATION == WEEK) {
                 CurrentWeekBegin.set(SelectedTime.get(Calendar.YEAR), SelectedTime.get(Calendar.MONTH), SelectedTime.get(Calendar.DAY_OF_MONTH), 0, 0);
                 mCalendarListener.ShowDayDetail(SelectedTime);
+
             }
             return true;
         }
@@ -1469,5 +1500,26 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
     }
 
 
+    private class ShadowView extends View{
+        public ShadowView(Context context) {
+            this(context, null);
+        }
+
+        public ShadowView(Context context, AttributeSet attrs) {
+            this(context, attrs, 0);
+        }
+
+        public ShadowView(Context context, AttributeSet attrs, int defStyleAttr) {
+            super(context, attrs, defStyleAttr);
+        }
+
+        @Override
+        protected void onDraw(Canvas canvas) {
+            canvas.drawRect(0,0,getMeasuredWidth(),mSurface.TextHeight,mSurface.whitePaint);
+            if(OPERATION == MONTH){
+                canvas.drawRect(0,mSurface.TextHeight,getMeasuredWidth(),mSurface.ViewMeasureHeight+mSurface.TextHeight,mSurface.MonthShadowPaint);
+            }
+        }
+    }
 }
 

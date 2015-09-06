@@ -1,12 +1,15 @@
 package com.fifteentec.Fragment;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.fifteentec.yoko.R;
 
@@ -29,6 +32,11 @@ public class TabButtonFragment extends Fragment implements View.OnClickListener 
     private ImageView mImBtn3;
     private ImageView mImBtn4;
 
+    private TextView mTextView1;
+    private TextView mTextView2;
+    private TextView mTextView3;
+    private TextView mTextView4;
+
     private Ibutton mButton;
 
 
@@ -46,6 +54,7 @@ public class TabButtonFragment extends Fragment implements View.OnClickListener 
     }
 
     private void InitFm(View mInflater) {
+
         mTabBtn1 = (LinearLayout) mInflater.findViewById(R.id.tab_button_ll_1);
         mTabBtn2 = (LinearLayout) mInflater.findViewById(R.id.tab_button_ll_2);
         mTabBtn3 = (LinearLayout) mInflater.findViewById(R.id.tab_button_ll_3);
@@ -60,6 +69,29 @@ public class TabButtonFragment extends Fragment implements View.OnClickListener 
         mTabBtn2.setOnClickListener(this);
         mTabBtn3.setOnClickListener(this);
         mTabBtn4.setOnClickListener(this);
+
+        mTextView1 = (TextView) mInflater.findViewById(R.id.tab_button_text_1);
+        mTextView2 = (TextView) mInflater.findViewById(R.id.tab_button_text_2);
+        mTextView3 = (TextView) mInflater.findViewById(R.id.tab_button_text_3);
+        mTextView4 = (TextView) mInflater.findViewById(R.id.tab_button_text_4);
+
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int displayWidth = displayMetrics.widthPixels;
+        float Ratio  = 1/18f;
+        float textsize = 5f+displayWidth/80f;
+        ViewGroup.LayoutParams layoutParams = mImBtn1.getLayoutParams();
+        layoutParams.width =(int)(displayWidth*Ratio);
+        layoutParams.height=(int)(displayWidth*Ratio);
+        mImBtn1.setLayoutParams(layoutParams);
+        mImBtn2.setLayoutParams(layoutParams);
+        mImBtn3.setLayoutParams(layoutParams);
+        mImBtn4.setLayoutParams(layoutParams);
+        mTextView1.setTextSize(textsize);
+        mTextView2.setTextSize(textsize);
+        mTextView3.setTextSize(textsize);
+        mTextView4.setTextSize(textsize);
 
         setTabSelection(SelectCalendar);
     }
@@ -98,6 +130,13 @@ public class TabButtonFragment extends Fragment implements View.OnClickListener 
         mImBtn2.setImageResource(R.drawable.found);
         mImBtn3.setImageResource(R.drawable.friend);
         mImBtn4.setImageResource(R.drawable.me);
+
+        mTextView1.setTextColor(Color.BLACK);
+        mTextView2.setTextColor(Color.BLACK);
+        mTextView3.setTextColor(Color.BLACK);
+        mTextView4.setTextColor(Color.BLACK);
+
+
     }
 
     private void setTabSelection(int index) {
@@ -106,15 +145,19 @@ public class TabButtonFragment extends Fragment implements View.OnClickListener 
         switch (index) {
             case SelectCalendar:
                 mImBtn1.setImageResource(R.drawable.calendarselected);
+                mTextView1.setTextColor(getResources().getColor(R.color.appMainColor));
                 break;
             case SelectFound:
                 mImBtn2.setImageResource(R.drawable.foundselceted);
+                mTextView2.setTextColor(getResources().getColor(R.color.appMainColor));
                 break;
             case SelectFriend:
                 mImBtn3.setImageResource(R.drawable.friendselected);
+                mTextView3.setTextColor(getResources().getColor(R.color.appMainColor));
                 break;
             case SelectCount:
                 mImBtn4.setImageResource(R.drawable.meselected);
+                mTextView4.setTextColor(getResources().getColor(R.color.appMainColor));
                 break;
             default:
                 break;

@@ -38,6 +38,10 @@ public class EventManager {
     private ArrayList<EventManager> WeekManager = new ArrayList<>();
 
 
+    public EventRecord getEventRecordByRid(long rid){
+        return mtableEvent.queryEventByRid(rid);
+    }
+
     public static EventManager newInstance(TableEvent tableEvent,int Type,long TimeInMill){
         EventManager eventManager;
         switch (Type){
@@ -199,11 +203,23 @@ public class EventManager {
         return mtableEvent.queryEventByRid(NormalEvent.get(index)).introduction;
     }
 
+    public String getNormalIntroduction(long rid){
+        return mtableEvent.queryEventByRid(rid).introduction;
+    }
 
-    public float getPositionRatioByTime(long TimeBegin){
+    public int getNormalType(int index){
+        return mtableEvent.queryEventByRid(NormalEvent.get(index)).type;
+    }
+
+    public int getNormalType(long rid){
+        return mtableEvent.queryEventByRid(rid).type;
+    }
+
+
+    public double getPositionRatioByTime(long TimeBegin){
         long offset = TimeBegin - DayView_Date;
 
-        return offset/(float)MillsInOneDay;
+        return offset/(double)MillsInOneDay;
 
     }
 
@@ -223,7 +239,7 @@ public class EventManager {
             }
             for (int i = 0; i < AlldayEvent.size(); i++) {
                 if(AlldayEvent.get(i) == rid){
-                    AlldayEvent.remove(rid);
+                    AlldayEvent.remove(i);
                     return true;
                 }
             }
