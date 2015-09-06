@@ -1,8 +1,8 @@
 package com.fifteentec.Component.Parser;
 
 import com.Database.FriendInfoRecord;
+import com.Database.FriendInvitationRecord;
 import com.Database.FriendTagRecord;
-import com.Service.DataSyncService;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -79,5 +79,33 @@ public class DataSyncServerParser {
         }
 
         return friendInfoRecords;
+    }
+
+    public static List<FriendInvitationRecord> parseFriendInvitationResponse(final JSONObject response) {
+        List<FriendInvitationRecord> friendInvitationRecords = new ArrayList<FriendInvitationRecord>();
+
+        try {
+            JSONArray records = response.getJSONArray("list");
+            for (int i = 0; i < records.length(); ++i) {
+                JSONObject record = (JSONObject)records.get(i);
+
+                long uid = record.getLong("user_id");
+                long fuid = record.getLong("friend_id");
+                String msg = record.getString("msg");
+                long createdtime = record.getLong("createdtime");
+
+                FriendInvitationRecord friendInvitationRecord = new FriendInvitationRecord();
+                friendInvitationRecord.uid = uid;
+                friendInvitationRecord.fuid = fuid;
+                friendInvitationRecord.msg = msg;
+                friendInvitationRecord.createdtime = createdtime;
+
+                friendInvitationRecords.add(friendInvitationRecord);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return friendInvitationRecords;
     }
 }

@@ -11,6 +11,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.fifteentec.Component.User.UserServer;
+import com.fifteentec.Fragment.FoundFragment.FoundFragment;
 import com.fifteentec.Fragment.FriendsFragment;
 import com.fifteentec.Fragment.MyPageFragment;
 import com.fifteentec.Fragment.CalViewFragment;
@@ -26,6 +27,7 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
     private MyPageFragment myPageFragment;
     private TestFragment tf;
     private CalViewFragment mCalViewFragment;
+    private FoundFragment mFoundFragment;
 
     @SuppressLint("NewApi")
     @Override
@@ -38,7 +40,7 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
         //TabSelector(R.integer.SelectorCir);
         TabSelector(R.integer.SelectorCal);
 
-        Log.e("uid", UserServer.getInstance().getUserid() + "");
+        Log.v("uid", UserServer.getInstance().getUserid() + "");
         //设置系统状态监听过滤器IntentFilter
         IntentFilter mFilter = new IntentFilter();
         //设定监听内容为网络状态改变
@@ -82,6 +84,13 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
                 }
                 break;
             case R.integer.SelectorFrd:
+                if(mFoundFragment == null){
+                    mFoundFragment = new FoundFragment();
+                    mFmTrans.add(R.id.id_content, mFoundFragment,"found");
+                }
+                else{
+                    mFmTrans.show(mFoundFragment);
+                }
                 Toast a = Toast.makeText(this, "Found",
                         Toast.LENGTH_SHORT);
                 a.setDuration(Toast.LENGTH_SHORT);
@@ -143,6 +152,7 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
         if (mCalViewFragment != null) mFmTrans.hide(mCalViewFragment);
         if (myPageFragment != null) mFmTrans.hide(myPageFragment);
         if (friendsFragment != null) mFmTrans.hide(friendsFragment);
+        if (mFoundFragment != null) mFmTrans.hide(mFoundFragment);
     }
 
     private InvitationReceiver invitationReceiver = new InvitationReceiver() {
