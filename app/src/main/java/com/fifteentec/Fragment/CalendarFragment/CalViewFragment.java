@@ -1,4 +1,4 @@
-package com.fifteentec.Fragment;
+package com.fifteentec.Fragment.CalendarFragment;
 
 import android.app.Activity;
 import android.app.FragmentManager;
@@ -18,14 +18,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.Database.DBManager;
 import com.Database.EventRecord;
 import com.fifteentec.Component.User.UserServer;
-import com.fifteentec.Component.calendar.CalView;
 import com.fifteentec.Component.calendar.CalendarController;
-import com.fifteentec.Component.calendar.CalendarView;
 import com.fifteentec.Component.calendar.DayEventView;
 import com.fifteentec.Component.calendar.NewEventView;
 import com.fifteentec.yoko.BaseActivity;
@@ -275,7 +272,7 @@ public class CalViewFragment extends Fragment {
                     startActivityForResult(Camera, IMAGE_OPENCAMERA_CODE);
                 }else {
                     Intent getAlbum = new Intent(Intent.ACTION_PICK);
-                    getAlbum.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,IMAGE_TYPE);
+                    getAlbum.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, IMAGE_TYPE);
                     startActivityForResult(getAlbum, IMAGE_NEWEVENT_CODE);
                 }
             }
@@ -317,6 +314,8 @@ public class CalViewFragment extends Fragment {
         mYearText.setText(mDate.getCurYear() + "");
     }
 
+
+
     private void showDayEventView(GregorianCalendar date) {
         if (mdayEventView == null) {
             mdayEventView = DayEventView.newInstance(getActivity(), date);
@@ -330,6 +329,7 @@ public class CalViewFragment extends Fragment {
                 @Override
                 public void closeDayView() {
                     mMainView.removeView(mdayEventView);
+                    mWeekEventFragment.UpdateWeekView();
                     mdayEventView = null;
                 }
 

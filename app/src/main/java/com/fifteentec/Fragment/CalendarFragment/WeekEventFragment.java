@@ -1,12 +1,10 @@
-package com.fifteentec.Fragment;
+package com.fifteentec.Fragment.CalendarFragment;
 
 import android.app.Fragment;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.Database.EventRecord;
 import com.fifteentec.Component.calendar.CalendarView;
@@ -33,6 +31,10 @@ public class WeekEventFragment extends Fragment {
         void CreateRecord(int TYPE,EventRecord eventRecord);
         void UpdateTime(ArrayList<Integer> Date);
         void ShowDetailView(GregorianCalendar date);
+    }
+
+    public void UpdateWeekView(){
+        weekEventView.UpdateEventArray();
     }
 
     public void setmWeekViewFragmentLinstener(WeekViewFragmentLinstener mWeekViewFragmentLinstener) {

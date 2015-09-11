@@ -52,7 +52,7 @@ public class EventManager {
                 long End = eventManager.DayView_Date +MillsInOneDay;
                 List<EventRecord> eventRecords= eventManager.mtableEvent.queryEvent(UserServer.getInstance().getUserid(),eventManager.DayView_Date,End);
                 for(EventRecord eventRecord:eventRecords){
-                    if(eventRecord.timebegin == eventRecord.timeend) eventManager.AlldayEvent.add(eventRecord.rid);
+                    if(eventRecord.timebegin == eventRecord.timeend&&eventRecord.timebegin==eventManager.DayView_Date) eventManager.AlldayEvent.add(eventRecord.rid);
                     else {
                         eventManager.NormalEvent.add(eventRecord.rid);
                     }
@@ -126,6 +126,11 @@ public class EventManager {
         return eventRecord.introduction;
     }
 
+    public int getAllDayTag(int index){
+        EventRecord eventRecord=mtableEvent.queryEventByRid(AlldayEvent.get(index));
+        return eventRecord.type;
+    }
+
     public EventRecord getNormalEventByIndex(int index){
         return mtableEvent.queryEventByRid(NormalEvent.get(index));
     }
@@ -175,7 +180,7 @@ public class EventManager {
         EventRecord eventRecord = mtableEvent.queryEventByRid(rid);
         if(mType == DAY_VIEW_EVENT_MANAGER) {
 
-            if (eventRecord.timebegin == eventRecord.timeend) {
+            if (eventRecord.timebegin == eventRecord.timeend && eventRecord.timebegin== DayView_Date) {
                 AlldayEvent.add(rid);
                 return true;
             } else {

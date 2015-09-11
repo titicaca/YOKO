@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,7 +81,7 @@ public class TabButtonFragment extends Fragment implements View.OnClickListener 
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int displayWidth = displayMetrics.widthPixels;
         float Ratio  = 1/18f;
-        float textsize = 5f+displayWidth/80f;
+        float textsize = displayWidth/30f;
         ViewGroup.LayoutParams layoutParams = mImBtn1.getLayoutParams();
         layoutParams.width =(int)(displayWidth*Ratio);
         layoutParams.height=(int)(displayWidth*Ratio);
@@ -88,10 +89,10 @@ public class TabButtonFragment extends Fragment implements View.OnClickListener 
         mImBtn2.setLayoutParams(layoutParams);
         mImBtn3.setLayoutParams(layoutParams);
         mImBtn4.setLayoutParams(layoutParams);
-        mTextView1.setTextSize(textsize);
-        mTextView2.setTextSize(textsize);
-        mTextView3.setTextSize(textsize);
-        mTextView4.setTextSize(textsize);
+        mTextView1.setTextSize(TypedValue.COMPLEX_UNIT_PX,textsize);
+        mTextView2.setTextSize(TypedValue.COMPLEX_UNIT_PX,textsize);
+        mTextView3.setTextSize(TypedValue.COMPLEX_UNIT_PX,textsize);
+        mTextView4.setTextSize(TypedValue.COMPLEX_UNIT_PX,textsize);
 
         setTabSelection(SelectCalendar);
     }

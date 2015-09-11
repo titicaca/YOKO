@@ -7,8 +7,10 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -34,8 +36,8 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
     private LayoutInflater mInflater;
     private GestureDetector mGesture;
     private EventListListener mEventListListener;
+    private Surface mSurface;
 
-    private EventManager mEventManager;
 
 
     /**
@@ -63,6 +65,7 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
     public void init(ArrayList<Integer> date){
         setBackgroundColor(Color.WHITE);
         removeAllViews();
+        mSurface = new Surface();
         ScreenWidth =(getResources().getDisplayMetrics().widthPixels);
         ScreenHeight = (getResources().getDisplayMetrics().heightPixels);
         GregorianCalendar temp = new GregorianCalendar(date.get(0),date.get(1),date.get(2),0,0);
@@ -75,9 +78,12 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int widthMode = MeasureSpec.getMode(widthMeasureSpec);
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+        //ScreenHeight = MeasureSpec.getSize(heightMeasureSpec);
+        //ScreenWidth = MeasureSpec.getSize(widthMeasureSpec);
+        /*
         if(widthMode ==MeasureSpec.UNSPECIFIED|| heightMode == MeasureSpec.UNSPECIFIED){
             throw new IllegalArgumentException("Wrong Argument");
-        }
+        }*/
 
         int count = getChildCount();
         for(int i = 0 ;i<count;i++){
@@ -163,6 +169,12 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
         return false;
+    }
+
+    private class Surface{
+        float DayTextSize = 1/30;
+        float WeekTextSize = 1/50;
+        float MonthTextSize = 1/50;
     }
 
 
@@ -307,10 +319,9 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
             GregorianCalendar tempDate = new GregorianCalendar(mCurDate.get(0),mCurDate.get(1),mCurDate.get(2),0,0);
             tempDate.add(Calendar.DAY_OF_MONTH, mBottonIndex);
             View temp = mInflater.inflate(R.layout.view_event_list_text_layout,null);
-            TextView day = (TextView) temp.findViewById(R.id.id_event_list_day_text);
-            day.setText("" + tempDate.get(Calendar.DAY_OF_MONTH));
-            TextView Week = (TextView) temp.findViewById(R.id.id_event_list_week_text);
-            Week.setText(CalUtil.WEEK_NAME.get(tempDate.get(Calendar.DAY_OF_WEEK)));
+
+            setViewText(temp,tempDate);
+
             addView(temp, 0);
             EventList mEL = new EventList(mcontext);
             mEL.initView(tempDate, (int) (ScreenWidth * (1 - mRatio)));
@@ -322,7 +333,7 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
 
 
         /**
-         * 加载下视图的View
+         * 加载下视图的Viewa
          * @return 本次加载增加的Height
          */
         public int addViewList(){
@@ -330,16 +341,32 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
             GregorianCalendar tempDate = new GregorianCalendar(mCurDate.get(0),mCurDate.get(1),mCurDate.get(2));
             tempDate.add(Calendar.DAY_OF_MONTH, mTopIndex);
             View temp = mInflater.inflate(R.layout.view_event_list_text_layout,null);
-            TextView day = (TextView) temp.findViewById(R.id.id_event_list_day_text);
-            day.setText("" + tempDate.get(Calendar.DAY_OF_MONTH));
-            TextView Week = (TextView) temp.findViewById(R.id.id_event_list_week_text);
-            Week.setText(CalUtil.WEEK_NAME.get(tempDate.get(Calendar.DAY_OF_WEEK)));
+
+            setViewText(temp,tempDate);
+
             addView(temp);
 
             EventList mEL = new EventList(mcontext);
             mEL.initView(tempDate, (int) (ScreenWidth * (1 - mRatio)));
             addView(mEL);
             return mEL.ViewHeight;
+        }
+
+
+        private void setViewText(View temp,GregorianCalendar tempDate){
+            TextView day = (TextView) temp.findViewById(R.id.id_event_list_day_text);
+            day.setText("" + tempDate.get(Calendar.DAY_OF_MONTH));
+            day.setTypeface(Typeface.DEFAULT_BOLD);
+            day.setTextSize(TypedValue.COMPLEX_UNIT_PX,ScreenWidth*mSurface.DayTextSize);
+
+            TextView Week = (TextView) temp.findViewById(R.id.id_event_list_week_text);
+            Week.setText(CalUtil.WEEK_NAME.get(tempDate.get(Calendar.DAY_OF_WEEK)));
+            day.setTextSize(TypedValue.COMPLEX_UNIT_PX, ScreenWidth * mSurface.WeekTextSize);
+
+            TextView Month = (TextView) temp.findViewById(R.id.id_event_list_month_text);
+            int NowMonth = tempDate.get(Calendar.MONTH) +1;
+            Month.setText(tempDate.get(Calendar.YEAR)+"年"+NowMonth+"月");
+            day.setTextSize(TypedValue.COMPLEX_UNIT_PX, ScreenWidth * mSurface.MonthTextSize);
         }
 
 

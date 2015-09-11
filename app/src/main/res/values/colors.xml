@@ -7,5 +7,6 @@
     <color name = "OtherEventColor">#acd598</color>
     <color name = "ShadowColor">#b5b5b5</color>
     <color name = "DashlineColor">#898989</color>
+    <color name = "AllDayEvent">#F0F0F0</color>
 
 </resources>

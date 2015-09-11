@@ -469,6 +469,11 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
 
         AnimatorSet set = null;
         ObjectAnimator Scroller = null;
+        ObjectAnimator ScrollerLittle = null;
+        ObjectAnimator FlingScoller = null;
+
+        float acceleration =  2000;
+        int timeParaments =130;
 
         private void CircleAnimation(final MonthView monthView){
             if(set==null) {
@@ -577,7 +582,6 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
             ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(mSurface, "HJQ", mSurface.ViewMeasureHeight,end);
             final int startheight =  mSurface.ViewMeasureHeight;
             objectAnimator.setDuration(300);
-            objectAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
             objectAnimator.setInterpolator(new TimeInterpolator() {
                 private static final float s = 1.70158f * 1.525f;
 
@@ -694,9 +698,57 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
             });
         }
 
-        private void ScrollToCurrenAnimation(final int end, final int addTime, final boolean little){
+        private void FlingByVerlocity(final float velocity){
+            //if(FlingScoller !=null)  FlingScoller.cancel();
+            if(FlingScoller == null) {
+                if(ScrollerLittle !=null) ScrollerLittle.cancel();
+                int time = Math.abs((int)(velocity/acceleration));
+                int startV = (int) (velocity/4);
+                FlingScoller = ObjectAnimator.ofInt(mSurface, "HJQ", startV, 0);
+                FlingScoller.setDuration(time * timeParaments);
+                FlingScoller.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        int Value = (int) animation.getAnimatedValue();
+                        mViewController.scrollBy(0, -Value);
+                        mViewController.UpdateMonth();
+                    }
+                });
+                FlingScoller.start();
+
+                FlingScoller.addListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        mViewController.scrollToUnitTop();
+                        FlingScoller =null;
+
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+                        mViewController.UpdateMonth();
+                        FlingScoller = null;
+                        FlingByVerlocity(velocity);
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+                });
+            }
+        }
+
+        private void ScrollToCurrenAnimation(final int end, final int addTime){
             if(Scroller == null) {
-                Scroller = ObjectAnimator.ofInt(mSurface, "HJQ", mViewController.getScrollY(), end);
+                if(ScrollerLittle!=null) ScrollerLittle.cancel();
+                int start =mViewController.getScrollY();
+                Scroller = ObjectAnimator.ofInt(mSurface, "HJQ", start, end);
                 Scroller.setDuration(200);
                 Scroller.start();
                 Scroller.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -716,50 +768,15 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
                     @Override
                     public void onAnimationEnd(Animator animation) {
                         Scroller =null;
-                        if(!little) {
-                            if (addTime < 0) {
-                                for (int i = 0; i < -addTime; i++) {
-                                    mViewController.deleteExcess();
-                                }
-                            } else if (addTime > 0) {
-                                for (int i = 0; i < addTime; i++) {
-                                    Log.d("Test", "delete");
-                                    mViewController.scrollBy(0, -mViewController.deleteHide());
-                                }
-                            }
-                            int ScrollY = mViewController.getScrollY();
-                            int height = ScrollY;
-                            for (int i = 0; i < mViewController.getChildCount() / 2; i++) {
-                                MonthView monthView = (MonthView) mViewController.getChildAt(i * 2);
-                                if (height - monthView.getMonthHeight() < 0) {
-                                    break;
-                                }
-                                height -= monthView.getMonthHeight();
-                            }
-                            if (height - mSurface.MonthGap < 0) {
-                                ScrollToCurrenAnimation(ScrollY - height, 0, true);
-                            } else {
-                                height -= mSurface.MonthGap;
-                                int offset = height % mSurface.ViewCellHeight;
-                                if (offset < mSurface.ViewCellHeight / 2)
-                                    ScrollToCurrenAnimation(ScrollY - offset, 0, true);//mViewController.scrollBy(0, -offset);
-                                else
-                                    ScrollToCurrenAnimation(ScrollY +mSurface.ViewCellHeight-offset, 0, true);
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animation) {
-                        mViewController.scrollTo(0, end);
-                        mViewController.requestLayout();
-                        Scroller = null;
                         if (addTime < 0) {
                             for (int i = 0; i < -addTime; i++) {
+                                Log.d("Test", "delete Excess");
                                 mViewController.deleteExcess();
                             }
-                        } else if (addTime > 0) {
+                        }
+                        if (addTime > 0) {
                             for (int i = 0; i < addTime; i++) {
+                                Log.d("Test", "delete hide");
                                 mViewController.scrollBy(0, -mViewController.deleteHide());
                             }
                         }
@@ -773,16 +790,94 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
                             height -= monthView.getMonthHeight();
                         }
                         if (height - mSurface.MonthGap < 0) {
-                            ScrollToCurrenAnimation(ScrollY -height, 0, true);
+                            ScrollToLittle(ScrollY - height);
+                        } else {
+                            height -= mSurface.MonthGap;
+                            int offset = height % mSurface.ViewCellHeight;
+                            if (offset < mSurface.ViewCellHeight / 2)
+                                ScrollToLittle(ScrollY - offset);//mViewController.scrollBy(0, -offset);
+                            else
+                                ScrollToLittle(ScrollY + mSurface.ViewCellHeight - offset);
+                        }
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+                        mViewController.scrollTo(0, end);
+                        mViewController.requestLayout();
+
+
+                        if (addTime < 0) {
+                            for (int i = 0; i < -addTime; i++) {
+                                Log.d("Test", "delete Excess");
+                                mViewController.deleteExcess();
+                            }
+                        }
+                        if (addTime > 0) {
+                            for (int i = 0; i < addTime; i++) {
+                                Log.d("Test", "delete hide");
+                                mViewController.scrollBy(0, -mViewController.deleteHide());
+                            }
+                        }
+                        int ScrollY = mViewController.getScrollY();
+                        int height = ScrollY;
+                        for (int i = 0; i < mViewController.getChildCount() / 2; i++) {
+                            MonthView monthView = (MonthView) mViewController.getChildAt(i * 2);
+                            if (height - monthView.getMonthHeight() < 0) {
+                                break;
+                            }
+                            height -= monthView.getMonthHeight();
+                        }
+                        if (height - mSurface.MonthGap < 0) {
+                            ScrollToLittle(ScrollY - height);
 
                         } else {
                             height -= mSurface.MonthGap;
                             int offset = height % mSurface.ViewCellHeight;
                             if (offset < mSurface.ViewCellHeight / 3)
-                                ScrollToCurrenAnimation(ScrollY - offset, 0, true);//mViewController.scrollBy(0, -offset);
+                                ScrollToLittle(ScrollY - offset);//mViewController.scrollBy(0, -offset);
                             else
-                                ScrollToCurrenAnimation(ScrollY +mSurface.ViewCellHeight- offset, 0, true);
+                                ScrollToLittle(ScrollY + mSurface.ViewCellHeight - offset);
                         }
+                        Scroller = null;
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+                });
+            }
+        }
+        private void ScrollToLittle(final int end){
+            if(ScrollerLittle == null) {
+                int start =mViewController.getScrollY();
+                ScrollerLittle = ObjectAnimator.ofInt(mSurface, "HJQ", start, end);
+                ScrollerLittle.setDuration(50);
+                ScrollerLittle.start();
+                ScrollerLittle.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        int Value = (int) animation.getAnimatedValue();
+                        mViewController.scrollTo(0, Value);
+                        mViewController.requestLayout();
+                    }
+                });
+                ScrollerLittle.addListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        ScrollerLittle =null;
+
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+                        ScrollerLittle = null;
                     }
 
                     @Override
@@ -811,7 +906,7 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
 
         boolean LongEnough=false;
         boolean isScrolled = false;
-        float VelocityTime = 4/10000f;
+        float VelocityTime = 4/1000f;
 
         MonthView  SelectedMonthView=null;
 
@@ -837,19 +932,12 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
             mGestureDetector.setIsLongpressEnabled(false);
             HideSpace = ViewHeight*2;
             ExcessSpace = ViewHeight*2;
-            int ScrollTo=0;
             int temp = 0;
             do {
                 temp += addHide();
                 HideItemCount++;
-                MonthView monthView = (MonthView)getChildAt(getChildCount()-2);
-                if(monthView.gap) ScrollTo -= mSurface.ViewCellHeight;
             }while (temp < HideSpace);
             addExcess();
-            MonthView monthView = (MonthView)getChildAt(getChildCount()-2);
-            ScrollTo += temp;
-            if(!monthView.gap) ScrollTo += mSurface.ViewCellHeight;
-
             temp = 0;
             do {
                 temp += addExcess();
@@ -860,12 +948,28 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
             for(MonthView item:monthViews){
                 MonthViewHeight +=item.getMonthHeight();
             }
-            int index = ((CurrentWeekBegin.get(Calendar.DAY_OF_MONTH)+CalUtil.FindFirstDayofMonthInWeek(CurrentWeekBegin))/7-2)*mSurface.ViewCellHeight;
 
-            ScrollTo += index + mSurface.MonthGap;
 
-            //this.scrollTo(0, ScrollTo);
-            mViewController.GoToCurrent(CurrentWeekBegin.get(Calendar.YEAR) * 12 + CurrentWeekBegin.get(Calendar.MONTH) - (today.get(0) * 12 + today.get(1)));
+            int offset = CurrentWeekBegin.get(Calendar.YEAR) * 12 + CurrentWeekBegin.get(Calendar.MONTH) - (today.get(0) * 12 + today.get(1));
+            int AimScroll=0;
+            int begin = CalUtil.FindFirstDayofMonthInWeek(CurrentWeekBegin)-1;
+            int height = ((begin+CurrentWeekBegin.get(Calendar.DAY_OF_MONTH)-1)/7)*mSurface.ViewCellHeight+mSurface.MonthGap;
+
+            for (int i = 0; i <this.getChildCount()/2; i++) {
+                MonthView tempmonthView = (MonthView)this.getChildAt(i*2);
+                if(tempmonthView.index == offset){
+                    AimScroll += height;
+                    if(tempmonthView.gap){
+                        AimScroll -=mSurface.ViewCellHeight*mSurface.ScreenStrinkRatio;
+                    }
+                    break;
+                }
+                AimScroll+=((tempmonthView.mMonthItem.size()-1)/7+1)*mSurface.ViewCellHeight;
+                if(tempmonthView.gap){
+                    AimScroll -= mSurface.ViewCellHeight*mSurface.ScreenStrinkRatio;
+                }
+            }
+            this.scrollTo(0,AimScroll);
             setBackgroundColor(Color.rgb(245,245,245));
 
         }
@@ -908,7 +1012,7 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
                     AimScroll -= mSurface.ViewCellHeight*mSurface.ScreenStrinkRatio;
                 }
             }
-            mAnimatorController.ScrollToCurrenAnimation(AimScroll, addTime, false);
+            mAnimatorController.ScrollToCurrenAnimation(AimScroll, addTime);
 
 
         }
@@ -1084,31 +1188,35 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
                         }
                     case MONTH:
                         if(isScrolled) {
-                            int ScrollY = mViewController.getScrollY();
-                            int height = ScrollY;
-                            for (int i = 0; i < mViewController.getChildCount() / 2; i++) {
-                                MonthView monthView = (MonthView) mViewController.getChildAt(i * 2);
-                                if (height - monthView.getMonthHeight() < 0) {
-                                    break;
-                                }
-                                height -= monthView.getMonthHeight();
-                            }
-                            if (height - mSurface.MonthGap < 0) {
-                                mAnimatorController.ScrollToCurrenAnimation(ScrollY -height, 0, true);
-
-                            } else {
-                                height -= mSurface.MonthGap;
-                                int offset = height % mSurface.ViewCellHeight;
-                                if (offset < mSurface.ViewCellHeight / 2)
-                                    mAnimatorController.ScrollToCurrenAnimation(ScrollY - offset, 0, true);
-                                else
-                                    mAnimatorController.ScrollToCurrenAnimation(ScrollY + mSurface.ViewCellHeight-offset, 0, true);
-                            }
+                            scrollToUnitTop();
                         }
                         break;
                 }
             }
             return mGestureDetector.onTouchEvent(event);
+        }
+
+        void scrollToUnitTop(){
+
+            int ScrollY = mViewController.getScrollY();
+            int height = ScrollY;
+            for (int i = 0; i < mViewController.getChildCount() / 2; i++) {
+                MonthView monthView = (MonthView) mViewController.getChildAt(i * 2);
+                if (height - monthView.getMonthHeight() < 0) {
+                    break;
+                }
+                height -= monthView.getMonthHeight();
+            }
+            if (height - mSurface.MonthGap < 0) {
+                mAnimatorController.ScrollToLittle(ScrollY - height);
+            } else {
+                height -= mSurface.MonthGap;
+                int offset = height % mSurface.ViewCellHeight;
+                if (offset < mSurface.ViewCellHeight / 2)
+                    mAnimatorController.ScrollToLittle(ScrollY - offset);
+                else
+                    mAnimatorController.ScrollToLittle(ScrollY + mSurface.ViewCellHeight - offset);
+            }
         }
 
         @Override
@@ -1169,41 +1277,31 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
 
         private void UpdateMonth(){
             if (this.getScrollY() < ViewHeight + ScrollBuffer) {
-                int scroll = addHide();
-                this.scrollBy(0, scroll);
-                deleteExcess();
+                do {
+                    int scroll = addHide();
+                    this.scrollBy(0, scroll);
+                    deleteExcess();
+                }while(this.getScrollY() < ViewHeight + ScrollBuffer);
             } else if (this.getScrollY() > 2 * ViewHeight - ScrollBuffer) {
-                int scroll = -deleteHide();
-                this.scrollBy(0, scroll);
-                addExcess();
+                do {
+                    int scroll = -deleteHide();
+                    this.scrollBy(0, scroll);
+                    addExcess();
+                }while (this.getScrollY() > 2 * ViewHeight - ScrollBuffer);
             }
             requestLayout();
         }
         @Override
         public void onLongPress(MotionEvent e) {
-            Log.d("Test", "Long Press");
         }
 
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            if(Math.abs(velocityY )>5000&&OPERATION == MONTH) {
-                int offset = -(int) (velocityY * VelocityTime);
-                GoToCurrent(getMidIndex()+offset);
+            if(Math.abs(velocityY)>3000&&OPERATION == MONTH) {
+                mAnimatorController.FlingByVerlocity(velocityY);
             }
 
             return true;
-        }
-
-        private int getMidIndex(){
-            int temp=0;
-            for (int i = 0; i < getChildCount() / 2; i++) {
-                MonthView monthView = (MonthView)getChildAt(i*2);
-                temp += monthView.getHeight();
-                if(temp > HideSpace){
-                    return monthView.index;
-                }
-            }
-            return 0;
         }
 
     }

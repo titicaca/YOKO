@@ -8,6 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TableEvent extends DBTable {
+    public final static int VALUE_EVENT_STATUS_ACTIVE = 0;
+    public final static int VALUE_EVENT_STATUS_DELETED = 1;
+    public final static int VALUE_EVENT_UNMODIFIED = 0;
+    public final static int VALUE_EVENT_MODIFIED = 1;
 
     public TableEvent(SQLiteDatabase db) {
         super(db);
@@ -58,7 +62,7 @@ public class TableEvent extends DBTable {
             cv.put(DBConstants.COLUMN_EVENT_PROPERTY, eventRecord.property);
             cv.put(DBConstants.COLUMN_EVENT_DETAILLINK, eventRecord.detaillink);
             cv.put(DBConstants.COLUMN_EVENT_STATUS, eventRecord.status);
-            cv.put(DBConstants.COLUMN_EVENT_MODIFIED, 1);
+            cv.put(DBConstants.COLUMN_EVENT_MODIFIED, VALUE_EVENT_MODIFIED);
             cv.put(DBConstants.COLUMN_EVENT_UPDATETIME, System.currentTimeMillis());
             rid = db.insert(tableName, null, cv);
 
@@ -78,8 +82,8 @@ public class TableEvent extends DBTable {
 
         try {
             ContentValues cv = new ContentValues();
-            cv.put(DBConstants.COLUMN_EVENT_STATUS, 1);
-            cv.put(DBConstants.COLUMN_EVENT_MODIFIED, 1);
+            cv.put(DBConstants.COLUMN_EVENT_STATUS, VALUE_EVENT_STATUS_DELETED);
+            cv.put(DBConstants.COLUMN_EVENT_MODIFIED, VALUE_EVENT_MODIFIED);
             cv.put(DBConstants.COLUMN_EVENT_UPDATETIME, System.currentTimeMillis());
 
             db.update(tableName, cv,
@@ -94,7 +98,7 @@ public class TableEvent extends DBTable {
     }
 
     public void updateEvent(EventRecord eventRecord) {
-        updateEvent(eventRecord, 1);
+        updateEvent(eventRecord, VALUE_EVENT_MODIFIED);
     }
 
     public void updateEvent(EventRecord eventRecord, int modified) {
@@ -229,11 +233,11 @@ public class TableEvent extends DBTable {
     }
 
     public List<EventRecord> queryEvent(long uid, long startTime, long endTime) {
-        return queryEvent(uid, startTime, endTime, 0);
+        return queryEvent(uid, startTime, endTime, VALUE_EVENT_STATUS_ACTIVE);
     }
 
     public List<EventRecord> queryEvent(long uid, long startTime, long endTime, int status) {
-        return queryEvent(uid, startTime, endTime, status, 1);
+        return queryEvent(uid, startTime, endTime, status, VALUE_EVENT_MODIFIED);
     }
 
     public List<EventRecord> queryEvent(long uid, long startTime, long endTime, int status, int modified) {
@@ -242,7 +246,7 @@ public class TableEvent extends DBTable {
         try {
             cs = db.query(tableName, null,
                     DBConstants.COLUMN_EVENT_UID + " = ?" + " AND " +
-                            DBConstants.COLUMN_EVENT_TIMEEND + " > ?" + " AND " +
+                            DBConstants.COLUMN_EVENT_TIMEEND + " >= ?" + " AND " +
                             DBConstants.COLUMN_EVENT_TIMEBEGIN + " < ?" + " AND " +
                             DBConstants.COLUMN_EVENT_STATUS + " <= ?" + " AND " +
                             DBConstants.COLUMN_EVENT_MODIFIED + " <= ?",
@@ -259,11 +263,11 @@ public class TableEvent extends DBTable {
     }
 
     public List<EventRecord> queryEvent(long uid) {
-        return queryEvent(uid, 0);
+        return queryEvent(uid, VALUE_EVENT_STATUS_ACTIVE);
     }
 
     public List<EventRecord> queryEvent(long uid, int status) {
-        return queryEvent(uid, status, 1);
+        return queryEvent(uid, status, VALUE_EVENT_MODIFIED);
     }
 
     public List<EventRecord> queryEvent(long uid, int status, int modified) {

@@ -1,7 +1,5 @@
 package com.fifteentec.Component.calendar;
 
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.Context;
 
 import android.graphics.Canvas;
@@ -12,7 +10,6 @@ import android.graphics.Rect;
 
 import android.util.AttributeSet;
 
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 
@@ -20,11 +17,8 @@ import android.view.View;
 
 import android.view.ViewGroup;
 
-import com.fifteentec.Fragment.CalViewFragment;
-
 import java.util.ArrayList;
 
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;

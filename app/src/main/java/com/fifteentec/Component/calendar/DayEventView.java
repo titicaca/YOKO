@@ -7,9 +7,12 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.GestureDetector;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -171,6 +174,7 @@ public class DayEventView extends ViewGroup {
             mSurface.initSurface();
             firstEntry = false;
             mDateView.setTextSize(TypedValue.COMPLEX_UNIT_SP, mSurface.TextSize);
+            mAllDayView.initAllDay();
 
         }
         int SidePadding = (int) (mScreenWidth * mSurface.SidePadding);
@@ -306,6 +310,8 @@ public class DayEventView extends ViewGroup {
 
     public void deleteView(long rid){
         mEventManager.deleteByRid(rid);
+        mNormalEvent.UpdateView();
+        mAllDayView.UpdateView();
         invalidate();
     }
 
@@ -336,49 +342,21 @@ public class DayEventView extends ViewGroup {
         int TitleTextPadding;
 
         float AllDayViewWidth = (5/ 16f);
-        int AllDayItemHeight = 100;
+        int AllDayItemHeight ;
+        float AllDayItemHeightRatio = (1/8f) ;
         int AllDayViewPadding;
-        float AllDayViewPaddingRatio = 1/40f;
+        float AllDayViewPaddingRatio = 1/65f;
+        float AllDayViewTextSizeBase = 0f;
+        float AllDayViewTextSizeRatio = 1/30f;
 
-        Paint LinePaint;
-        int LineColor = Color.BLACK;
-        int LineWidth = 3;
-        int LinePadding = 80;
-
-        Paint NormalText;
-        int NormalEventViewDivid = 12;
-        int NormalEvnetLineLength = 100;
-        int NormalEvnetTextColor = Color.BLACK;
-        int NormalEvnetTextSize = 50;
-
-        Paint tempRectPaint;
-        int tempRectColor = Color.BLUE;
-        int tempRectWidth = 10;
-
-        Paint ExistRectPaint;
-        int ExistRectColor = Color.GREEN;
-
-        Paint NormalEventPaint;
-        int NormalEventColor = Color.GRAY;
+        String AllDayFirstString = "全天事件";
 
 
         void initSurface(){
-            LinePaint = new Paint();
-            LinePaint.setColor(LineColor);
-            LinePaint.setStrokeWidth(LineWidth);
-            NormalText = new Paint();
-            NormalText.setColor(NormalEvnetTextColor);
-            NormalText.setTextSize(NormalEvnetTextSize);
-            tempRectPaint = new Paint();
-            tempRectPaint.setColor(tempRectColor);
-            tempRectPaint.setStyle(Paint.Style.FILL);
-            NormalEventPaint = new Paint();
-            NormalEventPaint.setColor(NormalEventColor);
-            ExistRectPaint = new Paint();
-            ExistRectPaint.setColor(ExistRectColor);
+
             PageSidePadding = (int)(mScreenWidth*PageSidePaddingRatio);
             PageUpdownPadding= (int)(mScreenHeight*PageUpdownPaddingRatio);
-            AllDayViewPadding = (int)(mScreenHeight*AllDayViewPaddingRatio);
+            AllDayViewPadding = (int)(mScreenWidth*AllDayViewPaddingRatio);
             TextHeight = (int)(mScreenHeight*TextHeightRatio);
             TitleDatePaint.setTextSize(mScreenWidth * TitleDatePaintRatio);
             TitleDatePaint.setAntiAlias(true);
@@ -388,15 +366,18 @@ public class DayEventView extends ViewGroup {
             TitleSmallPaint.setAntiAlias(true);
             TitleSmallPaint.setColor(Color.WHITE);
             TitleTextPadding = (int)(mScreenWidth*TitleTextPaddingRatio);
+            AllDayItemHeight = (int)(AllDayItemHeightRatio*mScreenWidth);
         }
 
     }
 
     private class AllDayView extends ViewGroup implements GestureDetector.OnGestureListener {
 
-        int[] tempRect = new int[5];
-        int FullHeight = 0;
         long DownChildId = -1;
+        int ScrollMin = 0;
+        int ScreenHeight=0;
+        int allHeihgt=0;
+
 
         GestureDetector mgestureDetector;
 
@@ -410,19 +391,45 @@ public class DayEventView extends ViewGroup {
 
         public AllDayView(Context context, AttributeSet attrs, int defStyleAttr) {
             super(context, attrs, defStyleAttr);
-            initAllDay();
+
         }
 
-        private void initAllDay() {
+        void initAllDay() {
             mgestureDetector = new GestureDetector(mcontext, this);
-            for (int i = 0; i < mEventManager.getAllDayEventCount(); i++) {
-                tempRectView tx = new tempRectView(mcontext);
-                String item = mEventManager.getAllDayIntroduciton(i);
-                tx.setText(item);
-                tx.setTag(mEventManager.getAllDayEventRid(i));
-                addView(tx);
+            UpdateView();
+        }
+
+        void addTx(int i){
+            tempRectView tx = new tempRectView(mcontext);
+            String item = mEventManager.getAllDayIntroduciton(i);
+            tx.setText(item);
+            tx.setTextSize(TypedValue.COMPLEX_UNIT_PX,mSurface.AllDayViewTextSizeBase + mSurface.AllDayViewTextSizeRatio * mScreenWidth);
+            Drawable leftDrawabletx = getResources().getDrawable(R.drawable.dot);
+            leftDrawabletx.setBounds(0,0,mSurface.AllDayItemHeight/5,mSurface.AllDayItemHeight/5);
+            tx.setCompoundDrawablePadding(mSurface.AllDayViewPadding);
+            tx.setCompoundDrawables(leftDrawabletx, null, null, null);
+            tx.setPadding(mSurface.AllDayViewPadding, mSurface.AllDayViewPadding, mSurface.AllDayViewPadding, mSurface.AllDayViewPadding);
+            int aimColor;
+            switch (mEventManager.getAllDayTag(i)){
+                case 0:
+                    aimColor = R.color.WorkEventColor;
+                    break;
+                case 1:
+                    aimColor = R.color.StudyEventColor;
+                    break;
+                case 2:
+                    aimColor = R.color.EntertainEventColor;
+                    break;
+                case 3:
+                    aimColor = R.color.OtherEventColor;
+                    break;
+                default:
+                    aimColor = R.color.OtherEventColor;
             }
-            setBackgroundColor(Color.parseColor("#a3a3a3"));
+            tx.setBackgroundColor(getResources().getColor(aimColor));
+            tx.setGravity(Gravity.CENTER_VERTICAL);
+            tx.setTag(mEventManager.getAllDayEventRid(i));
+            addView(tx);
         }
 
 
@@ -430,12 +437,12 @@ public class DayEventView extends ViewGroup {
         protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
             int width = MeasureSpec.getSize(widthMeasureSpec);
             int height = MeasureSpec.getSize(heightMeasureSpec);
+            ScreenHeight =height;
             for (int i = 0; i < getChildCount(); i++) {
                 View temp = getChildAt(i);
                 int widthSpec = MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY);
                 int heightSpec = MeasureSpec.makeMeasureSpec(mSurface.AllDayItemHeight, MeasureSpec.EXACTLY);
                 temp.measure(widthSpec, heightSpec);
-                FullHeight += mSurface.AllDayItemHeight;
             }
 
             setMeasuredDimension(width, height);
@@ -447,14 +454,15 @@ public class DayEventView extends ViewGroup {
             for (int i = 0; i < getChildCount(); i++) {
                 View temp = getChildAt(i);
                 temp.layout(0, height, temp.getMeasuredWidth(), height + temp.getMeasuredHeight());
-                height += temp.getMeasuredHeight();
+                height += temp.getMeasuredHeight()+mSurface.AllDayViewPadding;
             }
+            allHeihgt = getChildCount()*(mSurface.AllDayViewPadding+mSurface.AllDayItemHeight);
         }
 
 
         @Override
         public boolean onTouchEvent(MotionEvent event) {
-            if (event.getAction() == MotionEvent.ACTION_UP) DownChildId = -1;
+            //if (event.getAction() == MotionEvent.ACTION_UP) DownChildId = -1;
             return mgestureDetector.onTouchEvent(event);
         }
 
@@ -471,14 +479,37 @@ public class DayEventView extends ViewGroup {
         @Override
         public boolean onSingleTapUp(MotionEvent e) {
             if (mEventManager.isAllDayEventExist(DownChildId)) {
-                Toast.makeText(mcontext, mEventManager.getIntroduction(DownChildId), Toast.LENGTH_SHORT).show();
+                dayEventViewListener.checkExist(DownChildId);
+                DownChildId = -1;
+            }else if(DownChildId == -2){
+                EventRecord eventRecord =  new EventRecord();
+                eventRecord.timebegin = mEventManager.DayView_Date;
+                eventRecord.timeend = mEventManager.DayView_Date;
+                dayEventViewListener.createRecord(NewEventView.HAVE_TIME,eventRecord);
+
             }
             return true;
         }
 
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            return false;
+            DownChildId = -1;
+            Log.d("Test", "getScrollY:" + getScrollY() + " distanceY:" + distanceY + " allHeight:" + this.allHeihgt + " ScreenHeight:" + ScreenHeight);
+            if(distanceY<0){
+                if(getScrollY()>ScrollMin) {
+                    if (getScrollY() - ScrollMin < Math.abs(distanceY)) scrollTo(0, ScrollMin);
+                    else scrollBy(0, (int) distanceY);
+                }else scrollBy(0,ScrollMin);
+            }else {
+                if(getScrollY()<this.allHeihgt -ScreenHeight) {
+                    if (this.allHeihgt - ScreenHeight - getScrollY() < Math.abs(distanceY))
+                        scrollTo(0, allHeihgt - ScreenHeight);
+                    else scrollBy(0, (int) distanceY);
+                }else {
+                    scrollTo(0,this.allHeihgt -ScreenHeight>ScrollMin?this.allHeihgt -ScreenHeight:ScrollMin);
+                }
+            }
+            return true;
         }
 
 
@@ -493,6 +524,7 @@ public class DayEventView extends ViewGroup {
                 eventRecord.timeend = mEventManager.DayView_Date;
                 dayEventViewListener.createRecord(NewEventView.HAVE_TIME,eventRecord);
             }
+            DownChildId =-1;
 
         }
 
@@ -504,12 +536,21 @@ public class DayEventView extends ViewGroup {
         public void UpdateView() {
             removeAllViews();
             DownChildId = -1;
+
+            tempRectView txfirst = new tempRectView(mcontext);
+            txfirst.setText(mSurface.AllDayFirstString);
+            txfirst.setTextSize(TypedValue.COMPLEX_UNIT_PX,mSurface.AllDayViewTextSizeBase + mSurface.AllDayViewTextSizeRatio * mScreenWidth);
+            Drawable leftDrawable = getResources().getDrawable(R.drawable.plusbutton);
+            leftDrawable.setBounds(0,0,mSurface.AllDayItemHeight/5,mSurface.AllDayItemHeight/5);
+            txfirst.setCompoundDrawablePadding(mSurface.AllDayViewPadding);
+            txfirst.setCompoundDrawables(leftDrawable, null, null, null);
+            txfirst.setTag((long) -2);
+            txfirst.setPadding(mSurface.AllDayViewPadding,mSurface.AllDayViewPadding,mSurface.AllDayViewPadding,mSurface.AllDayViewPadding);
+            txfirst.setBackgroundColor(getResources().getColor(R.color.AllDayEvent));
+            txfirst.setGravity(Gravity.CENTER_VERTICAL);
+            addView(txfirst);
             for (int i = 0; i < mEventManager.getAllDayEventCount(); i++) {
-                tempRectView tx = new tempRectView(mcontext);
-                String item = mEventManager.getAllDayIntroduciton(i);
-                tx.setText(item);
-                tx.setTag(i);
-                addView(tx);
+                addTx(i);
             }
         }
 

@@ -14,7 +14,7 @@ import com.fifteentec.Component.User.UserServer;
 import com.fifteentec.Fragment.FoundFragment.FoundFragment;
 import com.fifteentec.Fragment.FriendsFragment;
 import com.fifteentec.Fragment.MyPageFragment;
-import com.fifteentec.Fragment.CalViewFragment;
+import com.fifteentec.Fragment.CalendarFragment.CalViewFragment;
 import com.Service.InvitationReceiver;
 import com.fifteentec.Fragment.TabButtonFragment;
 import com.fifteentec.TestRicheng.TestFragment;
@@ -127,12 +127,12 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
                         Toast.LENGTH_SHORT);
                 c.setDuration(Toast.LENGTH_SHORT);
                 c.show();
-               /* if (myPageFragment == null) {
+                if (myPageFragment == null) {
                     myPageFragment = new MyPageFragment();
                     mFmTrans.add(R.id.id_content, myPageFragment, "home");
                 } else {
                     mFmTrans.show(myPageFragment);
-                }*/
+                }
                 break;
             default:
                 Log.e("Error", "Wrong TabActivity Selector");

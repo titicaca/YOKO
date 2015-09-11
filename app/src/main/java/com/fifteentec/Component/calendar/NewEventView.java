@@ -30,7 +30,6 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import com.Database.EventRecord;
 import com.fifteentec.yoko.R;
@@ -57,7 +56,7 @@ public class NewEventView extends ViewGroup{
     private ImageView mDeleteButton;
     private HorizontalScrollView mSavedPic;
     private BackGroundPage mBackGroundPage;
-
+    private SwitchButton mAlldaySwitchBotton;
 
     private Surface mSurface;
 
@@ -182,12 +181,17 @@ public class NewEventView extends ViewGroup{
         mBackGround.setAlpha(mSurface.BackgroundAlpha);
         addView(mBackGround);
 
+
+
         mBackGroundPage = new BackGroundPage(mContext);
         addView(mBackGroundPage);
 
         mInputPage = new InputPage(mContext);
         addView(mInputPage);
         mFunctionBar = new FunctionBar(mContext);
+
+        mAlldaySwitchBotton = SwitchButton.newInstance(mContext,R.drawable.switchbutton_frame,R.drawable.switchbutton_full_button,R.drawable.switchbutton_background_mask,R.drawable.switchbutton_circle_trumb);
+        //addView(mAlldaySwitchBotton);
 
 
         mAddButton = new ImageView(mContext);
@@ -270,7 +274,6 @@ public class NewEventView extends ViewGroup{
                 Context.setLayoutParams(lp);
                 mSavedPic.addView(Context);
                 addView(mSavedPic);
-                //mInputPage.HeightChange();
             }
             else {
                 Context=(LinearLayout)mSavedPic.getChildAt(0);
@@ -302,7 +305,6 @@ public class NewEventView extends ViewGroup{
         }else{
             removeView(mSavedPic);
             mSavedPic = null;
-            //mInputPage.HeightChange();
         }
     }
 
@@ -424,13 +426,13 @@ public class NewEventView extends ViewGroup{
             int heightspec = MeasureSpec.makeMeasureSpec(mSurface.bottonBarHeight+2*mSurface.bottonHeightBarPadding,MeasureSpec.EXACTLY);
             mDeleteButton.measure(widthspec,heightspec);
         }
-/*
-        if(mSavedPic != null){
-            int widthspec = MeasureSpec.makeMeasureSpec((int)(mScreenWidth*(1-mSurface.InputPageSidePadding*2)),MeasureSpec.EXACTLY);
-            int heightspec = MeasureSpec.makeMeasureSpec((int)(mScreenHeight*(1-mSurface.InputPageUpdownPadding*2)*mSurface.PicScrollRatio),MeasureSpec.EXACTLY);
-            mSavedPic.measure(widthspec,heightspec);
+
+        if(mAlldaySwitchBotton != null){
+            int widthspec = MeasureSpec.makeMeasureSpec(mScreenWidth,MeasureSpec.EXACTLY);
+            int heightspec = MeasureSpec.makeMeasureSpec(mScreenHeight,MeasureSpec.EXACTLY);
+            mAlldaySwitchBotton.measure(widthspec,heightspec);
         }
-*/
+
         setMeasuredDimension(mScreenWidth, mScreenHeight);
     }
 
@@ -449,12 +451,15 @@ public class NewEventView extends ViewGroup{
             int lineheight = mInputPage.getLineHeight();
             int linecount = mInputPage.getLineCount()+1;
             int botton;
+            /*
             Log.d("Test","LineHeight:"+lineheight+"LineCount:"+linecount);
             if(t +InputUPdownPadding+lineheight*linecount+mSurface.InputPageTextPadding<b-InputUPdownPadding-mSurface.InputPageTextPadding){
                 botton = t +InputUPdownPadding+lineheight*linecount+mSurface.InputPageTextPadding;
             }else{
                 botton =b-InputUPdownPadding-mSurface.InputPageTextPadding;
             }
+            */
+            botton = mScreenHeight-InputUPdownPadding-2*mSurface.bottonHeightBarPadding-mSurface.bottonBarHeight-mSurface.InputPageTextPadding;
             mInputPage.layout(l + mSurface.InputPageTextPadding + InputSidePadding,
                     t + InputUPdownPadding + mSurface.InputPageTextPadding,
                     r - InputSidePadding - mSurface.InputPageTextPadding,
@@ -512,6 +517,10 @@ public class NewEventView extends ViewGroup{
                     b-InputUPdownPadding);
         }
 
+        if(mAlldaySwitchBotton !=null){
+            mAlldaySwitchBotton.layout(0,0,mAlldaySwitchBotton.getMeasuredWidth(),mAlldaySwitchBotton.getMeasuredHeight());
+        }
+
     }
 
 
@@ -529,8 +538,8 @@ public class NewEventView extends ViewGroup{
         public int InputPageTextPadding ;
         float InputPageTextPaddingRatio = 1/1000f;
         float InputPageTextSize ;
-        float InputPageTextBaseSize = 10f;
-        float InputPageTextSizeRatio = 1/60f;
+        //float InputPageTextBaseSize = 10f;
+        float InputPageTextSizeRatio = 1/20f;
 
 
         int bottonBarHeight;
@@ -554,8 +563,8 @@ public class NewEventView extends ViewGroup{
         public int CheckRectPadding;
         float CheckBoxRectPadingRatio = 1/80f;
         float CheckBoxTextSize;
-        float CheckBoxTextBaseSize = 5f;
-        float CheckBoxTextSizeRatio = 1/80f;
+        //float CheckBoxTextBaseSize = 5f;
+        float CheckBoxTextSizeRatio = 1/25f;
 
         Paint BackGoundPagePaint = new Paint();
         Paint DashLinePaint = new Paint();
@@ -564,12 +573,14 @@ public class NewEventView extends ViewGroup{
         float GapLineWidthRatio= 1/60f;
         float DashLineWidth = 1/200f;
 
+        float ItemHeight = 1/30f;
+
 
         void initSurface(){
             InputPageTextPadding = (int)(mScreenWidth*InputPageTextPaddingRatio);
             BackGoundPagePaint.setColor(Color.WHITE);
             //BackGoundPagePaint.setShadowLayer(mScreenHeight * ShadowOffsetRatio / 2, mScreenHeight * ShadowOffsetRatio, mScreenHeight * ShadowOffsetRatio, Color.BLACK);
-            InputPageTextSize =  (InputPageTextBaseSize+mScreenWidth*InputPageTextSizeRatio);
+            InputPageTextSize =  (mScreenWidth*InputPageTextSizeRatio);
             addBarHeight = (int)(mScreenWidth*addBarHeightRatio);
             bottonBarHeight = (int) (mScreenHeight*bottonBarHeightRatio);
             bottonBarPadding = (int)(mScreenHeight*bottonBarPaddingRatio);
@@ -585,7 +596,7 @@ public class NewEventView extends ViewGroup{
             IconInterval =(int)(mScreenWidth*IconIntervalRatio);
             CheckBoxPadding = (int)(mScreenWidth*CheckBoxPaddingRatio);
             CheckRectPadding = (int)(mScreenWidth*CheckBoxRectPadingRatio);
-            CheckBoxTextSize = CheckBoxTextBaseSize+(mScreenWidth*CheckBoxTextSizeRatio);
+            CheckBoxTextSize =(mScreenWidth*CheckBoxTextSizeRatio);
 
 
 
@@ -599,11 +610,6 @@ public class NewEventView extends ViewGroup{
 
 
         private String HintString = "诶嘿嘿...";
-
-        private int TopPadding =mSurface.InputPageTextPadding;
-        private int BottonPadding ;
-        private int LeftPadding =mSurface.InputPageTextPadding;
-        private int RightPadding =mSurface.InputPageTextPadding;
 
 
         private TextWatcher mtextWatcher = new TextWatcher() {
@@ -642,10 +648,9 @@ public class NewEventView extends ViewGroup{
 
 
         public void init(){
-            //BottonPadding = mSurface.FounctionBarPadding+TopPadding+mSurface.FounctionBarPadding;
             setBackgroundColor(mSurface.InputBackground);
             Log.d("Test","Size:"+mSurface.InputPageTextSize);
-            setTextSize(mSurface.InputPageTextSize);
+            setTextSize(TypedValue.COMPLEX_UNIT_PX,mSurface.InputPageTextSize);
             setGravity(Gravity.TOP);
             setHint(HintString);
             if(introduction != "null") setText(introduction);
@@ -653,12 +658,7 @@ public class NewEventView extends ViewGroup{
             setMaxEms(effectWidth/(int)(getTextSize()*(7/6f)));
             addTextChangedListener(mtextWatcher);
         }
-/*
-        public void HeightChange() {
-            if(mSavedPic != null) BottonPadding = (int)(mSurface.FounctionBarPadding+TopPadding+mSurface.FounctionBarHeight+mScreenHeight*(1-2*mSurface.InputPageUpdownPadding)*mSurface.PicScrollRatio+2*mSurface.PicScrollPadding);
-            else BottonPadding =mSurface.FounctionBarPadding+TopPadding+mSurface.FounctionBarHeight;
-            setPadding(LeftPadding,TopPadding,RightPadding,BottonPadding);
-        }*/
+
     }
 
     private class FunctionView extends ViewGroup{
@@ -668,7 +668,7 @@ public class NewEventView extends ViewGroup{
         private int CheckboxPadding;
         private int RectPadding;
         private float TextSize ;
-        private int SquareSize;
+        private int itemHeight;
 
         private Paint RectPaint;
 
@@ -683,8 +683,8 @@ public class NewEventView extends ViewGroup{
                 "工作","学习","娱乐","其他"
         ));
 
-        private List<Integer> TagSelectedList = new ArrayList<>(Arrays.asList(
-                getResources().getColor(R.color.WorkEventColor),getResources().getColor(R.color.StudyEventColor),getResources().getColor(R.color.EntertainEventColor),getResources().getColor(R.color.OtherEventColor)
+        private List<Drawable> TagSelectedList = new ArrayList<>(Arrays.asList(
+                getResources().getDrawable(R.drawable.radiobtn_work),getResources().getDrawable(R.drawable.radiobtn_study),getResources().getDrawable(R.drawable.radiobtn_entertainment),getResources().getDrawable(R.drawable.radiobtn_other)
         ));
 
         public FunctionView(Context context) {
@@ -713,11 +713,18 @@ public class NewEventView extends ViewGroup{
             PathEffect ef = new DashPathEffect(new float[]{15,5},1);
             RectPaint.setPathEffect(ef);
             RectPaint.setStrokeWidth(3);
+            for (int i = 0; i < TagSelectedList.size(); i++) {
+                Drawable temp = TagSelectedList.get(i);
+                temp.setBounds(0,0,(int)TextSize,(int)TextSize);
+            }
+            itemHeight  = (int)(mScreenHeight*mSurface.ItemHeight);
+
         }
 
         public void PopoutAnim(int Target){
             removeAllViews();
             LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
+            //lp.height = itemHeight;
             switch (Target){
                 case REMINED:
 
@@ -727,14 +734,12 @@ public class NewEventView extends ViewGroup{
                         radioButton.setText(ReminedList.get(i));
                         radioButton.setLayoutParams(lp);
                         radioButton.setTag(i);
-                        radioButton.setTextSize(TypedValue.COMPLEX_UNIT_SP,TextSize);
+                        radioButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, TextSize);
                         radioGroup.addView(radioButton);
                         if(i==RemindSelected){
                             radioButton.setChecked(true);
                         }
-
                     }
-
                     radioGroup.setTag(REMINED);
                     radioGroup.setLayoutParams(lp);
                     radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -753,9 +758,15 @@ public class NewEventView extends ViewGroup{
                         RadioButton radioButton = new RadioButton(mContext);
                         radioButton.setText(TagList.get(i));
                         radioButton.setLayoutParams(lp);
-                        radioButton.setBackgroundColor(TagSelectedList.get(i));
                         radioButton.setTag(i);
-                        radioButton.setTextSize(TypedValue.COMPLEX_UNIT_SP, TextSize);
+                        Drawable temp = TagSelectedList.get(i);
+                        radioButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, TextSize);
+                        radioButton.setButtonDrawable(android.R.color.transparent);
+                        temp.setBounds(0, 0, itemHeight, itemHeight);
+                        radioButton.setCompoundDrawablePadding(itemHeight / 3);
+                        radioButton.setPadding(itemHeight/3,itemHeight/3,itemHeight/3,itemHeight/3);
+                        radioButton.setCompoundDrawables(temp, null, null, null);
+
                         radioGroupTags.addView(radioButton);
                         if(i==TagSelected){
                             radioButton.setChecked(true);
@@ -1095,7 +1106,7 @@ public class NewEventView extends ViewGroup{
             int tempheight=0;
             if(FunctionActivate == REMINED) tempheight=0;
             else if(FunctionActivate == TAG) tempheight = mSurface.IconSide+mSurface.IconInterval;
-            RectF drawRect = new RectF(CheckboxPadding,tempheight+CheckboxPadding,getMeasuredWidth()-CheckboxPadding,tempheight+getMeasuredHeight()-CheckboxPadding);
+            RectF drawRect = new RectF(CheckboxPadding,tempheight+CheckboxPadding,getMeasuredWidth()-CheckboxPadding,tempheight+getMeasuredHeight() - CheckboxPadding);
             canvas.drawRoundRect(drawRect,20,20,RectPaint);
         }
     }
