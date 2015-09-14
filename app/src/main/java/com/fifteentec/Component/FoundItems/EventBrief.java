@@ -11,9 +11,13 @@ public class EventBrief {
     private String time="";
     private String location="";
     private String tags="";
+    private String name = "";
 
     public String getGroupName(){
         return groupName;
+    }
+    public String getName(){
+        return name;
     }
     public String getEventIntro(){
         return eventIntro;
@@ -32,6 +36,9 @@ public class EventBrief {
         return tags;
     }
 
+    public void setName(String name){
+        this.name = name;
+    }
     public void setGroupName(String name){
         this.groupName = name;
     }

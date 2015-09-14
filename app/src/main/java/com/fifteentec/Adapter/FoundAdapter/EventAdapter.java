@@ -28,6 +28,7 @@ public class EventAdapter extends BaseAdapter{
 
     static class ListItemView {
         public TextView name;
+        public TextView groupName;
         public TextView intro;
         public ImageView logo;
         public ImageView event;
@@ -78,7 +79,6 @@ public class EventAdapter extends BaseAdapter{
         }
 
         item.name.setText(eventList.get(position).getGroupName());
-        item.time.setText(eventList.get(position).getTime());
         item.location.setText(eventList.get(position).getLocation());
 
         if(!"".equals(eventList.get(position).getEventIntro()) && eventList.get(position).getEventIntro().length()>30){

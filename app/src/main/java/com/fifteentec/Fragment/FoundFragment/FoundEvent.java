@@ -190,11 +190,8 @@ public class FoundEvent extends Fragment {
 
                     Bundle args = new Bundle();
                     args.putString("name", eventList.get(position).getGroupName());
-                    args.putString("intro", eventList.get(position).getEventIntro());
+                    args.putString("groupName", eventList.get(position).getEventIntro());
                     args.putString("uri", eventList.get(position).getLogoUri());
-                    args.putString("time", eventList.get(position).getTime());
-                    args.putString("location", eventList.get(position).getLocation());
-                    args.putString("tags", eventList.get(position).getTags());
                     eventItem.setArguments(args);
 
                     mFmTrans.add(R.id.id_content, eventItem, "eventItem");
