@@ -4,6 +4,31 @@
     android:layout_height="match_parent"
     android:gravity="top"
     android:orientation="vertical" >
+    <RelativeLayout android:id="@+id/top3"
+        android:layout_width="fill_parent"
+        android:layout_alignParentTop="true"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:layout_height="wrap_content">
+        <EditText android:id="@+id/etSearch3"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:background="@drawable/search_frame"
+            android:layout_marginRight="10dp"
+            android:paddingLeft="45dp"
+            android:textSize="18sp"
+            android:hint="@string/search"/>
+
+        <ImageView android:id="@+id/ivDeleteText3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/delete"
+            android:layout_centerInParent="true"
+            android:paddingRight="20dp"
+            android:visibility="gone"/>
+    </RelativeLayout>
     <com.fifteentec.Component.FoundItems.PullToRefresh
         android:id="@+id/refreshable_view2"
         android:layout_width="fill_parent"

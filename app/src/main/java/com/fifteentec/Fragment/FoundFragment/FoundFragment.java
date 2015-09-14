@@ -30,14 +30,12 @@ public class FoundFragment extends Fragment {
     private int offset = 0;
     private int position_one;
     private int position_two;
-    private int position_three;
     private ImageView bottomLine;
     private int bottomLineWidth;
-    public final static int num = 4 ;
+    public final static int num = 3 ;
     Fragment group;
     Fragment activity;
     Fragment favorite;
-    Fragment msgbox;
     Resources resources;
 
 
@@ -61,12 +59,11 @@ public class FoundFragment extends Fragment {
         tabGroup = (TextView) parentView.findViewById(R.id.tab_group);
         tabActivity = (TextView) parentView.findViewById(R.id.tab_activity);
         tabFavorite = (TextView) parentView.findViewById(R.id.tab_favorite);
-        tabMsgBox = (TextView) parentView.findViewById(R.id.tab_msgbox);
 
         tabGroup.setOnClickListener(new MyOnClickListener(0));
         tabActivity.setOnClickListener(new MyOnClickListener(1));
         tabFavorite.setOnClickListener(new MyOnClickListener(2));
-        tabMsgBox.setOnClickListener(new MyOnClickListener(3));
+
         bottomLine = (ImageView) parentView.findViewById(R.id.bottom_line);
         bottomLineWidth = bottomLine.getLayoutParams().width;
         DisplayMetrics dm = new DisplayMetrics();
@@ -76,8 +73,6 @@ public class FoundFragment extends Fragment {
         int avg = screenW / num;
         position_one = avg+offset;
         position_two = avg*2+offset;
-        position_three = avg*3+offset;
-
     }
 
     @SuppressLint("NewApi")
@@ -88,12 +83,10 @@ public class FoundFragment extends Fragment {
         group = new FoundGroup();
         activity = new FoundEvent();
         favorite = new FoundFavorite();
-        msgbox = new FoundMsgBoxFragment();
 
-        fragmentsList.add(group);
         fragmentsList.add(activity);
+        fragmentsList.add(group);
         fragmentsList.add(favorite);
-        fragmentsList.add(msgbox);
 
         mPager.setAdapter(new MyFragmentPagerAdapter(getChildFragmentManager(), fragmentsList));
         mPager.setOnPageChangeListener(new MyOnPageChangeListener());
@@ -124,32 +117,24 @@ public class FoundFragment extends Fragment {
                 case 0:
                     if (currIndex == 1) {
                         animation = new TranslateAnimation(position_one, offset, 0, 0);
-                        tabActivity.setTextColor(resources.getColor(R.color.gray));
+                        tabGroup.setTextColor(resources.getColor(R.color.gray));
                     }
                     if (currIndex == 2) {
                         animation = new TranslateAnimation(position_two,offset, 0, 0);
                         tabFavorite.setTextColor(resources.getColor(R.color.gray));
                     }
-                    if (currIndex == 3) {
-                        animation = new TranslateAnimation(position_three,offset, 0, 0);
-                        tabFavorite.setTextColor(resources.getColor(R.color.gray));
-                    }
-                    tabGroup.setTextColor(resources.getColor(R.color.black));
+                    tabActivity.setTextColor(resources.getColor(R.color.black));
                     break;
                 case 1:
                     if (currIndex == 0) {
                         animation = new TranslateAnimation(offset, position_one, 0, 0);
-                        tabGroup.setTextColor(resources.getColor(R.color.gray));
+                        tabActivity.setTextColor(resources.getColor(R.color.gray));
                     }
                     if (currIndex == 2) {
                         animation = new TranslateAnimation(position_two, position_one, 0, 0);
                         tabFavorite.setTextColor(resources.getColor(R.color.gray));
                     }
-                    if (currIndex == 3) {
-                        animation = new TranslateAnimation(position_three,position_one, 0, 0);
-                        tabFavorite.setTextColor(resources.getColor(R.color.gray));
-                    }
-                    tabActivity.setTextColor(resources.getColor(R.color.black));
+                    tabGroup.setTextColor(resources.getColor(R.color.black));
                     break;
                 case 2:
                     if (currIndex == 0) {
@@ -159,25 +144,6 @@ public class FoundFragment extends Fragment {
                     if (currIndex == 1) {
                         animation = new TranslateAnimation(position_one, position_two, 0, 0);
                         tabGroup.setTextColor(resources.getColor(R.color.gray));
-                    }
-                    if (currIndex == 3) {
-                        animation = new TranslateAnimation(position_three,position_two, 0, 0);
-                        tabFavorite.setTextColor(resources.getColor(R.color.gray));
-                    }
-                    tabFavorite.setTextColor(resources.getColor(R.color.black));
-                    break;
-                case 3:
-                    if (currIndex == 0) {
-                        animation = new TranslateAnimation(offset, position_three, 0, 0);
-                        tabActivity.setTextColor(resources.getColor(R.color.gray));
-                    }
-                    if (currIndex == 1) {
-                        animation = new TranslateAnimation(position_one,position_three, 0, 0);
-                        tabGroup.setTextColor(resources.getColor(R.color.gray));
-                    }
-                    if (currIndex == 2) {
-                        animation = new TranslateAnimation(position_two,position_three, 0, 0);
-                        tabFavorite.setTextColor(resources.getColor(R.color.gray));
                     }
                     tabFavorite.setTextColor(resources.getColor(R.color.black));
                     break;

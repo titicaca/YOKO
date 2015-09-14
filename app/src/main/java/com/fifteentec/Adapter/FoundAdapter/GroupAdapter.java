@@ -48,6 +48,7 @@ public class GroupAdapter extends BaseAdapter{
 
     @Override
     public int getCount() {
+        if(groupList==null) return 0;
         return groupList.size();
     }
 
@@ -58,11 +59,12 @@ public class GroupAdapter extends BaseAdapter{
 
     @Override
     public long getItemId(int position) {
-        return 0;
+        return position;
     }
 
     public void setList(List<GroupBrief> groupData){
         this.groupList = groupData;
+        this.notifyDataSetChanged();
     }
 
     @Override

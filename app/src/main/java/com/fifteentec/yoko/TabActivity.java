@@ -152,7 +152,15 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
         if (mCalViewFragment != null) mFmTrans.hide(mCalViewFragment);
         if (myPageFragment != null) mFmTrans.hide(myPageFragment);
         if (friendsFragment != null) mFmTrans.hide(friendsFragment);
-        if (mFoundFragment != null) mFmTrans.hide(mFoundFragment);
+        if (mFoundFragment != null){
+            mFmTrans.hide(mFoundFragment);
+        }
+        if(mFragmentManager.findFragmentByTag("groupItem")!=null){
+            mFmTrans.hide(mFragmentManager.findFragmentByTag("groupItem"));
+        }
+        if(mFragmentManager.findFragmentByTag("eventItem")!=null){
+            mFmTrans.hide(mFragmentManager.findFragmentByTag("eventItem"));
+        }
     }
 
     private InvitationReceiver invitationReceiver = new InvitationReceiver() {

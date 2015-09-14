@@ -5,12 +5,18 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.API.APIJsonCallbackResponse;
 import com.API.APIUrl;
@@ -33,9 +39,14 @@ import java.util.List;
  */
 public class FoundEvent extends Fragment {
     private List<EventBrief> eventList = new ArrayList<EventBrief>();
+    private List<EventBrief> tempList = new ArrayList<EventBrief>();
+    private ImageView ivDeleteText;
+    private EditText etSearch;
     private ListView events;
     private EventAdapter eventAdapter;
     private FoundEventItem eventItem;
+    private int lastItem = 0;
+    private int page = 0;
     RequestQueue mRequestQueue;
     BaseActivity baseActivity;
     PullToRefresh refreshableView;
@@ -49,12 +60,13 @@ public class FoundEvent extends Fragment {
             events = (ListView) view.findViewById(R.id.listView_event);
             refreshableView = (PullToRefresh) view.findViewById(R.id.refreshable_view2);
             initDBfunctions();
+            initSearchFrame(view);
             initListView(view);
 
             refreshableView.setOnRefreshListener(new PullToRefresh.PullToRefreshListener() {
                 @Override
                 public void onRefresh() {
-                    new APIUserServer.JsonGet(APIUrl.URL_EVENTS_GET, null, null, new APIJsonCallbackResponse() {
+                    new APIUserServer.JsonGet(APIUrl.URL_EVENTS_GET+"/page/0/4", null, null, new APIJsonCallbackResponse() {
                         @Override
                         public void run() {
                             JSONObject object = this.getResponse();
@@ -80,7 +92,7 @@ public class FoundEvent extends Fragment {
         Log.e("initial DB", "get into function");
 
 
-        new APIUserServer.JsonGet(APIUrl.URL_EVENTS_GET, null, null, new APIJsonCallbackResponse() {
+        new APIUserServer.JsonGet(APIUrl.URL_EVENTS_GET+ "/page/0/4", null, null, new APIJsonCallbackResponse() {
             @Override
             public void run() {
                 JSONObject object = this.getResponse();
@@ -95,23 +107,84 @@ public class FoundEvent extends Fragment {
         }, mRequestQueue, null).send();
     }
 
-        private void initListView(View parentView){
-            //createEventList(5,eventList);
+    private void initSearchFrame(View parentView){
+        ivDeleteText = (ImageView) parentView.findViewById(R.id.ivDeleteText3);
+        etSearch = (EditText) parentView.findViewById(R.id.etSearch3);
 
-            //eventAdapter = new EventAdapter(getActivity().getLayoutInflater(),eventList);
-            //events.setAdapter(eventAdapter);
+        ivDeleteText.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View v) {
+                etSearch.setText("");
+            }
+        });
+
+        etSearch.addTextChangedListener(new TextWatcher() {
+
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // TODO Auto-generated method stub
+
+            }
+
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {
+                // TODO Auto-generated method stub
+
+            }
+
+            public void afterTextChanged(Editable s) {
+                if (s.length() == 0) {
+                    ivDeleteText.setVisibility(View.GONE);
+                } else {
+                    ivDeleteText.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+    }
+
+
+    private void initListView(View parentView) {
+            events.setOnScrollListener(new AbsListView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(AbsListView view, int scrollState) {
+                    if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE) {
+                        if (lastItem+1 == eventAdapter.getCount()){
+                            page++;
+                            new APIUserServer.JsonGet(APIUrl.URL_EVENTS_GET + "/page/" + page + "/4", null, null, new APIJsonCallbackResponse() {
+                                @Override
+                                public void run() {
+                                    JSONObject object = this.getResponse();
+                                    Log.e("object", object.toString());
+                                    tempList = FoundDataParser.parseEventBriefInfo(object);
+                                    if (tempList == null||tempList.size()== 0) {
+                                        Toast.makeText(getActivity(), "It is the last group", Toast.LENGTH_SHORT);
+                                    } else {
+                                        eventList.addAll(tempList);
+                                        eventAdapter.setList(eventList);
+                                        eventAdapter.notifyDataSetChanged();
+                                    }
+                                }
+                            }, mRequestQueue, null).send();
+                        }
+                    }
+
+                }
+
+                @Override
+                public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                    lastItem = events.getLastVisiblePosition();
+                }
+            });
 
             events.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @SuppressLint("NewApi")
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     mFragmentManager = FoundEvent.this.getParentFragment().getFragmentManager();
-                    FragmentTransaction mFmTrans= mFragmentManager.beginTransaction();
+                    FragmentTransaction mFmTrans = mFragmentManager.beginTransaction();
 
-                    if(eventItem==null){
-                        eventItem = new FoundEventItem();
-                    }
-                    if(mFragmentManager.findFragmentByTag("eventItem")!=null){
+                    eventItem = new FoundEventItem();
+
+                    if (mFragmentManager.findFragmentByTag("eventItem") != null) {
                         mFmTrans.remove(mFragmentManager.findFragmentByTag("eventItem"));
                     }
 
@@ -134,20 +207,6 @@ public class FoundEvent extends Fragment {
             });
 
         }
-
-        private void createEventList(int eventNum,List<EventBrief> list){
-            list.clear();
-            for(int i=0;i<eventNum;i++){
-                EventBrief newItem = new EventBrief();
-                newItem.setEventIntro("default");
-                newItem.setGroupName("default");
-                newItem.setTime("2020-8-12 08:00");
-                newItem.setLocation("SJTU");
-                list.add(newItem);
-            }
-        }
-
-
 
 }
 

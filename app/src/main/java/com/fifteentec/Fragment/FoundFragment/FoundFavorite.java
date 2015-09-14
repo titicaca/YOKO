@@ -59,7 +59,7 @@ public class FoundFavorite extends Fragment {
         refreshableView.setOnRefreshListener(new PullToRefresh.PullToRefreshListener() {
             @Override
             public void onRefresh() {
-                new APIUserServer.JsonGet(APIUrl.URL_JOINED_EVENTS_GET, null, null, new APIJsonCallbackResponse() {
+                new APIUserServer.JsonGet(APIUrl.URL_JOINED_EVENTS_GET+ "/page/0/4", null, null, new APIJsonCallbackResponse() {
                     @Override
                     public void run() {
                         JSONObject object = this.getResponse();
@@ -85,7 +85,7 @@ public class FoundFavorite extends Fragment {
         Log.e("initial DB", "get into function");
 
 
-        new APIUserServer.JsonGet(APIUrl.URL_JOINED_EVENTS_GET, null, null, new APIJsonCallbackResponse() {
+        new APIUserServer.JsonGet(APIUrl.URL_JOINED_EVENTS_GET+ "/page/0/4", null, null, new APIJsonCallbackResponse() {
             @Override
             public void run() {
                 JSONObject object = this.getResponse();
@@ -135,10 +135,7 @@ public class FoundFavorite extends Fragment {
     }
 
     private void initListView(View parentView){
-        //createEventList(5, eventList);
 
-//        favoriteAdapter = new FavoriteAdapter(getActivity().getLayoutInflater(),eventList);
-//        favorites.setAdapter(favoriteAdapter);
 
         favorites.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @SuppressLint("NewApi")

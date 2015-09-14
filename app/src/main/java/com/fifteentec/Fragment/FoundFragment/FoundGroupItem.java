@@ -2,6 +2,7 @@ package com.fifteentec.Fragment.FoundFragment;
 
 
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +24,7 @@ public class FoundGroupItem extends Fragment {
     private TextView name;
     private TextView intro;
     protected ImageLoader imageLoader = ImageLoader.getInstance();
+    private FragmentManager mFragmentManager;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -35,6 +37,7 @@ public class FoundGroupItem extends Fragment {
 
         name.setText(getArguments().getString("name"));
         intro.setText(getArguments().getString("intro"));
+        mFragmentManager = FoundGroupItem.this.getParentFragment().getFragmentManager();
 
         if(null!=getArguments().getString("intro")&&!"".equals(getArguments().getString("intro"))){
             imageLoader.displayImage(getArguments().getString("intro"),logo);
@@ -45,6 +48,16 @@ public class FoundGroupItem extends Fragment {
 
         return view;
     }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(mFragmentManager.findFragmentByTag("groupItem") != null){
+            mFragmentManager.popBackStack();
+        }
+    }
+
+
 
 }
 

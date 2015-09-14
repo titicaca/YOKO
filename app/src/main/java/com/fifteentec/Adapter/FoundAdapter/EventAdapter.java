@@ -42,6 +42,7 @@ public class EventAdapter extends BaseAdapter{
 
     @Override
     public int getCount() {
+        if(eventList==null) return 0;
         return eventList.size();
     }
 
@@ -52,11 +53,12 @@ public class EventAdapter extends BaseAdapter{
 
     @Override
     public long getItemId(int position) {
-        return 0;
+        return position;
     }
 
     public void setList(List<EventBrief> groupData){
         this.eventList = groupData;
+        this.notifyDataSetChanged();
     }
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
