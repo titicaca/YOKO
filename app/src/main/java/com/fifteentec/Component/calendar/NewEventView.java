@@ -10,6 +10,7 @@ import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.PathEffect;
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Editable;
@@ -33,7 +34,12 @@ import android.widget.TimePicker;
 
 import com.Database.EventRecord;
 import com.fifteentec.yoko.R;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.download.ImageDownloader;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -54,18 +60,20 @@ public class NewEventView extends ViewGroup{
     private ImageView mCancelButton;
     private ImageView mOKButton;
     private ImageView mDeleteButton;
-    private HorizontalScrollView mSavedPic;
+    private ImageView mSavedPic = null;
     private BackGroundPage mBackGroundPage;
     private SwitchButton mAlldaySwitchBotton;
+    private EventTime mEventTime;
+
 
     private Surface mSurface;
 
-    private ArrayList<Bitmap> SavedPic ;
 
     private int isNewEvent;
     public  final static int BLANK_EVENT = 0x00;
     public  final static int EXIST_EVENT = 0x01;
     public final static int HAVE_TIME = 0x03;
+    public final static int ALL_DAY_EVENT = 0x04;
 
     private final int TEXT_INPUT = 0x00;
     private final int FUNCITON_MODE = 0x10;
@@ -86,10 +94,16 @@ public class NewEventView extends ViewGroup{
     private int TagSelected =3;
     private GregorianCalendar StartDate;
     private GregorianCalendar EndDate;
+    private GregorianCalendar AllDayDate = new GregorianCalendar();
     private String introduction = "null";
     private long rid = 0;
+    private String PicPath = null;
+
+    private boolean AllDaySwitch = true;
 
     private boolean firstEntry = true;
+
+    private ImageLoader imageLoader=null;
 
     public interface NewEventListener{
         void CreateFinish(Bundle bundle,int isNewEvent);
@@ -114,8 +128,9 @@ public class NewEventView extends ViewGroup{
 
         switch (OpenType){
             case BLANK_EVENT:
-                mView.BlankEvnentView();
+
                 mView.isNewEvent= BLANK_EVENT;
+                mView.BlankEvnentView();
                 break;
             case EXIST_EVENT:
                 mView.isNewEvent = EXIST_EVENT;
@@ -125,6 +140,7 @@ public class NewEventView extends ViewGroup{
                 mView.introduction = eventRecord.introduction;
                 mView.RemindSelected = (int)eventRecord.remind;
                 mView.rid = eventRecord.rid;
+                mView.PicPath = eventRecord.localpicturelink;
                 mView.BlankEvnentView();
 
                 break;
@@ -135,8 +151,15 @@ public class NewEventView extends ViewGroup{
                 mView.BlankEvnentView();
 
                 break;
-        }
+            case ALL_DAY_EVENT:
 
+                mView.isNewEvent= ALL_DAY_EVENT;
+                mView.StartDate.setTimeInMillis(eventRecord.timebegin);
+                mView.EndDate.setTimeInMillis(eventRecord.timeend);
+                mView.BlankEvnentView();
+                break;
+
+        }
         return mView;
     }
 
@@ -145,8 +168,8 @@ public class NewEventView extends ViewGroup{
         mSurface = new Surface();
         StartDate= new GregorianCalendar();
         EndDate = new GregorianCalendar();
-        EndDate.add(Calendar.MINUTE, 1);
-        SavedPic = new ArrayList<Bitmap>();
+        EndDate.add(Calendar.HOUR_OF_DAY, 1);
+
 
     }
     public NewEventView(Context context) {
@@ -165,10 +188,21 @@ public class NewEventView extends ViewGroup{
 
 
     private void BlankEvnentView(){
+
+        ImageLoaderConfiguration configuration = ImageLoaderConfiguration.createDefault(mContext);
+        imageLoader = ImageLoader.getInstance();
+        imageLoader.init(configuration);
+
+        if(StartDate.getTimeInMillis()==EndDate.getTimeInMillis()){
+            AllDaySwitch = false;
+            AllDayDate.setTimeInMillis(StartDate.getTimeInMillis());
+        }
+
+
         this.setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if(Mode == FUNCITON_MODE ){
+                if (Mode == FUNCITON_MODE) {
                     ChangeMode(TEXT_INPUT);
                     return true;
                 }
@@ -183,6 +217,11 @@ public class NewEventView extends ViewGroup{
 
 
 
+
+
+
+
+
         mBackGroundPage = new BackGroundPage(mContext);
         addView(mBackGroundPage);
 
@@ -190,8 +229,38 @@ public class NewEventView extends ViewGroup{
         addView(mInputPage);
         mFunctionBar = new FunctionBar(mContext);
 
-        mAlldaySwitchBotton = SwitchButton.newInstance(mContext,R.drawable.switchbutton_frame,R.drawable.switchbutton_full_button,R.drawable.switchbutton_background_mask,R.drawable.switchbutton_circle_trumb);
-        //addView(mAlldaySwitchBotton);
+        if(PicPath != null){
+            DisplayImageOptions options = new DisplayImageOptions.Builder()
+                    .showImageOnFail(R.drawable.cat).considerExifParams(true)
+                    .build();
+            mSavedPic = new ImageView(mContext);
+            addView(mSavedPic);
+            String imageUrl = ImageDownloader.Scheme.FILE.wrap(PicPath);
+            imageLoader.displayImage(imageUrl, mSavedPic, options);
+        }
+
+
+
+        if(AllDaySwitch) mAlldaySwitchBotton = SwitchButton.newInstance(mContext,R.drawable.switchbutton_frame,R.drawable.switchbutton_full_button,R.drawable.switchbutton_background_mask,R.drawable.switchbutton_circle_trumb,true);
+        else mAlldaySwitchBotton = SwitchButton.newInstance(mContext,R.drawable.switchbutton_frame,R.drawable.switchbutton_full_button,R.drawable.switchbutton_background_mask,R.drawable.switchbutton_circle_trumb,false);
+        mAlldaySwitchBotton.setmSwitchButtonListener(new SwitchButton.SwitchButtonListener() {
+            @Override
+            public void ButtonSwitch(SwitchButton switchButton, boolean isOn) {
+                AllDaySwitch = isOn;
+                if (AllDaySwitch) {
+                    if(EndDate.getTimeInMillis()==StartDate.getTimeInMillis()){
+                        GregorianCalendar gregorianCalendar = new GregorianCalendar();
+                        gregorianCalendar.setTimeInMillis(StartDate.getTimeInMillis());
+                        gregorianCalendar.add(Calendar.HOUR,1);
+                        EndDate.setTimeInMillis(gregorianCalendar.getTimeInMillis());
+                    }
+                }else{
+                    AllDayDate = new GregorianCalendar(StartDate.get(Calendar.YEAR), StartDate.get(Calendar.MONTH), StartDate.get(Calendar.DAY_OF_MONTH),0,0,0);
+                }
+                mEventTime.initEventTime();
+            }
+        });
+        addView(mAlldaySwitchBotton);
 
 
         mAddButton = new ImageView(mContext);
@@ -226,87 +295,72 @@ public class NewEventView extends ViewGroup{
         });
         addView(mDeleteButton);
 
+        mEventTime = new EventTime(mContext);
+        mEventTime.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DateTimePicker dateTimePicker = new DateTimePicker(mContext,mScreenWidth);
+                dateTimePicker.initalDialog(StartDate,EndDate,AllDaySwitch);
+                dateTimePicker.setDateTimePickerListener(new DateTimePicker.DateTimePickerListener() {
+                    @Override
+                    public void DateChange(GregorianCalendar start, GregorianCalendar end) {
+                        StartDate = CalUtil.CopyDate(start);
+                        if(end.getTimeInMillis()>start.getTimeInMillis()) EndDate = CalUtil.CopyDate(end);
+                        else EndDate.setTimeInMillis(StartDate.getTimeInMillis()+(60*1000));
+                        if(!AllDaySwitch) AllDayDate = CalUtil.CopyDate(start);
+                        mEventTime.initEventTime();
+                    }
+                });
+            }
+        });
+        addView(mEventTime);
+
         mOKButton = new ImageView(mContext);
         mOKButton.setImageResource(R.drawable.ok);
         mOKButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
-                bundle.putString("Introduction",introduction);
-                bundle.putLong("StartTime",StartDate.getTimeInMillis());
-                bundle.putLong("EndTime",EndDate.getTimeInMillis());
-                bundle.putLong("Reminder",RemindSelected);
-                bundle.putInt("Type",TagSelected);
+                bundle.putString("Introduction", introduction);
+                if (AllDaySwitch) {
+                    bundle.putLong("StartTime", StartDate.getTimeInMillis());
+                    bundle.putLong("EndTime", EndDate.getTimeInMillis());
+                } else {
+                    bundle.putLong("StartTime", AllDayDate.getTimeInMillis());
+                    bundle.putLong("EndTime", AllDayDate.getTimeInMillis());
+                }
+                bundle.putString("LocalPicLink",PicPath);
+                bundle.putLong("Reminder", RemindSelected);
+                bundle.putInt("Type", TagSelected);
                 bundle.putLong("Rid",rid);
                 mEventListener.CreateFinish(bundle,isNewEvent);
             }
         });
         addView(mOKButton);
 
-        PicScrollChanged();
 
     }
 
     public void addNewPic(String Path){
 
-        BitmapFactory.Options op= new BitmapFactory.Options();
-        op.inJustDecodeBounds=true;
-        BitmapFactory.decodeFile(Path,op);
-        int oHeight =op.outHeight;
 
-        int contentHeight=(int)( mSurface.PicScrollRatio*mScreenHeight*(1-2*mSurface.InputPageUpdownPadding));
-        int scale=oHeight/contentHeight;
-        op.inJustDecodeBounds=false;
-        op.inSampleSize=scale;
-        Bitmap bm = BitmapFactory.decodeFile(Path,op);
-        SavedPic.add(bm);
-        PicScrollChanged();
-    }
-
-    public void PicScrollChanged(){
-        if(SavedPic.size() > 0){
-            LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);
-            final LinearLayout Context;
-            if(mSavedPic ==null){
-                mSavedPic = new HorizontalScrollView(mContext);
-                Context   = new LinearLayout(mContext);
-                Context.setOrientation(LinearLayout.HORIZONTAL);
-                Context.setLayoutParams(lp);
-                mSavedPic.addView(Context);
-                addView(mSavedPic);
-            }
-            else {
-                Context=(LinearLayout)mSavedPic.getChildAt(0);
-                Context.removeAllViews();
-            }
-
-            for(int i = 0;i<SavedPic.size();i++){
-                ImageView pic = new ImageView(mContext);
-                pic.setTag(i);
-                pic.setOnLongClickListener(new OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View v) {
-                        int index = (int) v.getTag();
-                        SavedPic.remove(index);
-                        PicScrollChanged();
-                        return true;
-                    }
-                });
-
-
-                pic.setImageBitmap(SavedPic.get(i));
-                lp.height=SavedPic.get(i).getHeight();
-                lp.width=SavedPic.get(i).getWidth();
-                pic.setLayoutParams(lp);
-                if(Context !=null) Context.addView(pic);
-
-            }
-
-        }else{
-            removeView(mSavedPic);
-            mSavedPic = null;
+        DisplayImageOptions options = new DisplayImageOptions.Builder()
+                .showImageOnFail(R.drawable.cat).considerExifParams(true)
+                .build();
+        if(mSavedPic ==null) {
+            mSavedPic = new ImageView(mContext);
+            addView(mSavedPic);
         }
+        String imageUrl = ImageDownloader.Scheme.FILE.wrap(Path);
+        imageLoader.displayImage(imageUrl, mSavedPic, options);
+        if(PicPath != null) {
+            File file = new File(PicPath);
+            file.delete();
+        }
+        PicPath = Path;
+        invalidate();
     }
+
 
 
     ///////////////////////////////////////////////////////////
@@ -371,6 +425,8 @@ public class NewEventView extends ViewGroup{
             mCancelButton.setPadding(mSurface.bottonBarPadding, mSurface.bottonHeightBarPadding, mSurface.bottonBarPadding, mSurface.bottonHeightBarPadding);
             mOKButton.setPadding(mSurface.bottonBarPadding, mSurface.bottonHeightBarPadding, mSurface.bottonBarPadding, mSurface.bottonHeightBarPadding);
             mDeleteButton.setPadding(mSurface.bottonBarPadding, mSurface.bottonHeightBarPadding, mSurface.bottonBarPadding,mSurface.bottonHeightBarPadding);
+            mEventTime.initEventTime();
+            mAlldaySwitchBotton.ChangeButtonHeight(mSurface.EventTimeViewHeight * 12/17);
             firstEntry = false;
         }
         mSurface.initSurface();
@@ -378,6 +434,12 @@ public class NewEventView extends ViewGroup{
             int widthspec = MeasureSpec.makeMeasureSpec(mScreenWidth, MeasureSpec.EXACTLY);
             int heightspec = MeasureSpec.makeMeasureSpec(mScreenHeight, MeasureSpec.EXACTLY);
             mBackGround.measure(widthspec, heightspec);
+        }
+
+        if(mEventTime != null){
+            int heightspec= MeasureSpec.makeMeasureSpec(mSurface.EventTimeViewHeight, MeasureSpec.EXACTLY);
+            int widthspec = MeasureSpec.makeMeasureSpec(mSurface.EventTimeViewHeight, MeasureSpec.EXACTLY);
+            mEventTime.measure(widthspec, heightspec);
         }
 
         if(mInputPage != null) {
@@ -433,6 +495,12 @@ public class NewEventView extends ViewGroup{
             mAlldaySwitchBotton.measure(widthspec,heightspec);
         }
 
+        if(mSavedPic != null) {
+            int widthspec = MeasureSpec.makeMeasureSpec(mScreenWidth-2*(int)(mScreenWidth * mSurface.InputPageSidePadding),MeasureSpec.EXACTLY);
+            int heightspec = MeasureSpec.makeMeasureSpec(mSurface.PicView,MeasureSpec.EXACTLY);
+            mSavedPic.measure(widthspec,heightspec);
+        }
+
         setMeasuredDimension(mScreenWidth, mScreenHeight);
     }
 
@@ -448,21 +516,11 @@ public class NewEventView extends ViewGroup{
 
 
         if(mInputPage !=null) {
-            int lineheight = mInputPage.getLineHeight();
-            int linecount = mInputPage.getLineCount()+1;
-            int botton;
-            /*
-            Log.d("Test","LineHeight:"+lineheight+"LineCount:"+linecount);
-            if(t +InputUPdownPadding+lineheight*linecount+mSurface.InputPageTextPadding<b-InputUPdownPadding-mSurface.InputPageTextPadding){
-                botton = t +InputUPdownPadding+lineheight*linecount+mSurface.InputPageTextPadding;
-            }else{
-                botton =b-InputUPdownPadding-mSurface.InputPageTextPadding;
-            }
-            */
-            botton = mScreenHeight-InputUPdownPadding-2*mSurface.bottonHeightBarPadding-mSurface.bottonBarHeight-mSurface.InputPageTextPadding;
-            mInputPage.layout(l + mSurface.InputPageTextPadding + InputSidePadding,
-                    t + InputUPdownPadding + mSurface.InputPageTextPadding,
-                    r - InputSidePadding - mSurface.InputPageTextPadding,
+            int botton = mScreenHeight-InputUPdownPadding-2*mSurface.bottonHeightBarPadding-mSurface.bottonBarHeight-mSurface.InputPageTextPadding;
+            int top = mSavedPic==null?t + InputUPdownPadding+mSurface.EventTimeViewHeight:t + InputUPdownPadding+mSurface.EventTimeViewHeight+mSavedPic.getMeasuredHeight();
+            mInputPage.layout(l +  InputSidePadding,
+                    top,
+                    r - InputSidePadding,
                     botton);
         }
 
@@ -470,12 +528,10 @@ public class NewEventView extends ViewGroup{
             mBackGroundPage.layout(0, 0, getMeasuredWidth(), getMeasuredHeight());
         }
 
-        /*
-        if(mSavedPic !=null) mSavedPic.layout(l+ InputSidePadding+mSurface.FounctionBarPadding,
-                b-InputUPdownPadding-mSurface.FounctionBarPadding-mSurface.FounctionBarHeight-mSavedPic.getMeasuredHeight()-mSurface.PicScrollPadding,
-                r-InputSidePadding-mSurface.FounctionBarPadding,
-                b-InputUPdownPadding-mSurface.FounctionBarPadding-mSurface.FounctionBarHeight-mSurface.PicScrollPadding);
-*/
+        if(mEventTime != null){
+            mEventTime.layout(InputSidePadding,InputUPdownPadding,InputSidePadding+mEventTime.getMeasuredWidth(),InputUPdownPadding+mEventTime.getMeasuredHeight());
+        }
+
         if(mAddButton != null) mAddButton.layout(
                 r-InputSidePadding-mAddButton.getMeasuredWidth()/2-mSurface.addBarMid,
                 b-InputUPdownPadding-mAddButton.getMeasuredHeight()-mSurface.bottonBarHeight-2*mSurface.bottonBarPadding,
@@ -518,27 +574,35 @@ public class NewEventView extends ViewGroup{
         }
 
         if(mAlldaySwitchBotton !=null){
-            mAlldaySwitchBotton.layout(0,0,mAlldaySwitchBotton.getMeasuredWidth(),mAlldaySwitchBotton.getMeasuredHeight());
+            mAlldaySwitchBotton.layout(r-InputSidePadding-mAlldaySwitchBotton.getMeasuredWidth()- mSurface.InputPageTextPadding,t+InputUPdownPadding+(mSurface.EventTimeViewHeight-mAlldaySwitchBotton.getMeasuredHeight())/2,r-InputSidePadding- mSurface.InputPageTextPadding,t+InputUPdownPadding+(mSurface.EventTimeViewHeight+mAlldaySwitchBotton.getMeasuredHeight())/2);
         }
+
+        if(mSavedPic != null){
+            mSavedPic.layout(l+InputSidePadding,t+InputUPdownPadding+mSurface.EventTimeViewHeight,l+InputSidePadding+mSavedPic.getMeasuredWidth(),t+InputUPdownPadding+mSurface.EventTimeViewHeight+mSavedPic.getMeasuredHeight());
+        }
+
 
     }
 
 
 
     private class Surface{
-        public int InputBackground = Color.WHITE;
-        public float InputPageSidePadding = (1/20f);
-        public float InputPageUpdownPadding =(1/20f);
-        public float BackgroundAlpha = 0.3f;
+        int InputBackground = Color.WHITE;
+        float InputPageSidePadding = (1/20f);
+        float InputPageUpdownPadding =(1/20f);
+        float BackgroundAlpha = 0.3f;
 
-        public float PicScrollRatio = 0.3f;
-        public int PicScrollPadding=20;
+        float PicViewRatio = 1/3f;
+        int PicView;
 
+        float EventTimeViewHeightRatio = 1/15f;
+        int EventTimeViewHeight;
+        float EventTimeBigTextSize = 1/20f;
+        float EventTimeSmallTextSize = 1/55f;
 
         public int InputPageTextPadding ;
-        float InputPageTextPaddingRatio = 1/1000f;
+        float InputPageTextPaddingRatio = 1/50f;
         float InputPageTextSize ;
-        //float InputPageTextBaseSize = 10f;
         float InputPageTextSizeRatio = 1/20f;
 
 
@@ -563,23 +627,23 @@ public class NewEventView extends ViewGroup{
         public int CheckRectPadding;
         float CheckBoxRectPadingRatio = 1/80f;
         float CheckBoxTextSize;
-        //float CheckBoxTextBaseSize = 5f;
         float CheckBoxTextSizeRatio = 1/25f;
 
         Paint BackGoundPagePaint = new Paint();
         Paint DashLinePaint = new Paint();
-        float ShadowOffsetRatio = 1/50f;
         float RealLineWidthRatio= 1/30f;
         float GapLineWidthRatio= 1/60f;
         float DashLineWidth = 1/200f;
 
         float ItemHeight = 1/30f;
 
+        float PicTextSizeRatio = 1/40f;
+
+
 
         void initSurface(){
             InputPageTextPadding = (int)(mScreenWidth*InputPageTextPaddingRatio);
             BackGoundPagePaint.setColor(Color.WHITE);
-            //BackGoundPagePaint.setShadowLayer(mScreenHeight * ShadowOffsetRatio / 2, mScreenHeight * ShadowOffsetRatio, mScreenHeight * ShadowOffsetRatio, Color.BLACK);
             InputPageTextSize =  (mScreenWidth*InputPageTextSizeRatio);
             addBarHeight = (int)(mScreenWidth*addBarHeightRatio);
             bottonBarHeight = (int) (mScreenHeight*bottonBarHeightRatio);
@@ -590,13 +654,16 @@ public class NewEventView extends ViewGroup{
             DashLinePaint.setPathEffect(effect);
             DashLinePaint.setStyle(Paint.Style.STROKE);
             DashLinePaint.setAntiAlias(true);
-            DashLinePaint.setStrokeWidth(mScreenWidth*DashLineWidth);
+            DashLinePaint.setStrokeWidth(mScreenWidth * DashLineWidth);
             addBarMid = (int)(mScreenWidth*addBarMidRatio);
             IconSide =(int)(mScreenWidth*IconSideRatio);
             IconInterval =(int)(mScreenWidth*IconIntervalRatio);
             CheckBoxPadding = (int)(mScreenWidth*CheckBoxPaddingRatio);
             CheckRectPadding = (int)(mScreenWidth*CheckBoxRectPadingRatio);
             CheckBoxTextSize =(mScreenWidth*CheckBoxTextSizeRatio);
+            EventTimeViewHeight = (int)(mScreenHeight*EventTimeViewHeightRatio);
+            PicView = (int)(mScreenHeight*PicViewRatio);
+
 
 
 
@@ -606,7 +673,7 @@ public class NewEventView extends ViewGroup{
     }
 
 
-    private class  InputPage extends EditText{
+    private class   InputPage extends EditText{
 
 
         private String HintString = "诶嘿嘿...";
@@ -649,13 +716,12 @@ public class NewEventView extends ViewGroup{
 
         public void init(){
             setBackgroundColor(mSurface.InputBackground);
-            Log.d("Test","Size:"+mSurface.InputPageTextSize);
             setTextSize(TypedValue.COMPLEX_UNIT_PX,mSurface.InputPageTextSize);
             setGravity(Gravity.TOP);
             setHint(HintString);
             if(introduction != "null") setText(introduction);
             int effectWidth = (int)(mScreenWidth*(1-2*mSurface.InputPageSidePadding))-2*mSurface.InputPageTextPadding;
-            setMaxEms(effectWidth/(int)(getTextSize()*(7/6f)));
+            setMaxEms(effectWidth/(int)(this.getTextSize()*(7/6f)));
             addTextChangedListener(mtextWatcher);
         }
 
@@ -676,7 +742,7 @@ public class NewEventView extends ViewGroup{
         private int RectColor= Color.parseColor("#666666");
 
         private List<String > ReminedList = new ArrayList<>(Arrays.asList(
-                "开始前","提前5分钟","提前10分钟","提前30分钟","提前1个小时","提前1天","提前1周"
+                "不提醒","提前5分钟","提前10分钟","提前30分钟","提前1个小时","提前1天"
         ));
 
         private List<String> TagList = new ArrayList<>(Arrays.asList(
@@ -724,7 +790,6 @@ public class NewEventView extends ViewGroup{
         public void PopoutAnim(int Target){
             removeAllViews();
             LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
-            //lp.height = itemHeight;
             switch (Target){
                 case REMINED:
 
@@ -785,254 +850,40 @@ public class NewEventView extends ViewGroup{
                     FunctionActivate =TAG;
                     break;
                 case TIME:
-
-
-
-
-                    final TextView startDate = new TextView(mContext);
-                    startDate.setTag(TIME);
-                    startDate.setLayoutParams(lp);
-
-                    startDate.setTextSize(TypedValue.COMPLEX_UNIT_SP,TextSize);
-                    String showDate = StartDate.get(Calendar.YEAR)+"年"+(StartDate.get(Calendar.MONTH)+1)+"月"+StartDate.get(Calendar.DAY_OF_MONTH)+"日";
-                    startDate.setText(showDate);
-
-
-                    TextView start = new TextView(mContext);
-                    start.setText("开始时间:");
-                    start.setTextColor(Color.parseColor("#CD3333"));
-                    start.getPaint().setFakeBoldText(true);
-                    start.setTag(TIME);
-                    start.setLayoutParams(lp);
-                    start.setTextSize(TypedValue.COMPLEX_UNIT_SP,TextSize);
-
-
-                    final TextView startTime = new TextView(mContext);
-                    if(StartDate.get(Calendar.AM_PM) == Calendar.PM){
-                        startTime.setText("下午"+StartDate.get(Calendar.HOUR)+":"+StartDate.get(Calendar.MINUTE));
-                    } else{
-                        startTime.setText("上午"+StartDate.get(Calendar.HOUR)+":"+StartDate.get(Calendar.MINUTE));
-                    }
-                    startTime.setTag(TIME);
-
-                    startTime.setLayoutParams(lp);
-                    startTime.setTextSize(TextSize);
-                    start.setTextSize(TypedValue.COMPLEX_UNIT_SP,TextSize);
-
-
-                    final TextView endDate = new TextView(mContext);
-                    String showEndDate = EndDate.get(Calendar.YEAR)+"年"+(EndDate.get(Calendar.MONTH)+1)+"月"+EndDate.get(Calendar.DAY_OF_MONTH)+"日";
-                    endDate.setText(showEndDate);
-                    endDate.setTag(TIME);
-                    endDate.setLayoutParams(lp);
-                    endDate.setTextSize(TypedValue.COMPLEX_UNIT_SP,TextSize);
-
-
-
-
-                    TextView end= new TextView(mContext);
-                    end.setText("结束时间:");
-                    end.setTag(TIME);
-                    end.setLayoutParams(lp);
-                    end.setTextColor(Color.parseColor("#CD2626"));
-                    end.getPaint().setFakeBoldText(true);
-                    end.setTextSize(TypedValue.COMPLEX_UNIT_SP,TextSize);
-
-
-                    final TextView endTime =new TextView(mContext);
-                    if(EndDate.get(Calendar.AM_PM) ==Calendar.PM){
-                        endTime.setText("下午" + EndDate.get(Calendar.HOUR) + ":" + EndDate.get(Calendar.MINUTE));
-                    } else{
-                        endTime.setText("上午"+EndDate.get(Calendar.HOUR)+":"+EndDate.get(Calendar.MINUTE));
-                    }
-                    endTime.setTag(TIME);
-                    endTime.setLayoutParams(lp);
-                    endTime.setTextSize(TypedValue.COMPLEX_UNIT_SP,TextSize);
-
-
-                    startTime.setOnClickListener(new OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            TimePicker mTP = new TimePicker(mContext);
-                            if (StartDate.get(Calendar.AM_PM) == Calendar.PM) {
-                                mTP.setCurrentHour(StartDate.get(Calendar.HOUR) + 12);
-                            } else {
-                                mTP.setCurrentHour(StartDate.get(Calendar.HOUR));
-                            }
-                            mTP.setCurrentMinute(StartDate.get(Calendar.MINUTE));
-                            mTP.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
-                                @Override
-                                public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
-                                    if (hourOfDay < 12) {
-                                        StartDate.set(Calendar.AM_PM, Calendar.AM);
-                                        StartDate.set(Calendar.HOUR, hourOfDay);
-                                    } else {
-                                        StartDate.set(Calendar.AM_PM, Calendar.PM);
-                                        StartDate.set(Calendar.HOUR, hourOfDay - 12);
-                                    }
-                                    StartDate.set(Calendar.MINUTE, minute);
-
-                                    if (StartDate.get(Calendar.AM_PM) == Calendar.PM) {
-                                        startTime.setText("下午" + StartDate.get(Calendar.HOUR) + ":" + StartDate.get(Calendar.MINUTE));
-                                    } else {
-                                        startTime.setText("上午" + StartDate.get(Calendar.HOUR) + ":" + StartDate.get(Calendar.MINUTE));
-                                    }
-                                    if (StartDate.getTimeInMillis() > EndDate.getTimeInMillis()) {
-                                        EndDate.setTimeInMillis(StartDate.getTimeInMillis());
-                                        EndDate.add(Calendar.MINUTE, 1);
-                                        String showDate = EndDate.get(Calendar.YEAR) + "年" + EndDate.get(Calendar.MONTH) + "月" + EndDate.get(Calendar.DAY_OF_MONTH) + "日";
-                                        endDate.setText(showDate);
-                                        if (EndDate.get(Calendar.AM_PM) == Calendar.PM) {
-                                            endTime.setText("下午" + EndDate.get(Calendar.HOUR) + ":" + EndDate.get(Calendar.MINUTE));
-                                        } else {
-                                            endTime.setText("上午" + EndDate.get(Calendar.HOUR) + ":" + EndDate.get(Calendar.MINUTE));
-                                        }
-                                    }
-                                }
-                            });
-                            new AlertDialog.Builder(mContext).setView(mTP).setPositiveButton("好嘞", null).show();
-                        }
-                    });
-
-                    startDate.setOnClickListener(new OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            DatePicker mDP = new DatePicker(mContext);
-                            mDP.init(StartDate.get(Calendar.YEAR), StartDate.get(Calendar.MONTH), StartDate.get(Calendar.DAY_OF_MONTH), new DatePicker.OnDateChangedListener() {
-                                @Override
-                                public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                                    StartDate.set(year, monthOfYear, dayOfMonth);
-                                    String showDate = StartDate.get(Calendar.YEAR) + "年" + StartDate.get(Calendar.MONTH) + "月" + StartDate.get(Calendar.DAY_OF_MONTH) + "日";
-                                    startDate.setText(showDate);
-                                    if (StartDate.getTimeInMillis() > EndDate.getTimeInMillis()) {
-                                        EndDate.setTimeInMillis(StartDate.getTimeInMillis());
-                                        EndDate.add(Calendar.MINUTE, 1);
-                                        String showDateNext = EndDate.get(Calendar.YEAR) + "年" + EndDate.get(Calendar.MONTH) + "月" + EndDate.get(Calendar.DAY_OF_MONTH) + "日";
-                                        endDate.setText(showDate);
-                                        if (EndDate.get(Calendar.AM_PM) == Calendar.PM) {
-                                            endTime.setText("下午" + EndDate.get(Calendar.HOUR) + ":" + EndDate.get(Calendar.MINUTE));
-                                        } else {
-                                            endTime.setText("上午" + EndDate.get(Calendar.HOUR) + ":" + EndDate.get(Calendar.MINUTE));
-                                        }
-                                    }
-                                }
-                            });
-                            new AlertDialog.Builder(mContext).setView(mDP).setPositiveButton("好嘞",null).show();
-                        }
-                    });
-
-                    endDate.setOnClickListener(new OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            DatePicker mDP = new DatePicker(mContext);
-                            mDP.init(EndDate.get(Calendar.YEAR), EndDate.get(Calendar.MONTH), EndDate.get(Calendar.DAY_OF_MONTH), new DatePicker.OnDateChangedListener() {
-                                @Override
-                                public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                                    EndDate.set(year, monthOfYear, dayOfMonth);
-                                    String showDate = EndDate.get(Calendar.YEAR) + "年" + EndDate.get(Calendar.MONTH) + "月" + EndDate.get(Calendar.DAY_OF_MONTH) + "日";
-                                    endDate.setText(showDate);
-                                    if (StartDate.getTimeInMillis() > EndDate.getTimeInMillis()) {
-                                        StartDate.setTimeInMillis(EndDate.getTimeInMillis());
-                                        StartDate.add(Calendar.MINUTE, 1);
-                                        String showDateNext = StartDate.get(Calendar.YEAR) + "年" + StartDate.get(Calendar.MONTH) + "月" + StartDate.get(Calendar.DAY_OF_MONTH) + "日";
-                                        startDate.setText(showDate);
-                                        if (EndDate.get(Calendar.AM_PM) == Calendar.PM) {
-                                            startTime.setText("下午" + StartDate.get(Calendar.HOUR) + ":" + StartDate.get(Calendar.MINUTE));
-                                        } else {
-                                            startTime.setText("上午" + StartDate.get(Calendar.HOUR) + ":" + StartDate.get(Calendar.MINUTE));
-                                        }
-                                    }
-                                }
-                            });
-                            new AlertDialog.Builder(mContext).setView(mDP).setPositiveButton("好嘞", null).show();
-                        }
-                    });
-
-                    endTime.setOnClickListener(new OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            TimePicker mTP = new TimePicker(mContext);
-                            if (StartDate.get(Calendar.AM_PM) == Calendar.PM) {
-                                mTP.setCurrentHour(EndDate.get(Calendar.HOUR) + 12);
-                            } else {
-                                mTP.setCurrentHour(EndDate.get(Calendar.HOUR));
-                            }
-                            mTP.setCurrentMinute(EndDate.get(Calendar.MINUTE));
-                            mTP.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
-                                @Override
-                                public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
-                                    if (hourOfDay < 12) {
-                                        EndDate.set(Calendar.AM_PM, Calendar.AM);
-                                        EndDate.set(Calendar.HOUR, hourOfDay);
-                                    } else {
-                                        EndDate.set(Calendar.AM_PM, Calendar.PM);
-                                        EndDate.set(Calendar.HOUR, hourOfDay - 12);
-                                    }
-                                    EndDate.set(Calendar.MINUTE, minute);
-                                    if (EndDate.get(Calendar.AM_PM) == Calendar.PM) {
-                                        endTime.setText("下午" + EndDate.get(Calendar.HOUR) + ":" + EndDate.get(Calendar.MINUTE));
-                                    } else {
-                                        endTime.setText("上午" + EndDate.get(Calendar.HOUR) + ":" + EndDate.get(Calendar.MINUTE));
-                                    }
-                                    if (StartDate.getTimeInMillis() > EndDate.getTimeInMillis()) {
-                                        StartDate.setTimeInMillis(EndDate.getTimeInMillis());
-                                        StartDate.add(Calendar.MINUTE, 1);
-                                        String showDate = StartDate.get(Calendar.YEAR) + "年" + StartDate.get(Calendar.MONTH) + "月" + StartDate.get(Calendar.DAY_OF_MONTH) + "日";
-                                        startDate.setText(showDate);
-                                        if (EndDate.get(Calendar.AM_PM) == Calendar.PM) {
-                                            startTime.setText("下午" + StartDate.get(Calendar.HOUR) + ":" + StartDate.get(Calendar.MINUTE));
-                                        } else {
-                                            startTime.setText("上午" + StartDate.get(Calendar.HOUR) + ":" + StartDate.get(Calendar.MINUTE));
-                                        }
-                                    }
-                                }
-                            });
-                            new AlertDialog.Builder(mContext).setView(mTP).setPositiveButton("好嘞", null).show();
-                        }
-                    });
-
-                    addView(start);
-                    addView(startDate);
-                    addView(startTime);
-                    addView(end);
-                    addView(endDate);
-                    addView(endTime);
                     FunctionActivate =TIME;
                     break;
                 case PIC:
                     LayoutParams ll_lp = new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
                     LinearLayout ll = new LinearLayout(mContext);
-                    ll.setOrientation(LinearLayout.HORIZONTAL);
+                    ll.setOrientation(LinearLayout.VERTICAL);
                     ll.setLayoutParams(ll_lp);
                     TextView photo = new TextView(mContext);
-                    photo.setText("拍照!");
-                    photo.setTextSize(50);
-                    photo.setPadding(20, 20, 20, 20);
-                    photo.setLayoutParams(ll_lp);
+                    photo.setText("拍照");
+                    photo.setTextSize(mScreenHeight * mSurface.PicTextSizeRatio);
+                    photo.setPadding((int) (mScreenHeight * mSurface.PicTextSizeRatio / 2), (int) (mScreenHeight * mSurface.PicTextSizeRatio / 2), (int) (mScreenHeight * mSurface.PicTextSizeRatio / 2), (int) (mScreenHeight * mSurface.PicTextSizeRatio / 2));
 
                     ll.addView(photo);
                     TextView album = new TextView(mContext);
-                    album .setText("相册~");
-                    album .setTextSize(50);
-                    album.setPadding(20, 20, 20, 20);
-                    album .setLayoutParams(ll_lp);
+                    album .setText("相册");
+                    album .setTextSize(mScreenHeight * mSurface.PicTextSizeRatio);
+                    album.setPadding((int) (mScreenHeight * mSurface.PicTextSizeRatio / 2), (int) (mScreenHeight * mSurface.PicTextSizeRatio / 2), (int) (mScreenHeight * mSurface.PicTextSizeRatio / 2), (int) (mScreenHeight * mSurface.PicTextSizeRatio / 2));
 
                     ll.addView(album);
-                    final AlertDialog a = new AlertDialog.Builder(mContext).setView(ll).setNegativeButton("不玩了", null).show();
+                    final AlertDialog dialogView = new AlertDialog.Builder(mContext).setView(ll).setNegativeButton("不玩了", null).show();
 
 
                     photo.setOnClickListener(new OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             mEventListener.addNewBitMap(true);
-                            a.dismiss();
+                            dialogView.dismiss();
                         }
                     });
                     album.setOnClickListener(new OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             mEventListener.addNewBitMap(false);
-                            a.dismiss();
+                            dialogView.dismiss();
                         }
                     });
                     ChangeMode(TEXT_INPUT);
@@ -1117,7 +968,6 @@ public class NewEventView extends ViewGroup{
         private ImageView PicIcon;
         private ImageView ReminedIcon;
         private ImageView TagIcon;
-        private ImageView TimeIcon;
 
         private int Interval;
 
@@ -1176,28 +1026,17 @@ public class NewEventView extends ViewGroup{
                     TagIcon.setImageResource(R.drawable.tags);
                 }
             });
-            TimeIcon = new ImageView(mContext);
-            TimeIcon.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    FunctionCall(TIME);
-                    cancelAll();
-                    TimeIcon.setImageResource(R.drawable.time2);
-                }
-            });
             cancelAll();
             addView(InviteIcon);
             addView(PicIcon);
             addView(ReminedIcon);
             addView(TagIcon);
-            addView(TimeIcon);
         }
 
         private void cancelAll(){
             InviteIcon.setImageResource(R.drawable.invite);
             ReminedIcon.setImageResource(R.drawable.remined);
             TagIcon.setImageResource(R.drawable.tag1);
-            TimeIcon.setImageResource(R.drawable.time1);
             PicIcon.setImageResource(R.drawable.pic1);
 
         }
@@ -1208,7 +1047,6 @@ public class NewEventView extends ViewGroup{
         protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
             int widthSpec = MeasureSpec.makeMeasureSpec(mSurface.IconSide,MeasureSpec.EXACTLY);
             int heightSpec = MeasureSpec.makeMeasureSpec(mSurface.IconSide,MeasureSpec.EXACTLY);
-            if(TimeIcon != null) TimeIcon.measure(widthSpec,heightSpec);
             if(InviteIcon != null) InviteIcon.measure(widthSpec,heightSpec);
             if(PicIcon != null) PicIcon.measure(widthSpec,heightSpec);
             if(ReminedIcon != null) ReminedIcon.measure(widthSpec,heightSpec);
@@ -1218,15 +1056,200 @@ public class NewEventView extends ViewGroup{
 
         @Override
         protected void onLayout(boolean changed, int l, int t, int r, int b) {
-            if(PicIcon != null) PicIcon.layout(0,mSurface.IconSide*4+Interval*4,mSurface.IconSide,mSurface.IconSide*5+Interval*4);
-            if(TagIcon != null) TagIcon.layout(0,mSurface.IconSide+Interval,mSurface.IconSide,mSurface.IconSide*2+Interval);
-            if(TimeIcon != null) TimeIcon.layout(0,mSurface.IconSide*3+Interval*3,mSurface.IconSide,mSurface.IconSide*4+Interval*3);
-            if(ReminedIcon != null) ReminedIcon.layout(0,0,mSurface.IconSide,mSurface.IconSide);
-            if(InviteIcon != null) InviteIcon.layout(0,mSurface.IconSide*2+Interval*2,mSurface.IconSide,mSurface.IconSide*3+Interval*2);
+            int time = 0;
+            if(ReminedIcon != null) ReminedIcon.layout(0,(mSurface.IconSide+Interval)*time,mSurface.IconSide,(mSurface.IconSide+Interval)*time+mSurface.IconSide);
+            time++;
+            if(TagIcon != null) TagIcon.layout(0,(mSurface.IconSide+Interval)*time,mSurface.IconSide,mSurface.IconSide+(mSurface.IconSide+Interval)*time);
+            time++;
+            if(InviteIcon != null) InviteIcon.layout(0,(mSurface.IconSide+Interval)*time,mSurface.IconSide,mSurface.IconSide+(mSurface.IconSide+Interval)*time);
+            time++;
+            if(PicIcon != null) PicIcon.layout(0,(mSurface.IconSide+Interval)*time,mSurface.IconSide,mSurface.IconSide+(mSurface.IconSide+Interval)*time);
 
 
 
 
+
+        }
+    }
+
+    private class EventTime extends ViewGroup{
+
+        View firstTime =null;
+        View lastTime = null;
+
+        Paint paint= new Paint();
+
+        public EventTime(Context context) {
+            this(context, null);
+        }
+
+        public EventTime(Context context, AttributeSet attrs) {
+            this(context, attrs, 0);
+        }
+
+        public EventTime(Context context, AttributeSet attrs, int defStyleAttr) {
+            super(context, attrs, defStyleAttr);
+        }
+
+        void initEventTime(){
+            this.removeAllViews();
+            firstTime = null;
+            lastTime = null;
+            if(!AllDaySwitch){
+                firstTime = inflate(mContext, R.layout.view_new_event_date, null);
+                TextView Day = (TextView) firstTime.findViewById(R.id.id_new_event_date);
+                Day.setText(TwoLetterNum(AllDayDate.get(Calendar.DAY_OF_MONTH)));
+                Day.setTextSize(TypedValue.COMPLEX_UNIT_PX,mSurface.EventTimeBigTextSize * mScreenHeight);
+                Day.setTypeface(Typeface.DEFAULT_BOLD);
+
+                TextView StartTime = (TextView) firstTime.findViewById(R.id.id_new_event_starttime);
+                StartTime.setText("全天");
+                StartTime.setTextSize(TypedValue.COMPLEX_UNIT_PX,mScreenHeight * mSurface.EventTimeSmallTextSize);
+
+                TextView EndTime = (TextView) firstTime.findViewById(R.id.id_new_event_endtime);
+                EndTime.setText("事件");
+                EndTime.setTextSize(TypedValue.COMPLEX_UNIT_PX,mScreenHeight * mSurface.EventTimeSmallTextSize);
+
+            }else {
+                if (StartDate.get(Calendar.YEAR) == EndDate.get(Calendar.YEAR) && StartDate.get(Calendar.MONTH) == EndDate.get(Calendar.MONTH) && StartDate.get(Calendar.DAY_OF_MONTH) == EndDate.get(Calendar.DAY_OF_MONTH)) {
+                    firstTime = inflate(mContext, R.layout.view_new_event_date, null);
+                    TextView Day = (TextView) firstTime.findViewById(R.id.id_new_event_date);
+                    Day.setText(TwoLetterNum(StartDate.get(Calendar.DAY_OF_MONTH)));
+                    Day.setTextSize(TypedValue.COMPLEX_UNIT_PX,mSurface.EventTimeBigTextSize * mScreenHeight);
+                    Day.setTypeface(Typeface.DEFAULT_BOLD);
+
+                    TextView StartTime = (TextView) firstTime.findViewById(R.id.id_new_event_starttime);
+
+                    String startTime = new String();
+                    if (StartDate.get(Calendar.AM_PM) == Calendar.PM) {
+                        startTime = "" + (StartDate.get(Calendar.HOUR) + 12);
+                    } else {
+                        startTime = TwoLetterNum(StartDate.get(Calendar.HOUR));
+                    }
+                    startTime += ":" + TwoLetterNum(StartDate.get(Calendar.MINUTE));
+                    StartTime.setText(startTime);
+                    StartTime.setTextSize(TypedValue.COMPLEX_UNIT_PX,mScreenHeight * mSurface.EventTimeSmallTextSize);
+
+                    TextView EndTime = (TextView) firstTime.findViewById(R.id.id_new_event_endtime);
+
+                    String endTime = new String();
+                    if (EndDate.get(Calendar.AM_PM) == Calendar.PM) {
+                        endTime = "" + (EndDate.get(Calendar.HOUR) + 12);
+                    } else {
+                        endTime = TwoLetterNum(EndDate.get(Calendar.HOUR));
+                    }
+                    endTime += ":" + TwoLetterNum(EndDate.get(Calendar.MINUTE));
+                    EndTime.setText(endTime);
+                    EndTime.setTextSize(TypedValue.COMPLEX_UNIT_PX,mScreenHeight * mSurface.EventTimeSmallTextSize);
+                } else {
+                    firstTime = inflate(mContext, R.layout.view_new_event_date, null);
+                    TextView Day = (TextView) firstTime.findViewById(R.id.id_new_event_date);
+                    Day.setText(TwoLetterNum(StartDate.get(Calendar.DAY_OF_MONTH)));
+                    Day.setTextSize(TypedValue.COMPLEX_UNIT_PX,mSurface.EventTimeBigTextSize * mScreenHeight);
+                    Day.setTypeface(Typeface.DEFAULT_BOLD);
+
+                    TextView StartTime = (TextView) firstTime.findViewById(R.id.id_new_event_starttime);
+
+                    String startTime = new String();
+                    if (StartDate.get(Calendar.AM_PM) == Calendar.PM) {
+                        startTime = "" + (StartDate.get(Calendar.HOUR) + 12);
+                    } else {
+                        startTime = TwoLetterNum(StartDate.get(Calendar.HOUR));
+                    }
+                    startTime += ":" + TwoLetterNum(StartDate.get(Calendar.MINUTE));
+                    StartTime.setText(startTime);
+                    StartTime.setTextSize(TypedValue.COMPLEX_UNIT_PX,mScreenHeight * mSurface.EventTimeSmallTextSize);
+
+                    TextView textView = (TextView) firstTime.findViewById(R.id.id_new_event_endtime);
+                    textView.setTextSize(mScreenHeight * mSurface.EventTimeSmallTextSize);
+
+                    lastTime = inflate(mContext, R.layout.view_new_event_date, null);
+
+                    TextView DayTwo = (TextView) lastTime.findViewById(R.id.id_new_event_date);
+                    DayTwo.setText(TwoLetterNum(EndDate.get(Calendar.DAY_OF_MONTH)));
+                    DayTwo.setTextSize(TypedValue.COMPLEX_UNIT_PX,mSurface.EventTimeBigTextSize * mScreenHeight);
+                    DayTwo.setTypeface(Typeface.DEFAULT_BOLD);
+
+                    TextView EndTime = (TextView) lastTime.findViewById(R.id.id_new_event_endtime);
+                    String endTime = new String();
+                    if (EndDate.get(Calendar.AM_PM) == Calendar.PM) {
+                        endTime = "" + (EndDate.get(Calendar.HOUR) + 12);
+                    } else {
+                        endTime = TwoLetterNum(EndDate.get(Calendar.HOUR));
+                    }
+                    endTime += ":" + TwoLetterNum(EndDate.get(Calendar.MINUTE));
+                    EndTime.setText(endTime);
+                    EndTime.setTextSize(TypedValue.COMPLEX_UNIT_PX,mScreenHeight * mSurface.EventTimeSmallTextSize);
+
+                    textView = (TextView) lastTime.findViewById(R.id.id_new_event_starttime);
+                    textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,mScreenHeight * mSurface.EventTimeSmallTextSize);
+                }
+            }
+
+
+            paint.setAntiAlias(true);
+            paint.setColor(Color.BLACK);
+
+            this.setWillNotDraw(false);
+
+            if(firstTime != null){
+                this.addView(firstTime);
+            }
+
+            if(lastTime != null){
+                this.addView(lastTime);
+            }
+        }
+
+        @Override
+        protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+
+            float Ratio = 2.3f;
+            int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+            int widthSize = 0;
+            if(firstTime != null){
+                int widthSpec = MeasureSpec.makeMeasureSpec((int)(heightSize*Ratio),MeasureSpec.EXACTLY);
+                int heightSpec = MeasureSpec.makeMeasureSpec(heightSize,MeasureSpec.EXACTLY);
+                firstTime.measure(widthSpec,heightSpec);
+                widthSize += (int)(heightSize*Ratio);
+            }
+
+            if(lastTime != null){
+                int widthSpec = MeasureSpec.makeMeasureSpec((int)(heightSize*Ratio),MeasureSpec.EXACTLY);
+                int heightSpec = MeasureSpec.makeMeasureSpec(heightSize,MeasureSpec.EXACTLY);
+                lastTime.measure(widthSpec,heightSpec);
+                widthSize += (int)(heightSize*Ratio) + heightSize*(3/30);
+            }
+
+            setMeasuredDimension(widthSize, heightSize);
+        }
+
+        @Override
+        protected void onLayout(boolean changed, int l, int t, int r, int b) {
+
+            if (firstTime != null) {
+                firstTime.layout(0,0,firstTime.getMeasuredWidth(),firstTime.getMeasuredHeight());
+            }
+
+            if(lastTime != null){
+                lastTime.layout(this.getMeasuredWidth()- lastTime.getMeasuredWidth(),0,this.getMeasuredWidth(),lastTime.getMeasuredHeight());
+            }
+        }
+
+        @Override
+        protected void onDraw(Canvas canvas) {
+            super.onDraw(canvas);
+            if(lastTime != null&&firstTime != null){
+                canvas.drawRect(firstTime.getWidth()+firstTime.getHeight()/30,firstTime.getWidth()/10,firstTime.getWidth()+firstTime.getHeight()*2/30, firstTime.getHeight(),paint);
+            }
+        }
+    }
+
+    private String TwoLetterNum(int num){
+        if(num<10){
+            return "0"+num;
+        }else{
+            return ""+num;
         }
     }
 

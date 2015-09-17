@@ -17,7 +17,7 @@ import android.view.View;
 
 import com.fifteentec.yoko.R;
 
-public class SwitchButton extends View{
+public class SwitchButton extends View implements View.OnClickListener{
 
     private Bitmap mSwitchMask,mSwitchFrame,mSwitchLong,mSwitchBotton;
     private int mMaxMoveLength;
@@ -30,9 +30,34 @@ public class SwitchButton extends View{
     private float mLastX = 0;
     private float mCurrentX = 0;
 
+
+    private float  ratio = 1;
     private boolean mSwitchOn = true;
 
     private boolean mFlag = false;
+
+
+    private SwitchButtonListener mSwitchButtonListener=null;
+
+
+    @Override
+    public void onClick(View v) {
+        Log.d("Test","here");
+        mDeltaX = mSwitchOn?mMaxMoveLength:-mMaxMoveLength;
+        mSwitchOn = !mSwitchOn;
+        if(mSwitchButtonListener!=null) mSwitchButtonListener.ButtonSwitch(this,mSwitchOn);
+        invalidate();
+        mDeltaX = 0;
+    }
+
+
+    public interface SwitchButtonListener{
+        void ButtonSwitch(SwitchButton switchButton,boolean isOn);
+    }
+
+    public void setmSwitchButtonListener(SwitchButtonListener mSwitchButtonListener) {
+        this.mSwitchButtonListener = mSwitchButtonListener;
+    }
 
     public SwitchButton(Context context) {
         this(context, null);
@@ -46,20 +71,27 @@ public class SwitchButton extends View{
         super(context, attrs, defStyleAttr);
     }
 
-    public static SwitchButton newInstance(Context context,int Back,int full,int mask,int botton){
+    public static SwitchButton newInstance(Context context,int Back,int full,int mask,int botton,boolean on){
         SwitchButton switchButton = new SwitchButton(context);
-        switchButton.initSwitch(Back, full, mask, botton);
+        switchButton.initSwitch(Back, full, mask, botton,on);
+
         return switchButton;
     }
 
-    public void initSwitch(int Back,int full,int mask,int botton){
+    public void initSwitch(int Back,int full,int mask,int botton,boolean on){
+
+
+        mSwitchOn = on;
         mSwitchMask = BitmapFactory.decodeResource(getResources(), mask);
-        mSwitchBotton = BitmapFactory.decodeResource(getResources(),botton);
         mSwitchFrame = BitmapFactory.decodeResource(getResources(),Back);
+        mSwitchBotton = BitmapFactory.decodeResource(getResources(),botton);
         mSwitchLong = BitmapFactory.decodeResource(getResources(),full);
+        setOnClickListener(this);
+
+
 
         mMaxMoveLength = mSwitchLong.getWidth() - mSwitchFrame.getWidth();
-        mDst = new Rect(0,0,mSwitchFrame.getWidth(),mSwitchFrame.getHeight());
+        mDst = new Rect(0,0,(int)(mSwitchFrame.getWidth()*ratio),(int)(mSwitchFrame.getHeight()*ratio));
         mSrc = new Rect();
 
 
@@ -67,10 +99,18 @@ public class SwitchButton extends View{
         mPaint.setAntiAlias(true);
         mPaint.setAlpha(255);
         mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
+
     }
+
+
+    public void ChangeButtonHeight(int height){
+        ratio = (float)height/mSwitchFrame.getHeight();
+        mDst = new Rect(0,0,(int)(mSwitchFrame.getWidth()*ratio),(int)(mSwitchFrame.getHeight()*ratio));
+    }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        setMeasuredDimension(mSwitchFrame.getWidth(), mSwitchFrame.getHeight());
+        setMeasuredDimension((int)(mSwitchFrame.getWidth()*ratio),(int)( mSwitchFrame.getHeight()*ratio));
     }
 
     @Override
@@ -89,10 +129,11 @@ public class SwitchButton extends View{
         }
         int count = canvas.saveLayer(new RectF(mDst), null, Canvas.ALL_SAVE_FLAG);
 
+
         canvas.drawBitmap(mSwitchLong, mSrc, mDst, null);
         canvas.drawBitmap(mSwitchBotton,mSrc, mDst, null);
-        canvas.drawBitmap(mSwitchFrame, 0, 0, null);
-        canvas.drawBitmap(mSwitchMask, 0, 0, mPaint);
+        canvas.drawBitmap(mSwitchFrame, null, mDst, null);
+        canvas.drawBitmap(mSwitchMask, null, mDst, mPaint);
         canvas.restoreToCount(count);
 
     }
@@ -105,7 +146,7 @@ public class SwitchButton extends View{
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 mLastX = event.getX();
-                return true;
+                break;
             case MotionEvent.ACTION_MOVE:
                 mCurrentX = event.getX();
                 mDeltaX = (int) (mCurrentX - mLastX);
@@ -120,17 +161,16 @@ public class SwitchButton extends View{
                 invalidate();
                 return true;
             case MotionEvent.ACTION_UP:
-                if (Math.abs(mDeltaX) > 0 && Math.abs(mDeltaX) < mMaxMoveLength / 2) {
+                if (Math.abs(mDeltaX) > mMaxMoveLength/4 && Math.abs(mDeltaX) < mMaxMoveLength / 2) {
                     mDeltaX = 0;
                     invalidate();
                     return true;
                 } else if (Math.abs(mDeltaX) > mMaxMoveLength / 2 && Math.abs(mDeltaX) <= mMaxMoveLength) {
                     mDeltaX = mDeltaX > 0 ? mMaxMoveLength : -mMaxMoveLength;
                     mSwitchOn = !mSwitchOn;
-                    /*
-                    if(mListener != null) {
-                        mListener.onChange(this, mSwitchOn);
-                    }*/
+                    if(mSwitchButtonListener != null) {
+                        mSwitchButtonListener.ButtonSwitch(this, mSwitchOn);
+                    }
                     invalidate();
                     mDeltaX = 0;
                     return true;

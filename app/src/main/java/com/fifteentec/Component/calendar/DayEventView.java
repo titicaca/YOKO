@@ -76,6 +76,12 @@ public class DayEventView extends ViewGroup {
         return true;
     }
 
+    public void UpdateDayEventView(){
+        mEventManager.UpdateEventManager();
+        mAllDayView.UpdateView();
+        mNormalEvent.UpdateView();
+    }
+    /*
     public void EventRecordUpdate(long rid,boolean exist) {
         if(!exist) {
             if (mEventManager.addEvent(rid)) mAllDayView.UpdateView();
@@ -84,7 +90,7 @@ public class DayEventView extends ViewGroup {
             if(mEventManager.isAllDayEventExist(rid)) mAllDayView.UpdateView();
             else mNormalEvent.UpdateView();
         }
-    }
+    }*/
 
 
     public static DayEventView newInstance(Context context, GregorianCalendar today) {
@@ -109,7 +115,7 @@ public class DayEventView extends ViewGroup {
     private void init(GregorianCalendar today) {
         mSurface = new Surface();
         mDate = CalUtil.CopyDate(today);
-        GregorianCalendar time = new GregorianCalendar(today.get(Calendar.YEAR),today.get(Calendar.MONTH),today.get(Calendar.DAY_OF_MONTH),0,0);
+        GregorianCalendar time = new GregorianCalendar(today.get(Calendar.YEAR),today.get(Calendar.MONTH),today.get(Calendar.DAY_OF_MONTH),0,0,0);
         mEventManager = EventManager.newInstance(((BaseActivity)mcontext).getDBManager().getTableEvent(),EventManager.DAY_VIEW_EVENT_MANAGER,time.getTimeInMillis());
 
         mBackgroundView = new View(mcontext);
@@ -225,12 +231,12 @@ public class DayEventView extends ViewGroup {
             int heightSpec = MeasureSpec.makeMeasureSpec(mSurface.TextHeight+mSurface.PageUpdownPadding,MeasureSpec.EXACTLY);
             mTitleBackGroud.measure(widthSpec, heightSpec);
         }
+
                /*if(!= null){
             int widthSpec = MeasureSpec.makeMeasureSpec();
             int heightSpec = MeasureSpec.makeMeasureSpec();
             .measure(widthSpec,heightSpec);
         }
-
          */
         setMeasuredDimension(mScreenWidth, mScreenHeight);
     }
@@ -462,7 +468,6 @@ public class DayEventView extends ViewGroup {
 
         @Override
         public boolean onTouchEvent(MotionEvent event) {
-            //if (event.getAction() == MotionEvent.ACTION_UP) DownChildId = -1;
             return mgestureDetector.onTouchEvent(event);
         }
 
@@ -473,7 +478,6 @@ public class DayEventView extends ViewGroup {
 
         @Override
         public void onShowPress(MotionEvent e) {
-
         }
 
         @Override
@@ -485,7 +489,7 @@ public class DayEventView extends ViewGroup {
                 EventRecord eventRecord =  new EventRecord();
                 eventRecord.timebegin = mEventManager.DayView_Date;
                 eventRecord.timeend = mEventManager.DayView_Date;
-                dayEventViewListener.createRecord(NewEventView.HAVE_TIME,eventRecord);
+                dayEventViewListener.createRecord(NewEventView.ALL_DAY_EVENT,eventRecord);
 
             }
             return true;
@@ -494,7 +498,6 @@ public class DayEventView extends ViewGroup {
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
             DownChildId = -1;
-            Log.d("Test", "getScrollY:" + getScrollY() + " distanceY:" + distanceY + " allHeight:" + this.allHeihgt + " ScreenHeight:" + ScreenHeight);
             if(distanceY<0){
                 if(getScrollY()>ScrollMin) {
                     if (getScrollY() - ScrollMin < Math.abs(distanceY)) scrollTo(0, ScrollMin);
@@ -522,7 +525,7 @@ public class DayEventView extends ViewGroup {
                 EventRecord eventRecord = new EventRecord();
                 eventRecord.timebegin = mEventManager.DayView_Date;
                 eventRecord.timeend = mEventManager.DayView_Date;
-                dayEventViewListener.createRecord(NewEventView.HAVE_TIME,eventRecord);
+                dayEventViewListener.createRecord(NewEventView.ALL_DAY_EVENT,eventRecord);
             }
             DownChildId =-1;
 

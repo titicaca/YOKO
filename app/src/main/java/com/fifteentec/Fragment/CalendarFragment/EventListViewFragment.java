@@ -15,13 +15,12 @@ import java.util.ArrayList;
 
 public class EventListViewFragment extends Fragment{
 
-    private EventListView mListView;
+
     private ArrayList<Integer> mCurDate;
 
     private Context mContext;
     private static final String DATE = "DATE";
     private static final String HEIGHT = "HEIGHT";
-    private int mViewHeight;
     private EventListFragmentListener mEvnetFragmentListener;
 
     private EventListView mEvnetView;

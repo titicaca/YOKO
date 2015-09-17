@@ -30,7 +30,7 @@ import java.util.Random;
 public class EventListView extends ViewGroup implements GestureDetector.OnGestureListener{
     private Context mcontext ;
     private EventController mEvent;
-    private float mRatio =1/7f;
+    private float mRatio =1/4f;
     private int ScreenWidth;
     private int ScreenHeight;
     private LayoutInflater mInflater;
@@ -68,7 +68,7 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
         mSurface = new Surface();
         ScreenWidth =(getResources().getDisplayMetrics().widthPixels);
         ScreenHeight = (getResources().getDisplayMetrics().heightPixels);
-        GregorianCalendar temp = new GregorianCalendar(date.get(0),date.get(1),date.get(2),0,0);
+        GregorianCalendar temp = new GregorianCalendar(date.get(0),date.get(1),date.get(2),0,0,0);
         mEvent = new EventController(temp);
         scrollTo(0, mEvent.initEventList());
 
@@ -78,12 +78,10 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int widthMode = MeasureSpec.getMode(widthMeasureSpec);
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
-        //ScreenHeight = MeasureSpec.getSize(heightMeasureSpec);
-        //ScreenWidth = MeasureSpec.getSize(widthMeasureSpec);
-        /*
+
         if(widthMode ==MeasureSpec.UNSPECIFIED|| heightMode == MeasureSpec.UNSPECIFIED){
             throw new IllegalArgumentException("Wrong Argument");
-        }*/
+        }
 
         int count = getChildCount();
         for(int i = 0 ;i<count;i++){
@@ -172,9 +170,9 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
     }
 
     private class Surface{
-        float DayTextSize = 1/30;
-        float WeekTextSize = 1/50;
-        float MonthTextSize = 1/50;
+        float DayTextSize = 1/10f;
+        float WeekTextSize = 1/30f;
+        float MonthTextSize = 1/40f;
     }
 
 
@@ -316,13 +314,9 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
          */
         public int  addHideViewList(){
             mBottonIndex--;
-            GregorianCalendar tempDate = new GregorianCalendar(mCurDate.get(0),mCurDate.get(1),mCurDate.get(2),0,0);
+            GregorianCalendar tempDate = new GregorianCalendar(mCurDate.get(0),mCurDate.get(1),mCurDate.get(2),0,0,0);
             tempDate.add(Calendar.DAY_OF_MONTH, mBottonIndex);
-            View temp = mInflater.inflate(R.layout.view_event_list_text_layout,null);
-
-            setViewText(temp,tempDate);
-
-            addView(temp, 0);
+            addView(addViewText(tempDate), 0);
             EventList mEL = new EventList(mcontext);
             mEL.initView(tempDate, (int) (ScreenWidth * (1 - mRatio)));
             addView(mEL, 1);
@@ -340,12 +334,7 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
             mTopIndex++;
             GregorianCalendar tempDate = new GregorianCalendar(mCurDate.get(0),mCurDate.get(1),mCurDate.get(2));
             tempDate.add(Calendar.DAY_OF_MONTH, mTopIndex);
-            View temp = mInflater.inflate(R.layout.view_event_list_text_layout,null);
-
-            setViewText(temp,tempDate);
-
-            addView(temp);
-
+            addView(addViewText(tempDate));
             EventList mEL = new EventList(mcontext);
             mEL.initView(tempDate, (int) (ScreenWidth * (1 - mRatio)));
             addView(mEL);
@@ -353,20 +342,27 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
         }
 
 
-        private void setViewText(View temp,GregorianCalendar tempDate){
+        private View addViewText(GregorianCalendar tempDate){
+            View temp = mInflater.inflate(R.layout.view_event_list_text_layout,null);
             TextView day = (TextView) temp.findViewById(R.id.id_event_list_day_text);
-            day.setText("" + tempDate.get(Calendar.DAY_OF_MONTH));
+            int dayDate =tempDate.get(Calendar.DAY_OF_MONTH);
+            if(dayDate <10){
+                day.setText("0" + tempDate.get(Calendar.DAY_OF_MONTH));
+            }else{
+                day.setText("" + tempDate.get(Calendar.DAY_OF_MONTH));
+            }
             day.setTypeface(Typeface.DEFAULT_BOLD);
             day.setTextSize(TypedValue.COMPLEX_UNIT_PX,ScreenWidth*mSurface.DayTextSize);
-
             TextView Week = (TextView) temp.findViewById(R.id.id_event_list_week_text);
             Week.setText(CalUtil.WEEK_NAME.get(tempDate.get(Calendar.DAY_OF_WEEK)));
-            day.setTextSize(TypedValue.COMPLEX_UNIT_PX, ScreenWidth * mSurface.WeekTextSize);
+            Week.setTextSize(TypedValue.COMPLEX_UNIT_PX, ScreenWidth * mSurface.WeekTextSize);
 
             TextView Month = (TextView) temp.findViewById(R.id.id_event_list_month_text);
             int NowMonth = tempDate.get(Calendar.MONTH) +1;
-            Month.setText(tempDate.get(Calendar.YEAR)+"年"+NowMonth+"月");
-            day.setTextSize(TypedValue.COMPLEX_UNIT_PX, ScreenWidth * mSurface.MonthTextSize);
+            Month.setText(tempDate.get(Calendar.YEAR)+"."+NowMonth);
+            Month.setTextSize(TypedValue.COMPLEX_UNIT_PX, ScreenWidth * mSurface.MonthTextSize);
+
+            return temp;
         }
 
 
@@ -408,12 +404,12 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
 
             mBottonIndex -=offset;
             mTopIndex -=offset;
-            mEventListListener.DateChange(mCurDate);
+            //mEventListListener.DateChange(mCurDate);
 
         }
 
         private EventController(ArrayList<Integer> date){
-            mTodayDate = new GregorianCalendar(date.get(0),date.get(1),date.get(2),0,0);
+            mTodayDate = new GregorianCalendar(date.get(0),date.get(1),date.get(2),0,0,0);
             mCurDate = date;
         }
 

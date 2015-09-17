@@ -42,6 +42,33 @@ public class EventManager {
         return mtableEvent.queryEventByRid(rid);
     }
 
+
+    public void UpdateEventManager(){
+        switch (mType){
+            case DAY_VIEW_EVENT_MANAGER:
+                long End = DayView_Date +MillsInOneDay;
+                List<EventRecord> eventRecords=mtableEvent.queryEvent(UserServer.getInstance().getUserid(),DayView_Date,End);
+                AlldayEvent.clear();
+                NormalEvent.clear();
+                for(EventRecord eventRecord:eventRecords){
+                    if(eventRecord.timebegin == eventRecord.timeend&&eventRecord.timebegin==DayView_Date) AlldayEvent.add(eventRecord.rid);
+                    else {
+                        NormalEvent.add(eventRecord.rid);
+                    }
+                }
+                break;
+            case WEEK_VIEW_EVENT_MANAGER:
+                WeekManager.clear();
+                ArrayList<Long> DayStart = CalUtil.GetWeekBeginTimeInMills(DayView_Date);
+                for (int i = 0; i < CalUtil.LENTH_OF_WEEK; i++) {
+                    EventManager temp = EventManager.newInstance(mtableEvent,DAY_VIEW_EVENT_MANAGER,DayStart.get(i));
+                    WeekManager.add(temp);
+                }
+
+                break;
+        }
+    }
+
     public static EventManager newInstance(TableEvent tableEvent,int Type,long TimeInMill){
         EventManager eventManager;
         switch (Type){
@@ -170,6 +197,10 @@ public class EventManager {
             long a = mtableEvent.queryEventByRid(AlldayEvent.get(i)).rid;
             if(a == rid) return true;
         }
+        /*
+        EventRecord eventRecord = mtableEvent.queryEventByRid(rid);
+        if(eventRecord.timebegin==eventRecord.timeend&&eventRecord.timebegin==DayView_Date) return true;
+        */
         return false;
     }
     public long getAllDayEventRid(int index){
@@ -179,7 +210,6 @@ public class EventManager {
     public boolean addEvent(long rid){
         EventRecord eventRecord = mtableEvent.queryEventByRid(rid);
         if(mType == DAY_VIEW_EVENT_MANAGER) {
-
             if (eventRecord.timebegin == eventRecord.timeend && eventRecord.timebegin== DayView_Date) {
                 AlldayEvent.add(rid);
                 return true;
@@ -264,6 +294,7 @@ public class EventManager {
         drawTags.add(drawTag);
         return drawTag;
     }
+
 
     public class DrawTag{
         boolean task = false;

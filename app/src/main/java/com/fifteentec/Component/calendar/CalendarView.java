@@ -107,6 +107,10 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
     }
 
     public void initView(ArrayList<Integer> date) {
+
+        firstEnter=true;
+        OPERATION= WEEK;
+        removeAllViews();
         mAnimatorController=new AnimatorController();
         gestureDetector = new GestureDetector(mContext,this);
         gestureDetector.setIsLongpressEnabled(false);

@@ -8,7 +8,9 @@ import android.view.ViewGroup;
 
 import com.Database.EventRecord;
 import com.fifteentec.Component.calendar.CalendarView;
+import com.fifteentec.Component.calendar.EventManager;
 import com.fifteentec.Component.calendar.WeekEventView;
+import com.fifteentec.yoko.BaseActivity;
 import com.fifteentec.yoko.R;
 
 import java.util.ArrayList;
@@ -59,8 +61,9 @@ public class WeekEventFragment extends Fragment {
     }
 
 
-    public void EventRecordUpdate(long rid,boolean exist){
-        weekEventView.UpdateView(rid, exist);
+    public void EventRecordUpdate(){
+
+        weekEventView.UpdateView();
 
     }
 
@@ -81,6 +84,12 @@ public class WeekEventFragment extends Fragment {
         }
     }
 
+    public void UpdateToView(GregorianCalendar time){
+        if(weekEventView!=null&&calendarView !=null) {
+            UpdateFragmentTime(time);
+            calendarView.initView(mCurDate);
+        }
+    }
     public void UpdateScale(){
         weekEventView.UpdateScale();
     }

@@ -617,7 +617,7 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
             }else if(Math.abs(positionY - existRect.botton)<StrechMinDistance){
                 OPERATIONMODE = EXIST_DOWN;
                 return true;
-            }else if((positionY > existRect.top&&(positionY<existRect.botton)))return true;
+            }else if(positionY > existRect.top&&positionY<existRect.botton) return true;
             UpdateTimeByMove();
 
 
@@ -907,19 +907,34 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
 
                 OPERATIONMODE = EXIST;
                 return true;
-            }else if(OPERATIONMODE == EXIST_TOP|| OPERATIONMODE == EXIST_DOWN) OPERATIONMODE = EXIST;
+            }
             else if(OPERATIONMODE == TEMPRECT){
-                int positionTop = tempRect.top;
-                int positionBotton = tempRect.botton;
-                long offsetTop = Math.round((positionTop / (double) (EndY)) * mEventManager.MillsInOneDay);
-                long offsetBotton = Math.round((positionBotton / ((double) EndY)) * mEventManager.MillsInOneDay);
+
+                double unit = (double)CellHeight/mSurface.CellUnit;
+                double newTop;
+                if(tempRect.top%unit<unit/2){
+                    newTop = tempRect.top-tempRect.top%unit;
+                }else{
+                    newTop = tempRect.top-tempRect.top%unit+unit;
+                }
+
+                double newEnd;
+                if(tempRect.botton%unit<unit/2){
+                    newEnd = tempRect.botton-tempRect.botton%unit;
+                }else{
+                    newEnd = tempRect.botton-tempRect.botton%unit+unit;
+                }
+
+                tempRect.starttime = mEventManager.DayView_Date + Math.round((newTop/(double)EndY)*mEventManager.MillsInOneDay);
+                tempRect.endtime =mEventManager.DayView_Date + Math.round((newEnd/(double)EndY)*mEventManager.MillsInOneDay);
+
                 EventRecord eventRecord = new EventRecord();
-                eventRecord.timebegin = mEventManager.DayView_Date+offsetTop;
-                eventRecord.timeend = mEventManager.DayView_Date+offsetBotton;
+                eventRecord.timebegin = tempRect.starttime;
+                eventRecord.timeend = tempRect.endtime;
                 normalEventListener.createRecord(NewEventView.HAVE_TIME,eventRecord);
                 CleartempRect();
                 OPERATIONMODE= SCREEN;
-            }else if(OPERATIONMODE == EXIST){
+            }else if(OPERATIONMODE == EXIST||OPERATIONMODE == EXIST_TOP|| OPERATIONMODE == EXIST_DOWN){
                 double unit = (double)CellHeight/mSurface.CellUnit;
                 double newTop;
                 if(existRect.top%unit<unit/2){
@@ -939,6 +954,7 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
 
                 ExistRectUpdate((int) Math.round(newTop), (int) Math.round(newEnd));
                 pressOffset = 0;
+                OPERATIONMODE = EXIST;
             }
             AutoScrollEnd = 0;
         }
@@ -968,6 +984,13 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
         protected void onDraw(Canvas canvas) {
             if(tempRect.exist){
                 canvas.drawRect(tempRect.left,tempRect.top,tempRect.right,tempRect.botton,mSurface.tempRectPaint);
+
+                Rect rect = new Rect();
+                mSurface.NormalText.getTextBounds("新建", 0, 1, rect);
+                canvas.drawText("新建", (tempRect.left+tempRect.right)/2 + mSurface.EventTextPadding, (tempRect.top+tempRect.botton)/2, mSurface.NormalText);
+
+                drawCircle(canvas, tempRect.top,findTimeByY(tempRect.top,true),true,true);
+                drawCircle(canvas, tempRect.botton, findTimeByY(tempRect.botton,true), true, false);
             }
             if(existRect.exist){
 
@@ -1021,8 +1044,7 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
         int EventTextPadding ;
 
         Paint tempRectPaint;
-        int tempRectColor = Color.BLUE;
-        int tempRectWidth = 10;
+        int tempRectColor = Color.YELLOW;
 
         Paint ExistRectPaint;
         int ExistRectColor = Color.GREEN;

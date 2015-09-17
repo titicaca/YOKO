@@ -6,6 +6,8 @@ import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.database.Cursor;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.Database.DBManager;
@@ -29,6 +32,9 @@ import com.fifteentec.yoko.BaseActivity;
 import com.fifteentec.yoko.R;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -40,8 +46,8 @@ public class CalViewFragment extends Fragment {
 
     private CalendarController mDate;
 
-    private TextView mMonthText;
-    private TextView mYearText;
+    private TextView mCalendarFilter;
+    private ImageView mEventListButton;
     private FragmentManager mFragmentManager;
     private EventListViewFragment mListView;
     private FrameLayout mMainView;
@@ -53,7 +59,8 @@ public class CalViewFragment extends Fragment {
     private final int CAL_VIEW_MONTH_TAP = 0x01;
 
     private final String IMAGE_TYPE = "image/*";
-    private final String CAMERA_PATH = "/sdcard/DCIM/Camera/";
+    private final String CAMERA_PATH =Environment.getExternalStorageDirectory().getPath()+"/"+Environment.DIRECTORY_DCIM+"/";
+    private final String YOKO_STORAGE_PATH = Environment.getExternalStorageDirectory().getPath()+"/YOKO/EventPic/";
     private String RECENT_FILE_NAME;
 
     private final int IMAGE_NEWEVENT_CODE = 0x00;
@@ -68,6 +75,7 @@ public class CalViewFragment extends Fragment {
     private final String TYPE = "Type";
     private final String REMIND ="Reminder";
     private final String RID = "Rid";
+    private final String LOCALPICLINK = "LocalPicLink";
 
     private final int DAY_EVENT_VIEW = 0x00;
 
@@ -86,6 +94,7 @@ public class CalViewFragment extends Fragment {
 
         this.activity = (BaseActivity)this.getActivity();
         this.dbManager = this.activity.getDBManager();
+
     }
 
 
@@ -96,17 +105,16 @@ public class CalViewFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_calendar_main_layout, container, false);
         mMainView = (FrameLayout) view.findViewById(R.id.id_cal_main_all);
 
-        mMonthText = (TextView) view.findViewById(R.id.id_cal_view_month);
-        mMonthText.setOnClickListener(new View.OnClickListener() {
+        mCalendarFilter = (TextView) view.findViewById(R.id.id_calendar);
+        mCalendarFilter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                //mCalView.SwitchMode();
                 mWeekEventFragment.UpdateScale();
             }
         });
-        mYearText = (TextView) view.findViewById(R.id.id_cal_view_year);
-        mYearText.setOnClickListener(new View.OnClickListener() {
+        mEventListButton = (ImageView) view.findViewById(R.id.id_eventlist_button);
+        mEventListButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
@@ -135,36 +143,31 @@ public class CalViewFragment extends Fragment {
             }
         });
 
-
-
-/*
-        mCalView =  (CalView) view.findViewById(R.id.id_cal_view);
-
-
-        mCalView.init(mDate.getNowCalendar());
-        mCalView.setCalViewListner(new CalView.CalViewListener() {
+        ImageView NewEvent = (ImageView)view.findViewById(R.id.id_new_event);
+        NewEvent.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void DateChange(GregorianCalendar arry) {
-                mDate.UpdateCur(arry);
-                UpdateTime(CAL_VIEW_MONTH_TAP);
-
-            }
-
-            @Override
-            public void ShowDayDetail(GregorianCalendar date) {
-                showDayEventView(date);
+            public void onClick(View v) {
+                CreateNewEvent(NewEventView.BLANK_EVENT,null);
             }
         });
-*/
+
+        TextView today = (TextView)view.findViewById(R.id.id_today);
+        today.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mWeekEventFragment.UpdateToView(mDate.getNowCalendar());
+            }
+        });
+
         FragmentTransaction mTrans = mFragmentManager.beginTransaction();
         mListView = EventListViewFragment.newInstance(mDate.getNowArray());
+        /*
         mListView.setEventFragmentListener(new EventListViewFragment.EventListFragmentListener() {
             @Override
             public void ListDateChange(ArrayList<Integer> list) {
                 mDate.UpdateCur(list);
-                UpdateTime(EVENT_LIST);
             }
-        });
+        });*/
 
         mWeekEventFragment = WeekEventFragment.newInstance(mDate.getNowArray());
         mWeekEventFragment.setmWeekViewFragmentLinstener(new WeekEventFragment.WeekViewFragmentLinstener() {
@@ -202,6 +205,8 @@ public class CalViewFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+        String Path = null;
         switch (requestCode) {
             case IMAGE_NEWEVENT_CODE:
                 if (resultCode == Activity.RESULT_OK) {
@@ -210,24 +215,63 @@ public class CalViewFragment extends Fragment {
                     Cursor cursor = getActivity().managedQuery(uri, proj, null, null, null);
                     int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
                     cursor.moveToFirst();
-                    String Path = cursor.getString(column_index);
+                    Path = cursor.getString(column_index);
                     try {
                         if (Integer.parseInt(Build.VERSION.SDK) < 14) {
                             cursor.close();
                         }
                     } catch (Exception e) {
-                        Log.e("YOKO", "error:" + e);
+                        e.printStackTrace();
                     }
-                    if (mNewEventView != null) {
-                        mNewEventView.addNewPic(Path);
-                    }
+
                 }
                 break;
             case IMAGE_OPENCAMERA_CODE:
                 if(resultCode == Activity.RESULT_OK){
-                    if(RECENT_FILE_NAME != null&&mNewEventView != null) mNewEventView.addNewPic(CAMERA_PATH+RECENT_FILE_NAME);
+                    Path = CAMERA_PATH+RECENT_FILE_NAME;
+
                 }
+                break;
         }
+
+        if(Path != null) {
+            Bitmap bitmap = BitmapFactory.decodeFile(Path);
+            File file = new File(YOKO_STORAGE_PATH);
+
+            if (!file.exists()) {
+                file.mkdirs();
+            }
+
+            File f_file = new File(YOKO_STORAGE_PATH,RECENT_FILE_NAME);
+
+            if (f_file.exists()){
+                f_file.delete();
+            }
+
+            try {
+                f_file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                FileOutputStream fOut = new FileOutputStream(f_file);
+                if(fOut != null) {
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 30, fOut);
+                }
+                fOut.flush();
+                fOut.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (mNewEventView != null) {
+                mNewEventView.addNewPic(YOKO_STORAGE_PATH + RECENT_FILE_NAME);
+            }
+
+        }
+        RECENT_FILE_NAME = null;
     }
 
     private void CreateNewEvent(int type,EventRecord eventRecord){
@@ -245,14 +289,17 @@ public class CalViewFragment extends Fragment {
                 eventRecord.remind = bundle.getLong(REMIND);
                 eventRecord.timebegin = bundle.getLong(TIMEBEGIN);
                 eventRecord.uid = UserServer.getInstance().getUserid();
+                eventRecord.localpicturelink = bundle.getString(LOCALPICLINK);
 
                 if(isNewEvent != NewEventView.EXIST_EVENT) {
-                    EventRecordUpdate(dbManager.getTableEvent().addEvent(eventRecord),false);
+                    dbManager.getTableEvent().addEvent(eventRecord);
+                    EventRecordUpdate();
                 }else{
                     eventRecord.rid = bundle.getLong(RID);
                     dbManager.getTableEvent().updateEvent(eventRecord);
-                    EventRecordUpdate(eventRecord.rid,true);
+                    EventRecordUpdate();
                 }
+
 
             }
 
@@ -260,17 +307,22 @@ public class CalViewFragment extends Fragment {
             public void addNewBitMap(boolean open) {
                 if(open){
                     Intent Camera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    String storage = Environment.getExternalStorageState();
-                    if(!storage.equals(Environment.MEDIA_MOUNTED)){
+                    if(!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
                         return;
                     }
                     GregorianCalendar date = new GregorianCalendar();
-                    RECENT_FILE_NAME = "YOKO"+date.get(Calendar.YEAR)+""+(date.get(Calendar.MONTH)+1)+""+date.get(Calendar.DAY_OF_MONTH)+""+date.get(Calendar.HOUR)+""+date.get(Calendar.MINUTE)+".jpg";
+                    RECENT_FILE_NAME = "YOKO"+date.get(Calendar.YEAR)+""+(date.get(Calendar.MONTH)+1)+""+date.get(Calendar.DAY_OF_MONTH)+""+date.get(Calendar.HOUR)+""+date.get(Calendar.MINUTE)+""+date.get(Calendar.SECOND)+".jpg";
+                    File dir = new File(CAMERA_PATH);
+                    if(!dir.exists()){
+                        dir.mkdirs();
+                    }
                     File file =new File(CAMERA_PATH,RECENT_FILE_NAME);
                     Uri imageUri = Uri.fromFile(file);
                     Camera.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
                     startActivityForResult(Camera, IMAGE_OPENCAMERA_CODE);
                 }else {
+                    GregorianCalendar date = new GregorianCalendar();
+                    RECENT_FILE_NAME = "YOKO"+date.get(Calendar.YEAR)+""+(date.get(Calendar.MONTH)+1)+""+date.get(Calendar.DAY_OF_MONTH)+""+date.get(Calendar.HOUR)+""+date.get(Calendar.MINUTE)+""+date.get(Calendar.SECOND)+".jpg";
                     Intent getAlbum = new Intent(Intent.ACTION_PICK);
                     getAlbum.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, IMAGE_TYPE);
                     startActivityForResult(getAlbum, IMAGE_NEWEVENT_CODE);
@@ -299,20 +351,16 @@ public class CalViewFragment extends Fragment {
     }
 
 
-    private void EventRecordUpdate(long rid,boolean exist) {
+    private void EventRecordUpdate() {
         if(mdayEventView != null){
-            mdayEventView.EventRecordUpdate(rid,exist);
+            mdayEventView.UpdateDayEventView();
         }
         if(mWeekEventFragment != null){
-            mWeekEventFragment.EventRecordUpdate(rid,exist);
+            mWeekEventFragment.EventRecordUpdate();
         }
     }
 
 
-    private void UpdateTime(int Updater) {
-        mMonthText.setText(mDate.MONTH_NAME.get(mDate.getCurMonth()));
-        mYearText.setText(mDate.getCurYear() + "");
-    }
 
 
 
