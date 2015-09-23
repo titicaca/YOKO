@@ -37,7 +37,10 @@ import com.fifteentec.yoko.R;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.download.ImageDownloader;
+import com.nostra13.universalimageloader.core.imageaware.ImageAware;
+import com.nostra13.universalimageloader.core.imageaware.ImageViewAware;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -110,6 +113,7 @@ public class NewEventView extends ViewGroup{
         void addNewBitMap(boolean open);
         void CancelCreate();
         void deleteEvent(long rid);
+        void ShowPic(String Path);
 
     }
 
@@ -193,6 +197,7 @@ public class NewEventView extends ViewGroup{
         imageLoader = ImageLoader.getInstance();
         imageLoader.init(configuration);
 
+
         if(StartDate.getTimeInMillis()==EndDate.getTimeInMillis()){
             AllDaySwitch = false;
             AllDayDate.setTimeInMillis(StartDate.getTimeInMillis());
@@ -233,8 +238,8 @@ public class NewEventView extends ViewGroup{
             DisplayImageOptions options = new DisplayImageOptions.Builder()
                     .showImageOnFail(R.drawable.cat).considerExifParams(true)
                     .build();
-            mSavedPic = new ImageView(mContext);
-            addView(mSavedPic);
+            initalPicView();
+
             String imageUrl = ImageDownloader.Scheme.FILE.wrap(PicPath);
             imageLoader.displayImage(imageUrl, mSavedPic, options);
         }
@@ -305,8 +310,8 @@ public class NewEventView extends ViewGroup{
                     @Override
                     public void DateChange(GregorianCalendar start, GregorianCalendar end) {
                         StartDate = CalUtil.CopyDate(start);
-                        if(end.getTimeInMillis()>start.getTimeInMillis()) EndDate = CalUtil.CopyDate(end);
-                        else EndDate.setTimeInMillis(StartDate.getTimeInMillis()+(60*1000));
+                        if(end.getTimeInMillis()>start.getTimeInMillis()+5*60*1000) EndDate = CalUtil.CopyDate(end);
+                        else EndDate.setTimeInMillis(StartDate.getTimeInMillis()+(5*60*1000));
                         if(!AllDaySwitch) AllDayDate = CalUtil.CopyDate(start);
                         mEventTime.initEventTime();
                     }
@@ -341,6 +346,19 @@ public class NewEventView extends ViewGroup{
 
     }
 
+    private void initalPicView(){
+        mSavedPic = new ImageView(mContext);
+        mSavedPic.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        mSavedPic.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(PicPath != null)
+                mEventListener.ShowPic(PicPath);
+            }
+        });
+        addView(mSavedPic);
+    }
+
     public void addNewPic(String Path){
 
 
@@ -348,8 +366,7 @@ public class NewEventView extends ViewGroup{
                 .showImageOnFail(R.drawable.cat).considerExifParams(true)
                 .build();
         if(mSavedPic ==null) {
-            mSavedPic = new ImageView(mContext);
-            addView(mSavedPic);
+            initalPicView();
         }
         String imageUrl = ImageDownloader.Scheme.FILE.wrap(Path);
         imageLoader.displayImage(imageUrl, mSavedPic, options);
@@ -663,11 +680,6 @@ public class NewEventView extends ViewGroup{
             CheckBoxTextSize =(mScreenWidth*CheckBoxTextSizeRatio);
             EventTimeViewHeight = (int)(mScreenHeight*EventTimeViewHeightRatio);
             PicView = (int)(mScreenHeight*PicViewRatio);
-
-
-
-
-
         }
 
     }
@@ -1161,7 +1173,7 @@ public class NewEventView extends ViewGroup{
                     StartTime.setTextSize(TypedValue.COMPLEX_UNIT_PX,mScreenHeight * mSurface.EventTimeSmallTextSize);
 
                     TextView textView = (TextView) firstTime.findViewById(R.id.id_new_event_endtime);
-                    textView.setTextSize(mScreenHeight * mSurface.EventTimeSmallTextSize);
+                    textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,mScreenHeight * mSurface.EventTimeSmallTextSize);
 
                     lastTime = inflate(mContext, R.layout.view_new_event_date, null);
 

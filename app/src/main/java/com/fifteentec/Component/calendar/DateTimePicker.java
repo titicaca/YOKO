@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.fifteentec.yoko.R;
 
@@ -47,7 +48,7 @@ public class DateTimePicker {
     private int ScreenWidth;
 
     private float TextRatio = 1/18f;
-    private float SizeRatio = 1/8f;
+    private float SizeRatio = 13/84f;
 
     public DateTimePicker(Context context,int screenWidth){
         mContext = context;
@@ -65,13 +66,13 @@ public class DateTimePicker {
     private void UpdateView(boolean allDay){
         if(allDay) {
             if (DialogView != null) {
-                String text = "开始时间:" ;//+ start_year + "年" + (start_month + 1) + "月" + start_day + "日 " + start_hour + ":" + start_minut;
+                String text = "开始时间:" ;
                 StartTextView.setText(text);
-                text = "结束时间:" ;//+ end_year + "年" + (end_month + 1) + "月" + end_day + "日 " + end_hour + ":" + end_minut;
+                text = "结束时间:" ;
                 EndTextView.setText(text);
             }
         }else{
-            String text = "事件日期:" ;//+ start_year + "年" + (start_month + 1) + "月" + start_day + "日 " ;
+            String text = "事件日期:" ;
             StartTextView.setText(text);
         }
     }
@@ -105,7 +106,7 @@ public class DateTimePicker {
 
     private void resizeNumberPicker(NumberPicker np){
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams((int)(ScreenWidth*SizeRatio), ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.setMargins(10, 0, 10, 0);
+        params.setMargins(2, 0, 2, 0);
         np.setLayoutParams(params);
     }
 
@@ -131,13 +132,23 @@ public class DateTimePicker {
             UpdateView(allDay);
 
 
-            DatePicker StartDatePicker = (DatePicker) DialogView.findViewById(R.id.start_datepicker);
+            final DatePicker StartDatePicker = (DatePicker) DialogView.findViewById(R.id.start_datepicker);
             StartDatePicker.init(start_year, start_month, start_day, new DatePicker.OnDateChangedListener() {
                 @Override
                 public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                     start_year = year;
                     start_month = monthOfYear;
                     start_day = dayOfMonth;
+                    GregorianCalendar start = new GregorianCalendar(start_year,start_month,start_day,start_hour,start_minut,0);
+                    GregorianCalendar end = new GregorianCalendar(end_year,end_month,end_day,end_hour,end_minut,0);
+                    if(start.getTimeInMillis()+5*60*1000>end.getTimeInMillis()){
+                        end.add(Calendar.DAY_OF_MONTH, -1);
+                        start_year = end.get(Calendar.YEAR);
+                        start_month = end.get(Calendar.MONTH);
+                        start_day = end.get(Calendar.DAY_OF_MONTH);
+                        view.updateDate(start_year, start_month, start_day);
+                        Toast.makeText(mContext,"最小间隔不可以小于五分钟",Toast.LENGTH_SHORT).show();
+                    }
                     UpdateView(allDay);
 
                 }
@@ -146,7 +157,7 @@ public class DateTimePicker {
             resizePikcer(StartDatePicker);
 
 
-            TimePicker StartTimePicker = (TimePicker) DialogView.findViewById(R.id.start_timepicker);
+            final TimePicker StartTimePicker = (TimePicker) DialogView.findViewById(R.id.start_timepicker);
             StartTimePicker.setCurrentHour(start_hour);
             StartTimePicker.setCurrentMinute(start_minut);
             StartTimePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
@@ -154,6 +165,16 @@ public class DateTimePicker {
                 public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
                     start_hour = hourOfDay;
                     start_minut = minute;
+                    GregorianCalendar start = new GregorianCalendar(start_year,start_month,start_day,start_hour,start_minut,0);
+                    GregorianCalendar end = new GregorianCalendar(end_year,end_month,end_day,end_hour,end_minut,0);
+                    if(start.getTimeInMillis()+5*60*1000>end.getTimeInMillis()){
+                        end.add(Calendar.MINUTE, -5);
+                        start_hour = end.get(Calendar.HOUR);
+                        start_minut = end.get(Calendar.MINUTE);
+                        StartTimePicker.setCurrentHour(start_hour);
+                        StartTimePicker.setCurrentMinute(start_minut);
+                        Toast.makeText(mContext,"最小间隔不可以小于五分钟",Toast.LENGTH_SHORT).show();
+                    }
                     UpdateView(allDay);
                 }
             });
@@ -168,6 +189,16 @@ public class DateTimePicker {
                     end_year = year;
                     end_month = monthOfYear;
                     end_day = dayOfMonth;
+                    GregorianCalendar start = new GregorianCalendar(start_year,start_month,start_day,start_hour,start_minut,0);
+                    GregorianCalendar end = new GregorianCalendar(end_year,end_month,end_day,end_hour,end_minut,0);
+                    if(start.getTimeInMillis()+5*60*1000>end.getTimeInMillis()){
+                        start.add(Calendar.DAY_OF_MONTH, 1);
+                        end_year = start.get(Calendar.YEAR);
+                        end_month = start.get(Calendar.MONTH);
+                        end_day = start.get(Calendar.DAY_OF_MONTH);
+                        view.updateDate(end_year,end_month,end_day);
+                        Toast.makeText(mContext,"最小间隔不可以小于五分钟",Toast.LENGTH_SHORT).show();
+                    }
                     UpdateView(allDay);
                 }
             });
@@ -175,7 +206,7 @@ public class DateTimePicker {
             resizePikcer(EndDatePicker);
 
 
-            TimePicker EndTimePicker = (TimePicker) DialogView.findViewById(R.id.end_timepicker);
+            final TimePicker EndTimePicker = (TimePicker) DialogView.findViewById(R.id.end_timepicker);
             EndTimePicker.setCurrentHour(end_hour);
             EndTimePicker.setCurrentMinute(end_minut);
             EndTimePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
@@ -183,6 +214,16 @@ public class DateTimePicker {
                 public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
                     end_hour = hourOfDay;
                     end_minut = minute;
+                    GregorianCalendar start = new GregorianCalendar(start_year,start_month,start_day,start_hour,start_minut,0);
+                    GregorianCalendar end = new GregorianCalendar(end_year,end_month,end_day,end_hour,end_minut,0);
+                    if(start.getTimeInMillis()+5*60*1000>end.getTimeInMillis()){
+                        start.add(Calendar.MINUTE,5);
+                        end_hour = start.get(Calendar.HOUR);
+                        end_minut = start.get(Calendar.MINUTE);
+                        EndTimePicker.setCurrentHour(end_hour);
+                        EndTimePicker.setCurrentMinute(end_minut);
+                        Toast.makeText(mContext,"最小间隔不可以小于五分钟",Toast.LENGTH_SHORT).show();
+                    }
                     UpdateView(allDay);
                 }
             });

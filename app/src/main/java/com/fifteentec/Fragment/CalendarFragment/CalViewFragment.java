@@ -29,6 +29,8 @@ import com.fifteentec.Component.calendar.CalendarController;
 import com.fifteentec.Component.calendar.DayEventView;
 import com.fifteentec.Component.calendar.NewEventView;
 import com.fifteentec.yoko.BaseActivity;
+import com.fifteentec.yoko.DetailPicActivity;
+import com.fifteentec.yoko.LoginActivity;
 import com.fifteentec.yoko.R;
 
 import java.io.File;
@@ -161,13 +163,7 @@ public class CalViewFragment extends Fragment {
 
         FragmentTransaction mTrans = mFragmentManager.beginTransaction();
         mListView = EventListViewFragment.newInstance(mDate.getNowArray());
-        /*
-        mListView.setEventFragmentListener(new EventListViewFragment.EventListFragmentListener() {
-            @Override
-            public void ListDateChange(ArrayList<Integer> list) {
-                mDate.UpdateCur(list);
-            }
-        });*/
+
 
         mWeekEventFragment = WeekEventFragment.newInstance(mDate.getNowArray());
         mWeekEventFragment.setmWeekViewFragmentLinstener(new WeekEventFragment.WeekViewFragmentLinstener() {
@@ -345,6 +341,15 @@ public class CalViewFragment extends Fragment {
                 if(mdayEventView !=null){
                     mdayEventView.deleteView(rid);
                 }
+            }
+
+            @Override
+            public void ShowPic(String Path) {
+                Intent intent =new Intent(getActivity(), DetailPicActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("Path",Path);
+                intent.putExtras(bundle);
+                startActivity(intent);
             }
         });
         mMainView.addView(mNewEventView);

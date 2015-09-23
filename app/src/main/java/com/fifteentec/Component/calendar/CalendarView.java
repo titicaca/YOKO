@@ -108,6 +108,7 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
 
     public void initView(ArrayList<Integer> date) {
 
+        OPERATION = WEEK;
         firstEnter=true;
         OPERATION= WEEK;
         removeAllViews();
@@ -1169,9 +1170,9 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
             if(event.getAction()==MotionEvent.ACTION_UP){
                 switch (OPERATION){
                     case WEEK_HORIZON:
-                        if(ScrollXToken<-getMeasuredWidth()/3){
+                        if(ScrollXToken<-getMeasuredWidth()/7){
                             mAnimatorController.ScrollToLeftRightAnimation(-getMeasuredWidth());
-                        }else if(ScrollXToken>getMeasuredWidth()/3){
+                        }else if(ScrollXToken>getMeasuredWidth()/7){
                             mAnimatorController.ScrollToLeftRightAnimation(getMeasuredWidth());
                         }else{
                             mAnimatorController.ScrollToLeftRightAnimation(0);

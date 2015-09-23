@@ -22,7 +22,7 @@ import com.fifteentec.TestRicheng.TestFragment;
 public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutton {
     private FragmentManager mFragmentManager;
     private final int EnterPage = 0;
-    private TabButtonFragment mbuttonfg;
+    private TabButtonFragment mbuttonfg=new TabButtonFragment();
     private FriendsFragment friendsFragment;
     private MyPageFragment myPageFragment;
     private TestFragment tf;
@@ -35,7 +35,7 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
         super.onCreate(savedInstanceState);
         mFragmentManager = this.getFragmentManager();
         setContentView(R.layout.activity_tab_main_layout);
-        mbuttonfg = (TabButtonFragment) mFragmentManager.findFragmentById(R.id.tab_main_botton);
+        //mbuttonfg = (TabButtonFragment) mFragmentManager.findFragmentById(R.id.tab_main_botton);
         mbuttonfg.setButton(this);
         //TabSelector(R.integer.SelectorCir);
         TabSelector(R.integer.SelectorCal);
