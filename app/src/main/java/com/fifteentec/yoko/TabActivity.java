@@ -35,9 +35,8 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
         super.onCreate(savedInstanceState);
         mFragmentManager = this.getFragmentManager();
         setContentView(R.layout.activity_tab_main_layout);
-        //mbuttonfg = (TabButtonFragment) mFragmentManager.findFragmentById(R.id.tab_main_botton);
+        mbuttonfg = (TabButtonFragment) mFragmentManager.findFragmentById(R.id.tab_main_botton);
         mbuttonfg.setButton(this);
-        //TabSelector(R.integer.SelectorCir);
         TabSelector(R.integer.SelectorCal);
 
         Log.v("uid", UserServer.getInstance().getUserid() + "");
