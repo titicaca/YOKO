@@ -11,6 +11,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.fifteentec.Component.User.UserServer;
+import com.fifteentec.Fragment.FoundFragment.FoundEvent;
 import com.fifteentec.Fragment.FoundFragment.FoundFragment;
 import com.fifteentec.Fragment.FriendsFragment;
 import com.fifteentec.Fragment.MyPageFragment;
@@ -27,7 +28,8 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
     private MyPageFragment myPageFragment;
     private TestFragment tf;
     private CalViewFragment mCalViewFragment;
-    private FoundFragment mFoundFragment;
+  //  private FoundFragment mFoundFragment;
+    private FoundEvent mFoundEvent;
 
     @SuppressLint("NewApi")
     @Override
@@ -84,12 +86,20 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
                 }
                 break;
             case R.integer.SelectorFrd:
-                if(mFoundFragment == null){
-                    mFoundFragment = new FoundFragment();
-                    mFmTrans.add(R.id.id_content, mFoundFragment,"found");
+//                if(mFoundFragment == null){
+//                    mFoundFragment = new FoundFragment();
+//                    mFmTrans.add(R.id.id_content, mFoundFragment,"found");
+//                }
+//                else{
+//                    mFmTrans.show(mFoundFragment);
+//                }
+
+                if(mFoundEvent == null){
+                    mFoundEvent = new FoundEvent();
+                    mFmTrans.add(R.id.id_content, mFoundEvent,"found");
                 }
                 else{
-                    mFmTrans.show(mFoundFragment);
+                    mFmTrans.show(mFoundEvent);
                 }
                 Toast a = Toast.makeText(this, "Found",
                         Toast.LENGTH_SHORT);
@@ -152,12 +162,15 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
         if (mCalViewFragment != null) mFmTrans.hide(mCalViewFragment);
         if (myPageFragment != null) mFmTrans.hide(myPageFragment);
         if (friendsFragment != null) mFmTrans.hide(friendsFragment);
-        if (mFoundFragment != null){
-            mFmTrans.hide(mFoundFragment);
+//        if (mFoundFragment != null){
+//            mFmTrans.hide(mFoundFragment);
+//        }
+        if (mFoundEvent != null){
+            mFmTrans.hide(mFoundEvent);
         }
-        if(mFragmentManager.findFragmentByTag("groupItem")!=null){
-            mFmTrans.hide(mFragmentManager.findFragmentByTag("groupItem"));
-        }
+//        if(mFragmentManager.findFragmentByTag("groupItem")!=null){
+//            mFmTrans.hide(mFragmentManager.findFragmentByTag("groupItem"));
+//        }
         if(mFragmentManager.findFragmentByTag("eventItem")!=null){
             mFmTrans.hide(mFragmentManager.findFragmentByTag("eventItem"));
         }

@@ -40,8 +40,8 @@ import java.util.List;
 public class FoundEvent extends Fragment {
     private List<EventBrief> eventList = new ArrayList<EventBrief>();
     private List<EventBrief> tempList = new ArrayList<EventBrief>();
-    private ImageView ivDeleteText;
-    private EditText etSearch;
+    //private ImageView ivDeleteText;
+    //private EditText etSearch;
     private ListView events;
     private EventAdapter eventAdapter;
     private FoundEventItem eventItem;
@@ -60,7 +60,7 @@ public class FoundEvent extends Fragment {
             events = (ListView) view.findViewById(R.id.listView_event);
             refreshableView = (PullToRefresh) view.findViewById(R.id.refreshable_view2);
             initDBfunctions();
-            initSearchFrame(view);
+//            initSearchFrame(view);
             initListView(view);
 
             refreshableView.setOnRefreshListener(new PullToRefresh.PullToRefreshListener() {
@@ -81,6 +81,7 @@ public class FoundEvent extends Fragment {
                     refreshableView.finishRefreshing();
                 }
             }, 0);
+            page=0;
 
             return view;
         }
@@ -88,10 +89,6 @@ public class FoundEvent extends Fragment {
     private void initDBfunctions() {
         baseActivity = (BaseActivity) this.getActivity();
         mRequestQueue = baseActivity.getRequestQueue();
-
-        Log.e("initial DB", "get into function");
-
-
         new APIUserServer.JsonGet(APIUrl.URL_EVENTS_GET+ "/page/0/4", null, null, new APIJsonCallbackResponse() {
             @Override
             public void run() {
@@ -107,42 +104,43 @@ public class FoundEvent extends Fragment {
         }, mRequestQueue, null).send();
     }
 
-    private void initSearchFrame(View parentView){
-        ivDeleteText = (ImageView) parentView.findViewById(R.id.ivDeleteText3);
-        etSearch = (EditText) parentView.findViewById(R.id.etSearch3);
-
-        ivDeleteText.setOnClickListener(new View.OnClickListener() {
-
-            public void onClick(View v) {
-                etSearch.setText("");
-            }
-        });
-
-        etSearch.addTextChangedListener(new TextWatcher() {
-
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // TODO Auto-generated method stub
-
-            }
-
-            public void beforeTextChanged(CharSequence s, int start, int count,
-                                          int after) {
-                // TODO Auto-generated method stub
-
-            }
-
-            public void afterTextChanged(Editable s) {
-                if (s.length() == 0) {
-                    ivDeleteText.setVisibility(View.GONE);
-                } else {
-                    ivDeleteText.setVisibility(View.VISIBLE);
-                }
-            }
-        });
-    }
+//    private void initSearchFrame(View parentView){
+//        ivDeleteText = (ImageView) parentView.findViewById(R.id.ivDeleteText3);
+//        etSearch = (EditText) parentView.findViewById(R.id.etSearch3);
+//
+//        ivDeleteText.setOnClickListener(new View.OnClickListener() {
+//
+//            public void onClick(View v) {
+//                etSearch.setText("");
+//            }
+//        });
+//
+//        etSearch.addTextChangedListener(new TextWatcher() {
+//
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                // TODO Auto-generated method stub
+//
+//            }
+//
+//            public void beforeTextChanged(CharSequence s, int start, int count,
+//                                          int after) {
+//                // TODO Auto-generated method stub
+//
+//            }
+//
+//            public void afterTextChanged(Editable s) {
+//                if (s.length() == 0) {
+//                    ivDeleteText.setVisibility(View.GONE);
+//                } else {
+//                    ivDeleteText.setVisibility(View.VISIBLE);
+//                }
+//            }
+//        });
+//    }
 
 
     private void initListView(View parentView) {
+        Log.e("initial listview", "get into function");
             events.setOnScrollListener(new AbsListView.OnScrollListener() {
                 @Override
                 public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -155,6 +153,7 @@ public class FoundEvent extends Fragment {
                                     JSONObject object = this.getResponse();
                                     Log.e("object", object.toString());
                                     tempList = FoundDataParser.parseEventBriefInfo(object);
+                                    Log.e("get parsed values", tempList.toString());
                                     if (tempList == null||tempList.size()== 0) {
                                         Toast.makeText(getActivity(), "It is the last group", Toast.LENGTH_SHORT);
                                     } else {
@@ -179,7 +178,8 @@ public class FoundEvent extends Fragment {
                 @SuppressLint("NewApi")
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    mFragmentManager = FoundEvent.this.getParentFragment().getFragmentManager();
+                    //mFragmentManager = FoundEvent.this.getParentFragment().getFragmentManager();
+                    mFragmentManager = getFragmentManager();
                     FragmentTransaction mFmTrans = mFragmentManager.beginTransaction();
 
                     eventItem = new FoundEventItem();
@@ -190,15 +190,18 @@ public class FoundEvent extends Fragment {
 
                     Bundle args = new Bundle();
                     args.putString("name", eventList.get(position).getGroupName());
-                    args.putString("groupName", eventList.get(position).getEventIntro());
+                    args.putString("eventUri", eventList.get(position).getEventUri());
+                    args.putString("name", eventList.get(position).getName());
+                    args.putInt("id", eventList.get(position).getID());
+                    args.putLong("timeEnd", eventList.get(position).getTimeEnd());
                     args.putString("uri", eventList.get(position).getLogoUri());
                     eventItem.setArguments(args);
 
-                    mFmTrans.add(R.id.id_content, eventItem, "eventItem");
+                   mFmTrans.add(R.id.id_content, eventItem, "eventItem");
 
                     mFmTrans.addToBackStack("eventItem");
                     mFmTrans.commit();
-                    mFmTrans.hide(FoundEvent.this.getParentFragment());
+                   mFmTrans.hide(FoundEvent.this);
 
                 }
             });

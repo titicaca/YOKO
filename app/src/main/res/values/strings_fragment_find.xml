@@ -34,4 +34,6 @@
     <string name="briefIntro">简介</string>
     <string name="eventDetail">内容详情:</string>
     <string name="from">from</string>
+    <string name="detail">活动详情</string>
+    <string name="no_limit">不限期</string>
 </resources>
