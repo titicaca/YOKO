@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name = "appMainColor">#43b96d</color>
+    <color name = "WorkEventColor">#a2c9e3</color>
+    <color name = "StudyEventColor">#f8b551</color>
+    <color name = "EntertainEventColor">#f29b76</color>
+    <color name = "OtherEventColor">#acd598</color>
+    <color name = "ShadowColor">#b5b5b5</color>
+    <color name = "DashlineColor">#898989</color>
+
+</resources>

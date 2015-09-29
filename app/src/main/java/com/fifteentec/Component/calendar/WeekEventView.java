@@ -3,11 +3,15 @@ package com.fifteentec.Component.calendar;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.DashPathEffect;
 import android.graphics.Paint;
+import android.graphics.PathEffect;
 import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
+import android.text.Layout;
+import android.text.StaticLayout;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
@@ -18,8 +22,11 @@ import android.view.ViewGroup;
 
 import com.Database.EventRecord;
 import com.fifteentec.yoko.BaseActivity;
+import com.fifteentec.yoko.R;
 
+import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.logging.LogRecord;
@@ -58,9 +65,9 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
     private final static int AUTO_SCROLL_TOPDOWN = 0x04;
     private final static int AUTO_SCROLL_BOTTONUP = 0x05;
 
-    private int AutoScrollMove = 50;
+    private int AutoScrollMove = 100;
     private int StrechMinDistance = 30;
-    private int StrechMinHeight = 100;
+    private int StrechMinHeight = CellHeight/2;
     private tempRectCanvas mTempRectCanvas;
 
     private GestureDetector gestureDetector;
@@ -71,14 +78,111 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
 
     private WeekViewListener mWeekViewListener;
 
+    private int pressOffset=0;
+
+    private boolean ViewEndable=true;
+
     public interface WeekViewListener{
         void CheckExistItem(long rid);
         void CreatRecord(int Type,EventRecord eventRecord);
+        void CalEnable(boolean enable);
     }
 
     public void setmWeekViewListener(WeekViewListener mWeekViewListener) {
         this.mWeekViewListener = mWeekViewListener;
     }
+
+    public void setViewEnable(boolean enable){
+        ViewEndable = enable;
+    }
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int height = MeasureSpec.getSize(heightMeasureSpec);
+        int width = MeasureSpec.getSize(widthMeasureSpec);
+
+        if (firstEntry) {
+            ScreenHeight =height;
+            ScreenWidth =width;
+            CellHeight = (int)(height*mSurface.ViewHeightRatio)/mSurface.dividePart;
+            mSurface.initSurface();
+
+            CellWidth = mSurface.ViewWidth/CalUtil.LENTH_OF_WEEK;
+            firstEntry = false;
+            UpdateEventArray();
+        }
+
+        if(mTempRectCanvas != null){
+            int WidthSpec = MeasureSpec.makeMeasureSpec(width,MeasureSpec.EXACTLY);
+            int HeightSpec = MeasureSpec.makeMeasureSpec(height,MeasureSpec.EXACTLY);
+            mTempRectCanvas.measure(WidthSpec, HeightSpec);
+        }
+
+
+        setMeasuredDimension(width, mSurface.ViewHeight);
+    }
+
+
+
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        if(mTempRectCanvas != null) mTempRectCanvas.layout(0,0,ScreenWidth,mSurface.EndHeight);
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+
+        int width = 0;
+        Rect rectText = new Rect();
+        mSurface.mEventTextPaint.getTextBounds("啊",0,1,rectText);
+        for (int i = 0; i < CalUtil.LENTH_OF_WEEK; i++) {
+            //canvas.drawLine(mSurface.TimeTextWidthInt+width,0,mSurface.TimeTextWidthInt+width,mSurface.EndHeight,mSurface.mLinePaint);
+            //width+=CellWidth;
+            EventManager eventManager = mEventManager.getEventMangerInDayOfWeek(i);
+            for(int j = 0;j<eventManager.getNormalDayEventCount();j++){
+                EventItem eventItem = EventArray.get(i).get(j);
+                mSurface.ChangePaintColor(eventManager.getNormalType(j));
+                canvas.drawRect(i * CellWidth + mSurface.TimeTextWidthInt + eventItem.left, eventItem.top, i * CellWidth + mSurface.TimeTextWidthInt + eventItem.right-CellWidth*mSurface.mExistGapRatio, eventItem.botton-CellWidth*mSurface.mExistGapRatio, mSurface.mNormalEventPaint);
+
+                ArrayList<String> a =getSubString(eventManager.getNormalIntroduction(j),eventItem.botton-eventItem.top,eventItem.right-eventItem.left);
+                if(eventItem.right-eventItem.left>= CellWidth) {
+                    canvas.drawRect(i * CellWidth + mSurface.TimeTextWidthInt + rectText.width() * 2 / 3f + eventItem.left, eventItem.botton - rectText.height() * 3 / 2f * (a.size() + 1) + rectText.height() / 2, i * CellWidth + mSurface.TimeTextWidthInt + rectText.width(), eventItem.botton - rectText.height() + eventItem.left, mSurface.mExistItemRect);
+                    for (int k = 0; k < a.size(); k++) {
+                        canvas.drawText(a.get(k), rectText.width() * (7 / 4f) + i * CellWidth + mSurface.TimeTextWidthInt + eventItem.left, eventItem.botton - rectText.height() * 3 / 2f * (k + 1), mSurface.mEventTextPaint);
+                    }
+                }else{
+                    for (int k = 0; k < a.size(); k++) {
+                        canvas.drawText(a.get(k), i * CellWidth + mSurface.TimeTextWidthInt + eventItem.left, eventItem.botton - rectText.height() * 3 / 2f * (k + 1), mSurface.mEventTextPaint);
+                    }
+                }
+
+            }
+        }
+
+        Rect rect = new Rect();
+        int height = 0;
+        for (int i = 0; i < 13; i++) {
+            String TimeText ;
+            if(i==0) TimeText = "12";
+            else if(i<5) TimeText = "0"+2*i;
+            else if(i<7&&i>4) TimeText=""+2*i;
+            else if(i>6&&i<11) TimeText ="0"+2*(i-6);
+            else TimeText = ""+2*(i-6);
+            String smallText;
+            if(i<6||i==12) smallText = "am";
+            else smallText = "pm";
+
+
+
+            mSurface.mTextPaint.getTextBounds(TimeText, 0, TimeText.length(), rect);
+
+            canvas.drawText(TimeText, mSurface.TimeTextWidthInt / 3 - rect.width() / 2, height - CellHeight * 3 / 20 + rect.height() / 2, mSurface.mTextPaint);
+            canvas.drawText(smallText, mSurface.TimeTextWidthInt *9/17, height - CellHeight *3/ 20 + rect.height() / 2, mSurface.mTextSmallPaint);
+            canvas.drawLine(mSurface.TimeTextWidthInt, height,mSurface.TimeTextWidthInt+mSurface.ViewWidth, height, mSurface.mLinePaint);
+            height +=2*CellHeight;
+        }
+
+    }
+
 
     Handler handler = new Handler(){
         @Override
@@ -120,11 +224,46 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
         mContext = context;
     }
 
-    public static WeekEventView newInstance(Context context,ArrayList<Integer> date){
-        WeekEventView weekEventView = new WeekEventView(context);
-        weekEventView.initView(date);
-        return weekEventView;
+    private ArrayList<String> getSubString(String s,int height,int width){
+        int lenth = s.length();
+        Rect rect = new Rect();
+        mSurface.mEventTextPaint.getTextBounds("啊",0,1,rect);
+        int hsize = height/(rect.height()*3/2)-1;
+        int wsize =width/rect.width();
+        int TextHeightSize;
+        if(width >= CellWidth) {
+            wsize-=2;
+            if (lenth / wsize > hsize) TextHeightSize = hsize;
+            else {
+                TextHeightSize = lenth / wsize;
+                if (lenth % wsize != 0)
+                    TextHeightSize++;
+
+            }
+        }else {
+            if(wsize<=0) TextHeightSize = 0;
+            else {
+                if (lenth / wsize > hsize) TextHeightSize = hsize;
+                else {
+                    TextHeightSize = lenth / wsize;
+                    if (lenth % wsize != 0)
+                        TextHeightSize++;
+
+                }
+            }
+        }
+
+        ArrayList<String> result = new ArrayList<>();
+        for (int i = 0; i < TextHeightSize; i++) {
+            int end = (i + 1) * wsize;
+            if((i + 1) * wsize>lenth)  end = lenth;
+            result.add(0,s.substring(i * wsize, end));
+        }
+
+        return result;
+
     }
+
 
     public void UpdateViewByTime(ArrayList<Integer> date){
         StartDate = new GregorianCalendar(date.get(0),date.get(1),date.get(2),0,0);
@@ -135,6 +274,10 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
         CleartempRect();
     }
 
+    public void UpdateView(long rid){
+        mEventManager.deleteByRid(rid);
+        UpdateView(rid,true);
+    }
     public void UpdateView(long rid,boolean exist){
         if(!exist) mEventManager.addEvent(rid);
         UpdateEventArray();
@@ -143,6 +286,7 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
         invalidate();
     }
     public void initView(ArrayList<Integer> date){
+        setBackgroundColor(Color.WHITE);
         StartDate = new GregorianCalendar(date.get(0),date.get(1),date.get(2),0,0);
         setWillNotDraw(false);
         mSurface = new Surface();
@@ -164,8 +308,8 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
                 eventItem.rid = mEventManager.getEventMangerInDayOfWeek(i).getNormalEventByIndex(j).rid;
                 eventItem.left = 0;
                 eventItem.right = CellWidth;
-                eventItem.top = (int)((24/mSurface.dividePart)*ScreenHeight*mEventManager.getEventMangerInDayOfWeek(i).getPositionRatioByTime(mEventManager.getEventMangerInDayOfWeek(i).getNormalEventByIndex(j).timebegin));
-                eventItem.botton= (int)((24/mSurface.dividePart)*ScreenHeight*mEventManager.getEventMangerInDayOfWeek(i).getPositionRatioByTime(mEventManager.getEventMangerInDayOfWeek(i).getNormalEventByIndex(j).timeend));
+                eventItem.top = (int)((24/mSurface.dividePart)*mSurface.ViewHeight*mEventManager.getEventMangerInDayOfWeek(i).getPositionRatioByTime(mEventManager.getEventMangerInDayOfWeek(i).getNormalEventByIndex(j).timebegin));
+                eventItem.botton= (int)((24/mSurface.dividePart)*mSurface.ViewHeight*mEventManager.getEventMangerInDayOfWeek(i).getPositionRatioByTime(mEventManager.getEventMangerInDayOfWeek(i).getNormalEventByIndex(j).timeend));
                 eventItem.colum = i;
                 addNewEvent(eventItem);
             }
@@ -236,7 +380,7 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
         EventItem aim = null;
         ArrayList<EventItem> arrayList=null;
         int Before_colum=-1;
-        for (int i = 0; i < CalUtil.LENTH_OF_WEEK; i++) {
+        for (int i = 0; i < CalUtil.LENTH_OF_WEEK; i++) {//遍历一周七个事件库获取要删除的事件
 
             arrayList = EventArray.get(i);
             for (int j= 0; j <arrayList.size(); j++) {
@@ -251,7 +395,9 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
             if(aim != null) break;
         }
 
+
         if(aim != null) {
+            ArrayList<List<Integer>> ChangeLists = new ArrayList<>();
             List<Integer> ChangeList = new ArrayList<>();
             boolean isChanged;
             int Head = aim.botton;
@@ -260,7 +406,7 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
                 int lengthNew = Head - Tail;
                 isChanged = false;
                 for (int j = 0; j < arrayList.size(); j++) {
-                    EventItem temp = arrayList.get(j);
+                    EventItem temp = arrayList.get(j) ;
                     int lengthOld = temp.botton - temp.top;
                     if (Math.max(Math.abs(temp.botton - Tail), Math.abs(Head - temp.top)) < (lengthNew + lengthOld) - 1) {
                         boolean isSame = false;
@@ -280,9 +426,49 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
                 }
             } while (isChanged);
 
+            if(ChangeList.size()!=0) {
+                do {
+                    EventItem tempNext=arrayList.get(ChangeList.get(0));
+                    int NextTail = tempNext.top;
+                    int index = 0;
+                    for (int i = 0; i < ChangeList.size(); i++) {
+                        EventItem tempfor= arrayList.get(ChangeList.get(i));
+                        if(tempfor.top<tempNext.top){
+                            tempNext = tempfor;
+                            NextTail = tempNext.top;
+                            index = i;
+                        }
+                    }
+                    int NextHead = tempNext.botton;
+                    int lengthNew = NextHead - NextTail;
+                    boolean isDelete = false;
+                    for (int i = 0; i < ChangeLists.size(); i++) {
+                        for (int j = 0; j < ChangeLists.get(i).size(); j++) {
+                            EventItem temp = arrayList.get(ChangeLists.get(i).get(j));
+                            int lengthOld = temp.botton - temp.top;
+                            if (Math.max(Math.abs(temp.botton - NextTail), Math.abs(NextHead - temp.top)) < (lengthNew + lengthOld) - 1) {
+                                ChangeLists.get(i).add(ChangeList.get(index));
+                                ChangeList.remove(index);
+                                isDelete = true;
+                                break;
+                            }
+                        }
+                        if(isDelete) break;
+                    }
 
-            RerangeList(ChangeList, Before_colum);
-            invalidate();
+                    if(!isDelete) {
+                        List<Integer> Lists = new ArrayList<>();
+                        Lists.add(ChangeList.get(index));
+                        ChangeList.remove(index);
+                        ChangeLists.add(Lists);
+                    }
+                } while (ChangeList.size() != 0);
+
+                for (int i = 0; i < ChangeLists.size(); i++) {
+                    RerangeList(ChangeLists.get(i), Before_colum);
+                }
+                invalidate();
+            }
         }
 
     }
@@ -351,68 +537,11 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
 
     public void UpdateScale(){
         firstEntry = true;
-        scrollTo(0,0);
+        scrollTo(0, 0);
         invalidate();
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int height = MeasureSpec.getSize(heightMeasureSpec);
-        int width = MeasureSpec.getSize(widthMeasureSpec);
 
-        if(mTempRectCanvas != null){
-            int WidthSpec = MeasureSpec.makeMeasureSpec(width,MeasureSpec.EXACTLY);
-            int HeightSpec = MeasureSpec.makeMeasureSpec(height,MeasureSpec.EXACTLY);
-            mTempRectCanvas.measure(WidthSpec,HeightSpec);
-        }
-        if (firstEntry) {
-            ScreenHeight = height;
-            ScreenWidth =width;
-            CellHeight = height/mSurface.dividePart;
-            mSurface.initSurface();
-            CellWidth = mSurface.ViewWidth/CalUtil.LENTH_OF_WEEK;
-            firstEntry = false;
-            UpdateEventArray();
-        }
-        setMeasuredDimension(width, height);
-    }
-
-
-
-    @Override
-    protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        if(mTempRectCanvas != null) mTempRectCanvas.layout(mSurface.TimeTextWidthInt,0,ScreenWidth,mSurface.EndHeight);
-    }
-
-    @Override
-    protected void onDraw(Canvas canvas) {
-
-        int width = 0;
-        for (int i = 0; i < CalUtil.LENTH_OF_WEEK; i++) {
-            canvas.drawLine(mSurface.TimeTextWidthInt+width,0,mSurface.TimeTextWidthInt+width,mSurface.EndHeight,mSurface.mLinePaint);
-            width+=CellWidth;
-            EventManager eventManager = mEventManager.getEventMangerInDayOfWeek(i);
-            for(int j = 0;j<eventManager.getNormalDayEventCount();j++){
-                EventItem eventItem = EventArray.get(i).get(j);
-                canvas.drawRect(i * CellWidth + mSurface.TimeTextWidthInt + eventItem.left, eventItem.top, i * CellWidth + mSurface.TimeTextWidthInt + eventItem.right, eventItem.botton, mSurface.mNormalEventPaint);
-                canvas.drawText(eventManager.getNormalIntroduction(j).substring(0,3), i*CellWidth+mSurface.TimeTextWidthInt+(eventItem.left+ eventItem.right) / 2, (eventItem.top + eventItem.botton) / 2, mSurface.mTextPaint);
-
-            }
-        }
-
-        canvas.drawLine(mSurface.TimeTextWidthInt, 0, mSurface.TimeTextWidthInt, mSurface.EndHeight, mSurface.mLinePaint);
-        Rect rect = new Rect();
-        int height = CellHeight;
-        for (int i = 0; i < 24; i++) {
-            String a = i+"";
-            mSurface.mTextPaint.getTextBounds(a, 0, a.length(), rect);
-            canvas.drawText(i + "", mSurface.TimeTextWidthInt / 2 - rect.width() / 2, height-CellHeight/2+ rect.height() / 2, mSurface.mTextPaint);
-
-            canvas.drawLine(mSurface.TimeTextWidthInt, height,ScreenWidth, height, mSurface.mLinePaint);
-            height +=CellHeight;
-        }
-
-    }
 
     public void CleartempRect() {
         tempRect.left = 0;
@@ -437,12 +566,14 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
         }
     }
 
-    private void tempRectUpdate(int start,int end){
+    private void tempRectUpdate(int start,int end,float x){
+        int[] head = findIndex(x,start);
         tempRect.left =0;
         tempRect.top = start;
         tempRect.right =CellWidth;
         tempRect.botton = end;
         tempRect.exist =true;
+        tempRect.colum = head[0];
         mTempRectCanvas.invalidate();
     }
 
@@ -456,6 +587,7 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
     }
 
     private void ExistRectUpdate(int start,int end,long rid,int colum){
+
         existRect.rid =rid;
         existRect.colum = colum;
         ExistRectUpdate(start, end);
@@ -481,6 +613,11 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
             IndexX++;
         }
         IndexX--;
+        if(IndexX>6){
+            IndexX=6;
+        }else if(IndexX<0){
+            IndexX = 0;
+        }
         int[] result = new int[2];
         result[0] = IndexX;
         result[1] = Index;
@@ -492,8 +629,25 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
+        if(!ViewEndable) return false;
         if(event.getAction() == MotionEvent.ACTION_UP){
             switch (OPERATIONMODE){
+                case TEMPRECT:
+                    int positionTop = tempRect.top;
+                    int positionBotton = tempRect.botton;
+                    long offsetTop = Math.round((positionTop / (double) (mSurface.EndHeight) * mEventManager.MillsInOneDay));
+                    long offsetBotton = Math.round((positionBotton/(double)(mSurface.EndHeight)*mEventManager.MillsInOneDay));
+                    EventRecord eventRecord = new EventRecord();
+                    eventRecord.timebegin = mEventManager.getEventMangerInDayOfWeek(tempRect.colum).DayView_Date+offsetTop;
+                    eventRecord.timeend = mEventManager.getEventMangerInDayOfWeek(tempRect.colum).DayView_Date+offsetBotton;
+                    Log.d("Test","Up Top:"+positionTop+" Botton:"+positionBotton+" TimeBegin:"+eventRecord.timebegin+" TimeEnd:"+eventRecord.timeend );
+
+                    mWeekViewListener.CreatRecord(NewEventView.HAVE_TIME, eventRecord);
+                    gestureDetector.setIsLongpressEnabled(true);
+                    CleartempRect();
+                    mWeekViewListener.CalEnable(true);
+                    OPERATIONMODE = SCREEN;
+                    return true;
                 case CONSUME_EXIST:
                     gestureDetector.setIsLongpressEnabled(true);
                     OPERATIONMODE = EXIST;
@@ -501,6 +655,31 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
                 case EXIST_DOWN:
                 case EXIST_TOP:
                     OPERATIONMODE = EXIST;
+                case EXIST:
+
+                    double unit = (double)CellHeight/mSurface.CellUnit;
+                    double newTop;
+                    if(existRect.top%unit<unit/2){
+                        newTop = existRect.top-existRect.top%unit;
+                    }else{
+                        newTop = existRect.top-existRect.top%unit+unit;
+                    }
+
+                    double newEnd;
+                    if(existRect.botton%unit<unit/2){
+                        newEnd = existRect.botton-existRect.botton%unit;
+                    }else{
+                        newEnd = existRect.botton-existRect.botton%unit+unit;
+                    }
+                    existRect.timeBegin = mEventManager.getEventMangerInDayOfWeek(existRect.colum).DayView_Date+Math.round((newTop/(double)mSurface.EndHeight)*mEventManager.MillsInOneDay);
+                    existRect.timeEnd =mEventManager.getEventMangerInDayOfWeek(existRect.colum).DayView_Date+Math.round((newEnd/(double)mSurface.EndHeight)*mEventManager.MillsInOneDay);
+
+
+
+                    ExistRectUpdate((int)Math.round(newTop),(int)Math.round(newEnd));
+                    pressOffset = 0;
+                    Log.d("Test","ExistUp Top:"+existRect.top+"Exist Botton:"+existRect.botton);
+                    break;
 
             }
             AutoScrollEnd = 0;
@@ -515,34 +694,47 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
         int positionX =(int)e.getX()-mSurface.TimeTextWidthInt;
         if(OPERATIONMODE == CONSUME_EXIST) return true;
         else if(OPERATIONMODE ==TEMPRECT){
-            if((positionY > tempRect.top) && (positionY < tempRect.botton)&&(positionX>tempRect.left+tempRect.colum*CellWidth)&&(positionX<tempRect.right+(tempRect.colum+1)*CellWidth)) return true;
+            //if((positionY > tempRect.top) && (positionY < tempRect.botton)&&(positionX>tempRect.left+tempRect.colum*CellWidth)&&(positionX<tempRect.right+(tempRect.colum+1)*CellWidth)) return true;
+
+            return true;
         }else if(OPERATIONMODE == EXIST){
-            if((positionX<existRect.right+existRect.colum*CellWidth)&&(positionX>existRect.left+existRect.colum*CellWidth)) {
+            //if((positionX<existRect.right+existRect.colum*CellWidth)&&(positionX>existRect.left+existRect.colum*CellWidth)) {
+            if((positionX<existRect.right+existRect.colum*CellWidth)) {
                 if (Math.abs(positionY - existRect.top) < StrechMinDistance) {
                     OPERATIONMODE = EXIST_TOP;
                     return true;
                 } else if (Math.abs(positionY - existRect.botton) < StrechMinDistance) {
                     OPERATIONMODE = EXIST_DOWN;
                     return true;
-                } else if ((positionY > existRect.top && (positionY < existRect.botton)))
+                } else if ((positionY > existRect.top && (positionY < existRect.botton))){
+                    pressOffset = (int)((existRect.top+existRect.botton)/2-(e.getY()+getScrollY()));
                     return true;
-                UpdateTimeByMove();
+                }
+                //UpdateTimeByMove();
             }
+            //long timebegin = mEventManager.getEventMangerInDayOfWeek(existRect.colum).DayView_Date+Math.round((existRect.top / (double) (mSurface.EndHeight) * mEventManager.MillsInOneDay));
 
+            //long timeend = mEventManager.getEventMangerInDayOfWeek(existRect.colum).DayView_Date+Math.round((existRect.botton / (double) (mSurface.EndHeight) * mEventManager.MillsInOneDay));
+            //Log.d("Test", "Up Top:" + existRect.top + " Botton:" + existRect.botton+" TimeBegin:"+timebegin+" TimeEnd:"+timeend);
+            mEventManager.UpdateEvent(existRect.timeBegin, existRect.timeEnd, existRect.rid);
+            addNewEvent(existRect);
+            mEventManager.addEvent(existRect.rid);
         }
 
+        mWeekViewListener.CalEnable(true);
         OPERATIONMODE = SCREEN;
         ClearExistRect();
         CleartempRect();
+        invalidate();
         return true;
     }
+    /*
 
     private void UpdateTimeByMove() {
-        int i= 0;
         deleteEvent(existRect.rid);
         mEventManager.deleteByRid(existRect.rid);
-        long timebegin = (long) (mEventManager.getEventMangerInDayOfWeek(existRect.colum).DayView_Date+(existRect.top/(float)(mSurface.EndHeight))*mEventManager.MillsInOneDay);
-        long timeend = (long)(mEventManager.getEventMangerInDayOfWeek(existRect.colum).DayView_Date+(existRect.botton/(float)(mSurface.EndHeight))*mEventManager.MillsInOneDay);
+        long timebegin = mEventManager.getEventMangerInDayOfWeek(existRect.colum).DayView_Date+(long)((existRect.top/(float)(mSurface.EndHeight)*mEventManager.MillsInOneDay));
+        long timeend = mEventManager.getEventMangerInDayOfWeek(existRect.colum).DayView_Date+(long)((existRect.botton/(float)(mSurface.EndHeight)*mEventManager.MillsInOneDay));
         mEventManager.UpdateEvent(timebegin, timeend, existRect.rid);
         addNewEvent(existRect);
         mEventManager.addEvent(existRect.rid);
@@ -550,7 +742,7 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
         ClearExistRect();
         invalidate();
     }
-
+*/
     @Override
     public void onShowPress(MotionEvent e) {
 
@@ -563,27 +755,26 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
         if(OPERATIONMODE ==SCREEN) {
             long i = isExist(positionY, positionX);
             if (i == -1) {
-                tempRectUpdate(positionY,positionX,true);
-                OPERATIONMODE=TEMPRECT;
+                //tempRectUpdate(positionY,positionX,true);
+                //OPERATIONMODE=TEMPRECT;
             } else {
                 mWeekViewListener.CheckExistItem(i);
             }
             return true;
         }else if(OPERATIONMODE==TEMPRECT){
-            int positionTop = tempRect.top;
-            int positionBotton = tempRect.botton;
-            long offsetTop = (long)((positionTop/(float)((24/mSurface.dividePart)*ScreenHeight)*mEventManager.MillsInOneDay));
-            long offsetBotton = (long)((positionBotton/(float)((24/mSurface.dividePart)*ScreenHeight)*mEventManager.MillsInOneDay));
-            EventRecord eventRecord = new EventRecord();
-            eventRecord.timebegin = mEventManager.getEventMangerInDayOfWeek(tempRect.colum).DayView_Date+offsetTop;
-            eventRecord.timeend = mEventManager.getEventMangerInDayOfWeek(tempRect.colum).DayView_Date+offsetBotton;
 
-            mWeekViewListener.CreatRecord(NewEventView.HAVE_TIME,eventRecord);
-            return true;
         }else if(OPERATIONMODE == EXIST|| OPERATIONMODE == EXIST_DOWN || OPERATIONMODE == EXIST_TOP){
-            UpdateTimeByMove();
+            long timebegin = mEventManager.getEventMangerInDayOfWeek(existRect.colum).DayView_Date+Math.round(existRect.top / (double) (mSurface.EndHeight) * mEventManager.MillsInOneDay);
+            long timeend = mEventManager.getEventMangerInDayOfWeek(existRect.colum).DayView_Date+Math.round(existRect.botton / (double) (mSurface.EndHeight) * mEventManager.MillsInOneDay);
+            mEventManager.UpdateEvent(timebegin, timeend, existRect.rid);
+            addNewEvent(existRect);
+            mEventManager.addEvent(existRect.rid);
+            mWeekViewListener.CheckExistItem(existRect.rid);
 
-            return true;
+
+            ClearExistRect();
+            invalidate();
+            return false;
         }
 
         return false;
@@ -604,10 +795,10 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
                         else scrollBy(0, (int) distanceY);
                     } else scrollTo(0,  mSurface.ScrollEndY);
                 } else {
-                    if (getScrollY() > 0) {
-                        if (getScrollY() < Math.abs(distanceY)) scrollTo(0, 0);
+                    if (getScrollY() >  mSurface.ScrollTop) {
+                        if (getScrollY() -mSurface.ScrollTop< Math.abs(distanceY)) scrollTo(0,  mSurface.ScrollTop);
                         else scrollBy(0, (int) distanceY);
-                    } else scrollTo(0, 0);
+                    } else scrollTo(0,  mSurface.ScrollTop);
                 }
                 return true;
             case CONSUME_EXIST:
@@ -617,15 +808,15 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
                 int TimeHeight = existRect.botton-existRect.top;
                 if(endx>existRect.colum*CellWidth+existRect.left&&endx<existRect.colum*CellWidth+existRect.right) {
 
-                    if(scrollY-TimeHeight/2<0) ExistRectUpdate(0,TimeHeight);
-                    else if(scrollY+TimeHeight/2 >mSurface.EndHeight) ExistRectUpdate(mSurface.EndHeight-TimeHeight,mSurface.EndHeight);
+                    if(scrollY+pressOffset-TimeHeight/2<0) ExistRectUpdate(0,TimeHeight);
+                    else if(scrollY+TimeHeight/2+pressOffset >mSurface.EndHeight) ExistRectUpdate(mSurface.EndHeight-TimeHeight,mSurface.EndHeight);
                     else {
-                        ExistRectUpdate(scrollY - TimeHeight / 2, scrollY + TimeHeight / 2);
+                        ExistRectUpdate(scrollY - TimeHeight / 2+pressOffset, scrollY + TimeHeight / 2+pressOffset);
                         if (distanceY * AutoScrollEnd < 0) AutoScrollEnd = 0;
-                        if ((endy < 100 && getScrollY() > 0) || (endy > ScreenHeight - 100 && getScrollY() < mSurface.ScrollEndY)) {
+                        if ((endy < 100 && getScrollY() > 0) || (endy >mSurface.ViewHeight - 100 && getScrollY() < mSurface.ScrollEndY)) {// 如果滑块的边界碰触到了屏幕的边界,开始滚动.
                             if (AutoScrollEnd == 0) {
                                 if (endy < 100) AutoScrollEnd = -1;
-                                if (endy > ScreenHeight - 100) AutoScrollEnd = 1;
+                                if (endy >  mSurface.ViewHeight - 100) AutoScrollEnd = 1;
                                 AutoScrollThread mthread = new AutoScrollThread();
                                 mthread.start();
                             }
@@ -635,17 +826,17 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
                     int index[] = findIndex(endx,endy);
                     if(scrollY-TimeHeight/2<0) ExistRectUpdate(0,TimeHeight,existRect.rid,index[0]);
                     else if(scrollY+TimeHeight/2 >mSurface.EndHeight) ExistRectUpdate(mSurface.EndHeight-TimeHeight,mSurface.EndHeight,existRect.rid,index[0]);
-                    else ExistRectUpdate(scrollY-TimeHeight/2,scrollY+TimeHeight/2,existRect.rid,index[0]);
+                    else ExistRectUpdate(scrollY-TimeHeight/2+pressOffset,scrollY+TimeHeight/2+pressOffset,existRect.rid,index[0]);
                 }
                 return true;
             case EXIST_TOP:
                 if((existRect.botton-existRect.top>StrechMinHeight||distanceY>0)&& scrollY<existRect.botton-StrechMinHeight) {
                     ExistRectUpdate(existRect.top - (int) distanceY, existRect.botton);
                     if (distanceY * AutoScrollEnd < 0) AutoScrollEnd = 0;
-                    if ((endy < 100 && getScrollY() > 0) || (endy > ScreenHeight - 100 && getScrollY() < mSurface.ScrollEndY)) {
+                    if ((endy < 100 && getScrollY() > 0) || (endy > mSurface.ViewHeight - 100 && getScrollY() < mSurface.ScrollEndY)) {
                         if (AutoScrollEnd == 0) {
                             if (endy < 100) AutoScrollEnd = -2;
-                            if (endy > ScreenHeight - 100) AutoScrollEnd = 2;
+                            if (endy > mSurface.ViewHeight - 100) AutoScrollEnd = 2;
                             AutoScrollThread mthread = new AutoScrollThread();
                             mthread.start();
                         }
@@ -656,10 +847,10 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
                 if((existRect.botton-existRect.top>StrechMinHeight||distanceY<0)&&endy+getScrollY()>existRect.top+StrechMinHeight) {
                     ExistRectUpdate(existRect.top, existRect.botton - (int) distanceY);
                     if (distanceY * AutoScrollEnd < 0) AutoScrollEnd = 0;
-                    if ((endy < 100 && getScrollY() > 0) || (endy >ScreenHeight - 100 && getScrollY() <  mSurface.ScrollEndY)) {
+                    if ((endy < 100 && getScrollY() > 0) || (endy >mSurface.ViewHeight - 100 && getScrollY() <  mSurface.ScrollEndY)) {
                         if (AutoScrollEnd == 0) {
                             if (endy < 100) AutoScrollEnd = -3;
-                            if (endy > ScreenHeight - 100) AutoScrollEnd = 3;
+                            if (endy > mSurface.ViewHeight - 100) AutoScrollEnd = 3;
                             AutoScrollThread mthread = new AutoScrollThread();
                             mthread.start();
                         }
@@ -667,8 +858,9 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
                 }
                 return true;
             case TEMPRECT:
-                OPERATIONMODE = SCREEN;
-                CleartempRect();
+
+                int Scrolly = endy+getScrollY();
+                tempRectUpdate(Scrolly-CellHeight/2,Scrolly+CellHeight/2,endx);
                 return true;
             default:
                 return false;
@@ -726,6 +918,7 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
 
     @Override
     public void onLongPress(MotionEvent e) {
+        Log.d("Test","Long press");
         int positionX = (int)e.getX()-mSurface.TimeTextWidthInt;
         int positionY = (int)e.getY()+getScrollY();
         long i =isExist(positionY,positionX);
@@ -740,15 +933,33 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
                         if(temp.rid == i)  break;
                     }
                     if(temp != null){
-                        if(temp.rid ==i) break;
+                        if (temp.rid == i) break;
                     }
                 }
                 if(temp == null) return;
-                ExistRectUpdate(temp.top, temp.botton, temp.rid,temp.colum);
+                pressOffset = (temp.top+temp.botton)/2-positionY;
+                ExistRectUpdate(temp.top, temp.botton, temp.rid, temp.colum);
+                Log.d("Test", "LongPress Top:" + existRect.top + " Botton:" + existRect.botton);
+                mWeekViewListener.CalEnable(false);
                 OPERATIONMODE = CONSUME_EXIST;
+                deleteEvent(existRect.rid);
+                mEventManager.deleteByRid(existRect.rid);
+                existRect.timeBegin = mEventManager.getEventMangerInDayOfWeek(existRect.colum).getEventRecordByRid(existRect.rid).timebegin;
+                existRect.timeEnd = mEventManager.getEventMangerInDayOfWeek(existRect.colum).getEventRecordByRid(existRect.rid).timeend;
                 gestureDetector.setIsLongpressEnabled(false);
                 MotionEvent ev = MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), MotionEvent.ACTION_DOWN, e.getX(), e.getY(), 0);
                 dispatchTouchEvent(ev);
+
+
+            }else{
+
+                tempRectUpdate(positionY - CellHeight / 2, positionY + CellHeight / 2, positionX);
+                mWeekViewListener.CalEnable(false);
+                OPERATIONMODE=TEMPRECT;
+                gestureDetector.setIsLongpressEnabled(false);
+                MotionEvent ev = MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), MotionEvent.ACTION_DOWN, e.getX(), e.getY(), 0);
+                dispatchTouchEvent(ev);
+
 
             }
 
@@ -759,6 +970,19 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
             dispatchTouchEvent(ev);
         }
 
+    }
+
+    private String showOperation(){
+        switch (OPERATIONMODE){
+            case TEMPRECT:
+                return  "temprect";
+            case SCREEN:
+                return "screen";
+            case EXIST:
+                return "exist";
+            default:
+                return "other";
+        }
     }
 
     private long isExist(int positionY,int positionX) {
@@ -784,40 +1008,90 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
 
 
     private class Surface{
-        float TimeTextWidth = 1/10f;
+        float TimeTextWidthRatio = 1/7f;
+        float ViewWidthRightPaddingRatio = 1/30f;
         int TimeTextWidthInt;
         int EndHeight ;
         int ViewWidth;
+        int ViewHeight;
         int dividePart = 12;
         int ScrollEndY;
+        float ViewHeightRatio =1-1/9f-1/35f;
+        int ScrollTop;
 
 
         Paint mLinePaint;
-        int mLineColor = Color.BLACK;
+        int mLineColor = Color.parseColor("#aaaaaa");
 
+        float mExistGapRatio = 1/20f;
 
         Paint mTextPaint;
-        int mTextColor = Color.RED;
-        int mTextSize =50;
+        Paint mTextSmallPaint;
+        int mTextColor = Color.BLACK;
+
+        Paint mEventTextPaint;
+        float mEventTextPaintSizeRatio =1/5f;
+
+
+        float mTextSizeRatio =3/10f;
+        float mTextSmallSizeRatio =1/6f;
+        int mTextSize;
         Paint tempRectPaint;
         int mtempRectColor = Color.BLUE;
         Paint ExistRectPaint;
         int mExistRectPaint = Color.YELLOW;
+        float ExistRectShadowRatio = 1/20f;
+        Paint mExistItemRect;
+        Paint DashlinePaint;
+        int DashlintColor = Color.parseColor("#888888");
+        float DashlineLength = 3/2f;
+
+        int OtherEventColor = getResources().getColor(R.color.OtherEventColor);
+        int StudyEventColor = getResources().getColor(R.color.StudyEventColor);
+        int EntertainmentEventColor = getResources().getColor(R.color.EntertainEventColor);
+        int WorkEventColor = getResources().getColor(R.color.WorkEventColor);
 
         Paint mNormalEventPaint;
-        int mNormalEvnentColor = Color.parseColor("#303030");
+        int mNormalEvnentColor = Color.parseColor("#cccccc");
+
+        Paint BackgroundPaint ;
+        int BackgroundColor = Color.parseColor("#f1f1f1");
+
+
+        float DashlineWidth = 1/55f;
+        float DashlineGap = 1/5f;
+
+        Paint TemporalTimePaint;
+        float TemporalTimePaintRatio =1/4f;
+
+        double CellUnit = 12d;
+
 
         void initSurface(){
-            TimeTextWidthInt = (int)(TimeTextWidth*ScreenWidth);
-            ViewWidth = ScreenWidth - TimeTextWidthInt;
-            ScrollEndY = CellHeight*24-(int)(ScreenHeight);
+            TimeTextWidthInt = (int)(TimeTextWidthRatio*ScreenWidth);
+            ViewWidth = (int)(ScreenWidth*(1-ViewWidthRightPaddingRatio)) - TimeTextWidthInt;
+            ViewHeight = (int)(ScreenHeight*ViewHeightRatio)+1;
+            ScrollEndY = CellHeight*24-ViewHeight+(int)(TimeTextWidthInt*mTextSmallSizeRatio);
             EndHeight = CellHeight*24;
+            ScrollTop = -(int)(TimeTextWidthInt*mTextSizeRatio);
             mLinePaint = new Paint();
             mLinePaint.setColor(mLineColor);
             mLinePaint.setAntiAlias(true);
             mTextPaint = new Paint();
             mTextPaint.setAntiAlias(true);
             mTextPaint.setColor(mTextColor);
+            TemporalTimePaint = new Paint();
+            TemporalTimePaint.setTextSize((int) (TimeTextWidthInt * TemporalTimePaintRatio));
+            mEventTextPaint = new Paint();
+            mEventTextPaint.setTextSize((int) (mSurface.TimeTextWidthInt * mSurface.mEventTextPaintSizeRatio));
+            mExistItemRect = new Paint();
+            mExistItemRect.setColor(Color.WHITE);
+            mSurface.mTextPaint.setTextSize((int) (mSurface.TimeTextWidthInt * mSurface.mTextSizeRatio));
+            mTextSmallPaint = new Paint();
+            mTextSmallPaint.setAntiAlias(true);
+            mTextSmallPaint.setColor(mTextColor);
+            mTextSmallPaint.setTextSize((int) (mSurface.TimeTextWidthInt * mSurface.mTextSmallSizeRatio));
+            mTextSize = (int)(TimeTextWidthInt*mTextSizeRatio);
             mTextPaint.setTextSize(mTextSize);
             tempRectPaint = new Paint();
             tempRectPaint.setColor(mtempRectColor);
@@ -827,10 +1101,47 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
             ExistRectPaint.setAntiAlias(true);
             ExistRectPaint.setColor(mExistRectPaint);
             ExistRectPaint.setStyle(Paint.Style.FILL);
+            ExistRectPaint.setShadowLayer(CellHeight * ExistRectShadowRatio * 3, CellHeight * ExistRectShadowRatio, CellHeight * ExistRectShadowRatio, Color.parseColor("#b5b5b5"));
             mNormalEventPaint = new Paint();
             mNormalEventPaint.setColor(mNormalEvnentColor);
             mNormalEventPaint.setAntiAlias(true);
             mNormalEventPaint.setStyle(Paint.Style.FILL);
+            DashlinePaint = new Paint();
+            DashlinePaint.setStyle(Paint.Style.STROKE);
+            DashlinePaint.setStrokeWidth(TimeTextWidthInt*DashlineWidth);
+            PathEffect effect = new DashPathEffect(new float[]{TimeTextWidthInt*DashlineGap,TimeTextWidthInt*DashlineGap/3},1);
+            DashlinePaint.setPathEffect(effect);
+            DashlinePaint.setColor(DashlintColor);
+
+            BackgroundPaint = new Paint();
+            BackgroundPaint.setColor(BackgroundColor);
+            BackgroundPaint.setAntiAlias(true);
+
+        }
+
+        void ChangePaintColor(int type){
+            switch (type){
+                case 0:
+                    mNormalEventPaint.setColor(WorkEventColor);
+                    ExistRectPaint.setColor(WorkEventColor);
+                    break;
+                case 1:
+                    mNormalEventPaint.setColor(StudyEventColor);
+                    ExistRectPaint.setColor(StudyEventColor);
+                    break;
+                case 2:
+                    mNormalEventPaint.setColor(EntertainmentEventColor);
+                    ExistRectPaint.setColor(EntertainmentEventColor);
+                    break;
+                case 3:
+                    mNormalEventPaint.setColor(OtherEventColor);
+                    ExistRectPaint.setColor(OtherEventColor);
+                    break;
+                default:
+                    mNormalEventPaint.setColor(mNormalEvnentColor);
+                    ExistRectPaint.setColor(mNormalEvnentColor);
+                    break;
+            }
         }
     }
 
@@ -846,16 +1157,107 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
 
         public tempRectCanvas(Context context, AttributeSet attrs, int defStyleAttr) {
             super(context, attrs, defStyleAttr);
+            initCanvas();
+        }
+
+        private void initCanvas(){
+            this.setAlpha(6/8f);
         }
 
 
         @Override
         protected void onDraw(Canvas canvas) {
             if(tempRect.exist){
-                canvas.drawRect(tempRect.colum * CellWidth  +tempRect.left,tempRect.top,tempRect.colum * CellWidth +tempRect.right,tempRect.botton,mSurface.tempRectPaint);
+                canvas.drawRect(mSurface.TimeTextWidthInt+tempRect.colum * CellWidth  +tempRect.left,
+                        tempRect.top,
+                        mSurface.TimeTextWidthInt+tempRect.colum * CellWidth +tempRect.right,
+                        tempRect.botton,mSurface.tempRectPaint);
             }
             if(existRect.exist){
-                canvas.drawRect(existRect.colum * CellWidth+existRect.left,existRect.top,existRect.colum * CellWidth +existRect.right,existRect.botton,mSurface.ExistRectPaint);
+                canvas.drawRect(mSurface.TimeTextWidthInt+existRect.colum * CellWidth+existRect.left,
+                        0,
+                        mSurface.TimeTextWidthInt+existRect.colum * CellWidth +existRect.right,
+                        mSurface.EndHeight,
+                        mSurface.BackgroundPaint);
+                Rect rectText = new Rect();
+                mSurface.mEventTextPaint.getTextBounds("啊",0,1,rectText);
+                mSurface.ChangePaintColor(mEventManager.getNormalType(existRect.rid));
+                canvas.drawRect(mSurface.TimeTextWidthInt+existRect.colum * CellWidth+existRect.left,
+                        existRect.top,
+                        mSurface.TimeTextWidthInt+existRect.colum * CellWidth +existRect.right,
+                        existRect.botton,
+                        mSurface.ExistRectPaint);
+                ArrayList<String> a =getSubString(mEventManager.getNormalIntroduction(existRect.rid),existRect.botton-existRect.top,existRect.right-existRect.left);
+                if(existRect.right-existRect.left>= CellWidth) {
+                    canvas.drawRect(mSurface.TimeTextWidthInt+existRect.colum* CellWidth + rectText.width() * 2 / 3f + existRect.left,
+                            existRect.botton - rectText.height() * 3 / 2f * (a.size() + 1) + rectText.height() / 2,
+                            existRect.colum * CellWidth+ rectText.width()+mSurface.TimeTextWidthInt,
+                            existRect.botton - rectText.height() + existRect.left,
+                            mSurface.mExistItemRect);
+                    for (int k = 0; k < a.size(); k++) {
+                        canvas.drawText(a.get(k), rectText.width() * (7 / 4f) + existRect.colum * CellWidth + existRect.left+mSurface.TimeTextWidthInt, existRect.botton - rectText.height() * 3 / 2f * (k + 1), mSurface.mEventTextPaint);
+                    }
+                }else{
+                    for (int k = 0; k < a.size(); k++) {
+                        canvas.drawText(a.get(k), mSurface.TimeTextWidthInt+existRect.colum * CellWidth  + existRect.left, existRect.botton - rectText.height() * 3 / 2f * (k + 1), mSurface.mEventTextPaint);
+                    }
+                }
+                //canvas.drawLine(mSurface.TimeTextWidthInt+existRect.colum * CellWidth +existRect.right,existRect.top,mSurface.TimeTextWidthInt+existRect.colum * CellWidth +existRect.right+CellWidth*mSurface.DashlineLength,existRect.top,mSurface.DashlinePaint);
+                //canvas.drawLine(mSurface.TimeTextWidthInt+existRect.colum * CellWidth+existRect.left,existRect.botton,mSurface.TimeTextWidthInt+existRect.colum * CellWidth+existRect.left-CellWidth*mSurface.DashlineLength,existRect.botton,mSurface.DashlinePaint);
+                canvas.drawLine(0,existRect.top,mSurface.TimeTextWidthInt+existRect.colum * CellWidth+existRect.left,existRect.top,mSurface.DashlinePaint);
+                canvas.drawLine(0, existRect.botton, mSurface.TimeTextWidthInt + existRect.colum * CellWidth + existRect.left, existRect.botton, mSurface.DashlinePaint);
+
+                double unit = (double)CellHeight/mSurface.CellUnit;
+                double newTop;
+                if(existRect.top%unit<unit/2){
+                    newTop = existRect.top-existRect.top%unit;
+                }else{
+                    newTop = existRect.top-existRect.top%unit+unit;
+                }
+                long timebegin = mEventManager.getEventMangerInDayOfWeek(existRect.colum).DayView_Date+Math.round((newTop/(double)mSurface.EndHeight)*mEventManager.MillsInOneDay);
+
+                double newEnd;
+                if(existRect.botton%unit<unit/2){
+                    newEnd = existRect.botton-existRect.botton%unit;
+                }else{
+                    newEnd = existRect.botton-existRect.botton%unit+unit;
+                }
+                long timeend = mEventManager.getEventMangerInDayOfWeek(existRect.colum).DayView_Date+Math.round((newEnd/(double)mSurface.EndHeight)*mEventManager.MillsInOneDay);
+
+                GregorianCalendar temp = new GregorianCalendar();
+                temp.setTimeInMillis(timebegin);
+                Rect rect = new Rect();
+                String startTime;
+                if( temp.get(Calendar.HOUR)<10) {
+                    startTime = "0"+temp.get(Calendar.HOUR) + ":";
+                }else{
+                    startTime = temp.get(Calendar.HOUR) + ":" ;
+                }
+                if(temp.get(Calendar.MINUTE)<10){
+                    startTime += "0"+temp.get(Calendar.MINUTE);
+                }else {
+                    startTime += temp.get(Calendar.MINUTE);
+                }
+                mSurface.TemporalTimePaint.getTextBounds(startTime,0,startTime.length(),rect);
+                canvas.drawText(startTime,mSurface.TimeTextWidthInt/2-rect.width()/2,existRect.top,mSurface.TemporalTimePaint);
+                temp.setTimeInMillis(timeend);
+                String endTime;
+                if( temp.get(Calendar.HOUR)<10) {
+                    endTime = "0"+temp.get(Calendar.HOUR)+":";
+                }else{
+                    endTime = temp.get(Calendar.HOUR)+":";
+                }
+                if(temp.get(Calendar.MINUTE)<10){
+                    endTime += "0"+temp.get(Calendar.MINUTE);
+                }else {
+                    endTime += temp.get(Calendar.MINUTE);
+                }
+                mSurface.TemporalTimePaint.getTextBounds(endTime,0,startTime.length(),rect);
+                canvas.drawText(endTime, mSurface.TimeTextWidthInt/2-rect.width()/2, existRect.botton, mSurface.TemporalTimePaint);
+
+
+
+
             }
         }
     }
@@ -880,5 +1282,8 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
         long rid=0;
         boolean exist=true;
         int colum=-1;
+
+        long timeBegin;
+        long timeEnd;
     }
 }

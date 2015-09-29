@@ -15,7 +15,7 @@
     <fragment
         android:id="@+id/tab_main_botton"
         android:name="com.fifteentec.Fragment.TabButtonFragment"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         tools:layout="@layout/view_tab_button_layout" />
 </LinearLayout>

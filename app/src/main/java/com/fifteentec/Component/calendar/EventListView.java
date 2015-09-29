@@ -61,6 +61,7 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
 
 
     public void init(ArrayList<Integer> date){
+        setBackgroundColor(Color.WHITE);
         removeAllViews();
         ScreenWidth =(getResources().getDisplayMetrics().widthPixels);
         ScreenHeight = (getResources().getDisplayMetrics().heightPixels);

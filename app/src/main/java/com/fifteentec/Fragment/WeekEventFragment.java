@@ -6,11 +6,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.Database.EventRecord;
+import com.fifteentec.Component.calendar.CalendarView;
 import com.fifteentec.Component.calendar.WeekEventView;
+import com.fifteentec.yoko.R;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 
 public class WeekEventFragment extends Fragment {
@@ -21,10 +26,13 @@ public class WeekEventFragment extends Fragment {
 
     private WeekViewFragmentLinstener mWeekViewFragmentLinstener;
     private WeekEventView weekEventView;
+    private CalendarView calendarView;
 
     public interface WeekViewFragmentLinstener{
         void CheckExist(long rid);
         void CreateRecord(int TYPE,EventRecord eventRecord);
+        void UpdateTime(ArrayList<Integer> Date);
+        void ShowDetailView(GregorianCalendar date);
     }
 
     public void setmWeekViewFragmentLinstener(WeekViewFragmentLinstener mWeekViewFragmentLinstener) {
@@ -48,18 +56,27 @@ public class WeekEventFragment extends Fragment {
         }
     }
 
-    public void UpdateViewTime(ArrayList<Integer> date){
-        mCurDate.clear();
-        mCurDate.add(date.get(0));
-        mCurDate.add(date.get(1));
-        mCurDate.add(date.get(2));
-        mCurDate.add(date.get(3));
-        weekEventView.UpdateViewByTime(mCurDate);
-    }
 
     public void EventRecordUpdate(long rid,boolean exist){
-        weekEventView.UpdateView(rid,exist);
+        weekEventView.UpdateView(rid, exist);
 
+    }
+
+    private void UpdateFragmentTime(GregorianCalendar gregorianCalendar){
+        mCurDate.clear();
+        mCurDate.add(gregorianCalendar.get(Calendar.YEAR));
+        mCurDate.add(gregorianCalendar.get(Calendar.MONTH));
+        mCurDate.add(gregorianCalendar.get(Calendar.DAY_OF_MONTH));
+        mCurDate.add(gregorianCalendar.get(Calendar.DAY_OF_WEEK));
+        mWeekViewFragmentLinstener.UpdateTime(mCurDate);
+        weekEventView.UpdateViewByTime(mCurDate);
+
+    }
+
+    public void deleteRecord(long rid){
+        if(weekEventView!=null){
+            weekEventView.UpdateView(rid);
+        }
     }
 
     public void UpdateScale(){
@@ -67,7 +84,9 @@ public class WeekEventFragment extends Fragment {
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        weekEventView = WeekEventView.newInstance(getActivity(),mCurDate);
+        View view = inflater.inflate(R.layout.fragment_calendar_weekevent,container,false);
+        weekEventView = (WeekEventView)view.findViewById(R.id.id_week_event);
+        weekEventView.initView(mCurDate);
         weekEventView.setmWeekViewListener(new WeekEventView.WeekViewListener() {
             @Override
             public void CheckExistItem(long rid) {
@@ -76,9 +95,33 @@ public class WeekEventFragment extends Fragment {
 
             @Override
             public void CreatRecord(int Type, EventRecord eventRecord) {
-                mWeekViewFragmentLinstener.CreateRecord(Type,eventRecord);
+                mWeekViewFragmentLinstener.CreateRecord(Type, eventRecord);
+            }
+
+            @Override
+            public void CalEnable(boolean enable) {
+                calendarView.TouchEnable(enable);
             }
         });
-        return weekEventView;
+        calendarView = (CalendarView)view.findViewById(R.id.id_cal_view);
+        calendarView.initView(mCurDate);
+        calendarView.setmCalendarListener(new CalendarView.CalendarListener() {
+            @Override
+            public void UpdateTime(GregorianCalendar time) {
+                UpdateFragmentTime(time);
+            }
+
+            @Override
+            public void ShowDayDetail(GregorianCalendar time) {
+                mWeekViewFragmentLinstener.ShowDetailView(time);
+            }
+
+            @Override
+            public void ModeSwitch(boolean isWeek) {
+                weekEventView.setViewEnable(isWeek);
+            }
+        });
+
+        return view;
     }
 }

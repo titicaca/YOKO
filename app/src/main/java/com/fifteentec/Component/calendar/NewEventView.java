@@ -53,8 +53,10 @@ public class NewEventView extends ViewGroup{
     private FunctionBar mFunctionBar;
     private FunctionView mFunctionView;
     private ImageView mCancelButton;
-    private ImageView mShareButton;
+    private ImageView mOKButton;
+    private ImageView mDeleteButton;
     private HorizontalScrollView mSavedPic;
+    private BackGroundPage mBackGroundPage;
 
 
     private Surface mSurface;
@@ -82,16 +84,19 @@ public class NewEventView extends ViewGroup{
 
 
     private int RemindSelected =-1;
-    private int TagSelected =-1;
+    private int TagSelected =3;
     private GregorianCalendar StartDate;
     private GregorianCalendar EndDate;
     private String introduction = "null";
     private long rid = 0;
 
+    private boolean firstEntry = true;
+
     public interface NewEventListener{
         void CreateFinish(Bundle bundle,int isNewEvent);
         void addNewBitMap(boolean open);
         void CancelCreate();
+        void deleteEvent(long rid);
 
     }
 
@@ -176,8 +181,11 @@ public class NewEventView extends ViewGroup{
         mBackGround.setBackgroundColor(Color.BLACK);
         mBackGround.setAlpha(mSurface.BackgroundAlpha);
         addView(mBackGround);
+
+        mBackGroundPage = new BackGroundPage(mContext);
+        addView(mBackGroundPage);
+
         mInputPage = new InputPage(mContext);
-        mInputPage.init();
         addView(mInputPage);
         mFunctionBar = new FunctionBar(mContext);
 
@@ -194,7 +202,7 @@ public class NewEventView extends ViewGroup{
         addView(mAddButton);
 
         mCancelButton = new ImageView(mContext);
-        mCancelButton.setImageResource(R.drawable.delete);
+        mCancelButton.setImageResource(R.drawable.cancel);
         mCancelButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -204,9 +212,19 @@ public class NewEventView extends ViewGroup{
 
         addView(mCancelButton);
 
-        mShareButton = new ImageView(mContext);
-        mShareButton.setImageResource(R.drawable.share);
-        mShareButton.setOnClickListener(new OnClickListener() {
+        mDeleteButton = new ImageView(mContext);
+        mDeleteButton.setImageResource(R.drawable.delete);
+        mDeleteButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mEventListener.deleteEvent(rid);
+            }
+        });
+        addView(mDeleteButton);
+
+        mOKButton = new ImageView(mContext);
+        mOKButton.setImageResource(R.drawable.ok);
+        mOKButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
@@ -219,7 +237,7 @@ public class NewEventView extends ViewGroup{
                 mEventListener.CreateFinish(bundle,isNewEvent);
             }
         });
-        addView(mShareButton);
+        addView(mOKButton);
 
         PicScrollChanged();
 
@@ -252,7 +270,7 @@ public class NewEventView extends ViewGroup{
                 Context.setLayoutParams(lp);
                 mSavedPic.addView(Context);
                 addView(mSavedPic);
-                mInputPage.HeightChange();
+                //mInputPage.HeightChange();
             }
             else {
                 Context=(LinearLayout)mSavedPic.getChildAt(0);
@@ -284,7 +302,7 @@ public class NewEventView extends ViewGroup{
         }else{
             removeView(mSavedPic);
             mSavedPic = null;
-            mInputPage.HeightChange();
+            //mInputPage.HeightChange();
         }
     }
 
@@ -340,32 +358,49 @@ public class NewEventView extends ViewGroup{
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        mScreenWidth = getResources().getDisplayMetrics().widthPixels;
+        mScreenWidth = MeasureSpec.getSize(widthMeasureSpec);
         mScreenHeight = MeasureSpec.getSize(heightMeasureSpec);
 
+
+        if(firstEntry) {
+            mSurface.initSurface();
+            mInputPage.init();
+            mFunctionBar.init();
+            mCancelButton.setPadding(mSurface.bottonBarPadding, mSurface.bottonHeightBarPadding, mSurface.bottonBarPadding, mSurface.bottonHeightBarPadding);
+            mOKButton.setPadding(mSurface.bottonBarPadding, mSurface.bottonHeightBarPadding, mSurface.bottonBarPadding, mSurface.bottonHeightBarPadding);
+            mDeleteButton.setPadding(mSurface.bottonBarPadding, mSurface.bottonHeightBarPadding, mSurface.bottonBarPadding,mSurface.bottonHeightBarPadding);
+            firstEntry = false;
+        }
+        mSurface.initSurface();
         if(mBackGround != null){
             int widthspec = MeasureSpec.makeMeasureSpec(mScreenWidth, MeasureSpec.EXACTLY);
             int heightspec = MeasureSpec.makeMeasureSpec(mScreenHeight, MeasureSpec.EXACTLY);
             mBackGround.measure(widthspec, heightspec);
         }
+
         if(mInputPage != null) {
-            int heightspec= MeasureSpec.makeMeasureSpec((int) (mScreenHeight * (1 - mSurface.InputPageUpdownPadding * 2)), MeasureSpec.EXACTLY);
-            int widthspec = MeasureSpec.makeMeasureSpec((int) (mScreenWidth * (1 - mSurface.InputPageSidePadding * 2)), MeasureSpec.EXACTLY);
+            int heightspec= MeasureSpec.makeMeasureSpec(mScreenHeight, MeasureSpec.AT_MOST);
+            int widthspec = MeasureSpec.makeMeasureSpec(mScreenWidth, MeasureSpec.AT_MOST);
             mInputPage.measure(widthspec, heightspec);
         }
 
+        if(mBackGroundPage != null) {
+            int heightspec= MeasureSpec.makeMeasureSpec(mScreenHeight, MeasureSpec.EXACTLY);
+            int widthspec = MeasureSpec.makeMeasureSpec(mScreenWidth, MeasureSpec.EXACTLY);
+            mBackGroundPage.measure(widthspec, heightspec);
+        }
+
         if(mAddButton != null){
-            int widthspec = MeasureSpec.makeMeasureSpec(mSurface.FounctionBarHeight,MeasureSpec.EXACTLY);
-            int heightspec = MeasureSpec.makeMeasureSpec(mSurface.FounctionBarHeight,MeasureSpec.EXACTLY);
+            int widthspec = MeasureSpec.makeMeasureSpec(mSurface.addBarHeight,MeasureSpec.EXACTLY);
+            int heightspec = MeasureSpec.makeMeasureSpec(mSurface.addBarHeight,MeasureSpec.EXACTLY);
             mAddButton.measure(widthspec,heightspec);
         }
 
         if(mFunctionBar !=null){
             int widthspec = MeasureSpec.makeMeasureSpec(mSurface.IconSide,MeasureSpec.EXACTLY);
-            int heightspec = MeasureSpec.makeMeasureSpec(mSurface.IconSide*mFunctionBar.getChildCount()+mSurface.IconInterval*(mFunctionBar.getChildCount()-1),MeasureSpec.EXACTLY);
-            mFunctionBar.measure(widthspec,heightspec);
+            int heightspec = MeasureSpec.makeMeasureSpec((mSurface.IconSide+mSurface.IconInterval)*mFunctionBar.getChildCount()+mSurface.addBarHeight,MeasureSpec.EXACTLY);
+            mFunctionBar.measure(widthspec, heightspec);
         }
-
         if(mFunctionView !=null) {
             int widthspec = MeasureSpec.makeMeasureSpec(mScreenWidth,MeasureSpec.AT_MOST);
             int heightspec = MeasureSpec.makeMeasureSpec(mScreenHeight,MeasureSpec.AT_MOST);
@@ -373,23 +408,29 @@ public class NewEventView extends ViewGroup{
         }
 
         if(mCancelButton != null){
-            int widthspec = MeasureSpec.makeMeasureSpec(mSurface.CancelButtonSize,MeasureSpec.EXACTLY);
-            int heightspec = MeasureSpec.makeMeasureSpec(mSurface.CancelButtonSize,MeasureSpec.EXACTLY);
+            int widthspec = MeasureSpec.makeMeasureSpec(mSurface.bottonBarHeight*4/5+2*mSurface.bottonBarPadding,MeasureSpec.EXACTLY);
+            int heightspec = MeasureSpec.makeMeasureSpec(mSurface.bottonBarHeight*4/5+2*mSurface.bottonHeightBarPadding,MeasureSpec.EXACTLY);
             mCancelButton.measure(widthspec,heightspec);
         }
 
-        if(mShareButton != null){
-            int widthspec = MeasureSpec.makeMeasureSpec(mSurface.FounctionBarHeight,MeasureSpec.EXACTLY);
-            int heightspec = MeasureSpec.makeMeasureSpec(mSurface.FounctionBarHeight,MeasureSpec.EXACTLY);
-            mShareButton.measure(widthspec,heightspec);
+        if(mOKButton != null){
+            int widthspec = MeasureSpec.makeMeasureSpec(mSurface.bottonBarHeight+2*mSurface.bottonBarPadding,MeasureSpec.EXACTLY);
+            int heightspec = MeasureSpec.makeMeasureSpec(mSurface.bottonBarHeight+2*mSurface.bottonHeightBarPadding,MeasureSpec.EXACTLY);
+            mOKButton.measure(widthspec,heightspec);
         }
 
+        if(mDeleteButton !=null){
+            int widthspec = MeasureSpec.makeMeasureSpec(mSurface.bottonBarHeight+2*mSurface.bottonBarPadding,MeasureSpec.EXACTLY);
+            int heightspec = MeasureSpec.makeMeasureSpec(mSurface.bottonBarHeight+2*mSurface.bottonHeightBarPadding,MeasureSpec.EXACTLY);
+            mDeleteButton.measure(widthspec,heightspec);
+        }
+/*
         if(mSavedPic != null){
             int widthspec = MeasureSpec.makeMeasureSpec((int)(mScreenWidth*(1-mSurface.InputPageSidePadding*2)),MeasureSpec.EXACTLY);
             int heightspec = MeasureSpec.makeMeasureSpec((int)(mScreenHeight*(1-mSurface.InputPageUpdownPadding*2)*mSurface.PicScrollRatio),MeasureSpec.EXACTLY);
             mSavedPic.measure(widthspec,heightspec);
         }
-
+*/
         setMeasuredDimension(mScreenWidth, mScreenHeight);
     }
 
@@ -402,45 +443,73 @@ public class NewEventView extends ViewGroup{
         int InputSidePadding =(int) (mScreenWidth * mSurface.InputPageSidePadding);
         int InputUPdownPadding =(int) (mScreenHeight * mSurface.InputPageUpdownPadding);
         if(mBackGround !=null) mBackGround.layout(l,t,r,b);
-        if(mInputPage !=null) mInputPage.layout(l+ InputSidePadding,
-                t +InputUPdownPadding,
-                r-InputSidePadding,
-                b-InputUPdownPadding);
+
+
+        if(mInputPage !=null) {
+            int lineheight = mInputPage.getLineHeight();
+            int linecount = mInputPage.getLineCount()+1;
+            int botton;
+            Log.d("Test","LineHeight:"+lineheight+"LineCount:"+linecount);
+            if(t +InputUPdownPadding+lineheight*linecount+mSurface.InputPageTextPadding<b-InputUPdownPadding-mSurface.InputPageTextPadding){
+                botton = t +InputUPdownPadding+lineheight*linecount+mSurface.InputPageTextPadding;
+            }else{
+                botton =b-InputUPdownPadding-mSurface.InputPageTextPadding;
+            }
+            mInputPage.layout(l + mSurface.InputPageTextPadding + InputSidePadding,
+                    t + InputUPdownPadding + mSurface.InputPageTextPadding,
+                    r - InputSidePadding - mSurface.InputPageTextPadding,
+                    botton);
+        }
+
+        if(mBackGroundPage !=null) {
+            mBackGroundPage.layout(0, 0, getMeasuredWidth(), getMeasuredHeight());
+        }
+
+        /*
         if(mSavedPic !=null) mSavedPic.layout(l+ InputSidePadding+mSurface.FounctionBarPadding,
                 b-InputUPdownPadding-mSurface.FounctionBarPadding-mSurface.FounctionBarHeight-mSavedPic.getMeasuredHeight()-mSurface.PicScrollPadding,
                 r-InputSidePadding-mSurface.FounctionBarPadding,
                 b-InputUPdownPadding-mSurface.FounctionBarPadding-mSurface.FounctionBarHeight-mSurface.PicScrollPadding);
-
+*/
         if(mAddButton != null) mAddButton.layout(
-                r-InputSidePadding-mAddButton.getMeasuredWidth()-mSurface.FounctionBarPadding,
-                b-InputUPdownPadding-mAddButton.getMeasuredHeight()-mSurface.FounctionBarPadding,
-                r-InputSidePadding-mSurface.FounctionBarPadding,
-                b-InputUPdownPadding-mSurface.FounctionBarPadding);
+                r-InputSidePadding-mAddButton.getMeasuredWidth()/2-mSurface.addBarMid,
+                b-InputUPdownPadding-mAddButton.getMeasuredHeight()-mSurface.bottonBarHeight-2*mSurface.bottonBarPadding,
+                r-InputSidePadding-mSurface.addBarMid+mAddButton.getMeasuredWidth()/2,
+                b-InputUPdownPadding-mSurface.bottonBarHeight-2*mSurface.bottonHeightBarPadding);
         if(mFunctionBar != null) mFunctionBar.layout(
-                r-InputSidePadding-mSurface.FounctionBarPadding-mFunctionBar.getMeasuredWidth()-(mSurface.FounctionBarHeight-mSurface.IconSide)/2,
-                b-InputUPdownPadding-mSurface.FounctionBarPadding-mSurface.FounctionBarHeight-mSurface.FounctionBarPadding-mFunctionBar.getMeasuredHeight(),
-                r-InputSidePadding-mSurface.FounctionBarPadding-(mSurface.FounctionBarHeight-mSurface.IconSide)/2,
-                b-InputUPdownPadding-mSurface.FounctionBarPadding);
+                r-InputSidePadding-mFunctionBar.getMeasuredWidth()/2-mSurface.addBarMid,
+                b-InputUPdownPadding-mSurface.bottonBarHeight-2*mSurface.bottonHeightBarPadding-mFunctionBar.getMeasuredHeight(),
+                r-InputSidePadding-mSurface.addBarMid+mFunctionBar.getMeasuredWidth()/2+2,
+                b-InputUPdownPadding-mSurface.bottonBarHeight-2*mSurface.bottonHeightBarPadding);
         if(mFunctionView !=null){
-            int right = r-InputSidePadding-mSurface.FounctionBarPadding-mAddButton.getMeasuredWidth();
+            int right = r-InputSidePadding-mSurface.addBarHeight;
             int left = right-mFunctionView.getMeasuredWidth();
-            int top = b-InputUPdownPadding-mSurface.FounctionBarPadding-mSurface.FounctionBarHeight-mSurface.FounctionBarPadding-mFunctionBar.getMeasuredHeight()-mSurface.CheckBoxPadding;
-            int botton =top + mFunctionView.getMeasuredHeight();
+            int top = b-InputUPdownPadding-mSurface.bottonBarHeight-2*mSurface.bottonHeightBarPadding-mFunctionBar.getMeasuredHeight();
+            int botton =top + mFunctionBar.getMeasuredHeight();
             mFunctionView.layout(left, top, right, botton);
         }
         if(mCancelButton !=null){
-            mCancelButton.layout(r-InputSidePadding-mSurface.CancelButtonPadding-mCancelButton.getMeasuredWidth(),
-                    t+InputUPdownPadding+mSurface.CancelButtonPadding,
-                    r-InputSidePadding-mSurface.CancelButtonPadding,
-                    t+InputUPdownPadding+mSurface.CancelButtonPadding+mCancelButton.getMeasuredHeight());
+            mCancelButton.layout(
+                    l+InputSidePadding,
+                    b-InputUPdownPadding-mCancelButton.getMeasuredHeight()-(mSurface.bottonHeightBarPadding*2+mSurface.bottonBarHeight-mCancelButton.getMeasuredHeight())/2,
+                    l+InputSidePadding+mCancelButton.getMeasuredWidth(),
+                    b-InputUPdownPadding-(mSurface.bottonHeightBarPadding*2+mSurface.bottonBarHeight-mCancelButton.getMeasuredHeight())/2);
         }
 
-        if(mShareButton != null){
-            mShareButton.layout(
-                    l+InputSidePadding+mSurface.FounctionBarPadding,
-                    b-InputUPdownPadding-mSurface.FounctionBarPadding-mShareButton.getMeasuredHeight(),
-                    l+InputSidePadding+mSurface.FounctionBarPadding+mShareButton.getMeasuredWidth(),
-                    b-InputUPdownPadding-mSurface.FounctionBarPadding);
+        if(mOKButton != null){
+            mOKButton.layout(
+                    r-InputSidePadding-mOKButton.getMeasuredWidth(),
+                    b-InputUPdownPadding-mOKButton.getMeasuredHeight(),
+                    r-InputSidePadding,
+                    b-InputUPdownPadding);
+        }
+
+        if(mDeleteButton != null){
+            mDeleteButton.layout(
+                    mScreenWidth/2-mOKButton.getMeasuredWidth()/2,
+                    b-InputUPdownPadding-mOKButton.getMeasuredHeight(),
+                    mScreenWidth/2+mOKButton.getMeasuredWidth()/2,
+                    b-InputUPdownPadding);
         }
 
     }
@@ -457,22 +526,71 @@ public class NewEventView extends ViewGroup{
         public int PicScrollPadding=20;
 
 
-        public int InputPageTextPadding =50;
-        public int InputPageTextSize = 15;
+        public int InputPageTextPadding ;
+        float InputPageTextPaddingRatio = 1/1000f;
+        float InputPageTextSize ;
+        float InputPageTextBaseSize = 10f;
+        float InputPageTextSizeRatio = 1/60f;
 
-        public int CancelButtonSize = 50;
-        public int CancelButtonPadding =20;
 
-        public int FounctionBarHeight = 120;
-        public int FounctionBarPadding = 20;
+        int bottonBarHeight;
+        float bottonBarHeightRatio = 1/25f;
+        int bottonBarPadding;
+        int bottonHeightBarPadding;
+        float bottonBarPaddingRatio = 1/40f;
 
-        public int IconSide = 100;
-        public int IconInterval=20;
+        float addBarHeightRatio = 1/8f;
+        int addBarHeight;
+        float addBarMidRatio = 1/15f;
+        int addBarMid;
 
-        public int CheckBoxPadding =40;
-        public int CheckRectPadding =20;
-        public int CheckBoxTextSize =15;
-        public int SquareSize = 40;
+        public int IconSide;
+        float IconSideRatio = 1/13f;
+        public int IconInterval;
+        float IconIntervalRatio = 1/25f;
+
+        public int CheckBoxPadding;
+        float CheckBoxPaddingRatio = 1/50f;
+        public int CheckRectPadding;
+        float CheckBoxRectPadingRatio = 1/80f;
+        float CheckBoxTextSize;
+        float CheckBoxTextBaseSize = 5f;
+        float CheckBoxTextSizeRatio = 1/80f;
+
+        Paint BackGoundPagePaint = new Paint();
+        Paint DashLinePaint = new Paint();
+        float ShadowOffsetRatio = 1/50f;
+        float RealLineWidthRatio= 1/30f;
+        float GapLineWidthRatio= 1/60f;
+        float DashLineWidth = 1/200f;
+
+
+        void initSurface(){
+            InputPageTextPadding = (int)(mScreenWidth*InputPageTextPaddingRatio);
+            BackGoundPagePaint.setColor(Color.WHITE);
+            //BackGoundPagePaint.setShadowLayer(mScreenHeight * ShadowOffsetRatio / 2, mScreenHeight * ShadowOffsetRatio, mScreenHeight * ShadowOffsetRatio, Color.BLACK);
+            InputPageTextSize =  (InputPageTextBaseSize+mScreenWidth*InputPageTextSizeRatio);
+            addBarHeight = (int)(mScreenWidth*addBarHeightRatio);
+            bottonBarHeight = (int) (mScreenHeight*bottonBarHeightRatio);
+            bottonBarPadding = (int)(mScreenHeight*bottonBarPaddingRatio);
+            bottonHeightBarPadding=(int)(mScreenHeight*bottonBarPaddingRatio*2/3);
+            PathEffect effect = new DashPathEffect(new float[]{mScreenWidth*RealLineWidthRatio,mScreenWidth*GapLineWidthRatio},1);
+            DashLinePaint.setColor(getResources().getColor(R.color.DashlineColor));
+            DashLinePaint.setPathEffect(effect);
+            DashLinePaint.setStyle(Paint.Style.STROKE);
+            DashLinePaint.setAntiAlias(true);
+            DashLinePaint.setStrokeWidth(mScreenWidth*DashLineWidth);
+            addBarMid = (int)(mScreenWidth*addBarMidRatio);
+            IconSide =(int)(mScreenWidth*IconSideRatio);
+            IconInterval =(int)(mScreenWidth*IconIntervalRatio);
+            CheckBoxPadding = (int)(mScreenWidth*CheckBoxPaddingRatio);
+            CheckRectPadding = (int)(mScreenWidth*CheckBoxRectPadingRatio);
+            CheckBoxTextSize = CheckBoxTextBaseSize+(mScreenWidth*CheckBoxTextSizeRatio);
+
+
+
+
+        }
 
     }
 
@@ -481,12 +599,12 @@ public class NewEventView extends ViewGroup{
 
 
         private String HintString = "诶嘿嘿...";
-        private int TextSize =mSurface.InputPageTextSize;
 
         private int TopPadding =mSurface.InputPageTextPadding;
         private int BottonPadding ;
         private int LeftPadding =mSurface.InputPageTextPadding;
         private int RightPadding =mSurface.InputPageTextPadding;
+
 
         private TextWatcher mtextWatcher = new TextWatcher() {
             @Override
@@ -524,21 +642,23 @@ public class NewEventView extends ViewGroup{
 
 
         public void init(){
-            BottonPadding = mSurface.FounctionBarPadding+TopPadding+mSurface.FounctionBarPadding;
+            //BottonPadding = mSurface.FounctionBarPadding+TopPadding+mSurface.FounctionBarPadding;
             setBackgroundColor(mSurface.InputBackground);
-            setTextSize(TypedValue.COMPLEX_UNIT_SP, TextSize);
+            Log.d("Test","Size:"+mSurface.InputPageTextSize);
+            setTextSize(mSurface.InputPageTextSize);
             setGravity(Gravity.TOP);
             setHint(HintString);
             if(introduction != "null") setText(introduction);
-            setPadding(LeftPadding, TopPadding, RightPadding, BottonPadding);
+            int effectWidth = (int)(mScreenWidth*(1-2*mSurface.InputPageSidePadding))-2*mSurface.InputPageTextPadding;
+            setMaxEms(effectWidth/(int)(getTextSize()*(7/6f)));
             addTextChangedListener(mtextWatcher);
         }
-
+/*
         public void HeightChange() {
             if(mSavedPic != null) BottonPadding = (int)(mSurface.FounctionBarPadding+TopPadding+mSurface.FounctionBarHeight+mScreenHeight*(1-2*mSurface.InputPageUpdownPadding)*mSurface.PicScrollRatio+2*mSurface.PicScrollPadding);
             else BottonPadding =mSurface.FounctionBarPadding+TopPadding+mSurface.FounctionBarHeight;
             setPadding(LeftPadding,TopPadding,RightPadding,BottonPadding);
-        }
+        }*/
     }
 
     private class FunctionView extends ViewGroup{
@@ -547,7 +667,7 @@ public class NewEventView extends ViewGroup{
 
         private int CheckboxPadding;
         private int RectPadding;
-        private int TextSize ;
+        private float TextSize ;
         private int SquareSize;
 
         private Paint RectPaint;
@@ -556,15 +676,15 @@ public class NewEventView extends ViewGroup{
         private int RectColor= Color.parseColor("#666666");
 
         private List<String > ReminedList = new ArrayList<>(Arrays.asList(
-                "开始前","提前五分钟","提前十分钟","提前三十分钟","提前一个小时","提前一天","提前一周"
+                "开始前","提前5分钟","提前10分钟","提前30分钟","提前1个小时","提前1天","提前1周"
         ));
 
         private List<String> TagList = new ArrayList<>(Arrays.asList(
-                "工作","学习","生活","娱乐","其他"
+                "工作","学习","娱乐","其他"
         ));
 
-        private List<Integer> TagColor =  new ArrayList<>(Arrays.asList(
-                R.drawable.work_sqare,R.drawable.learn_square,R.drawable.life_square,R.drawable.play_square,R.drawable.other_square
+        private List<Integer> TagSelectedList = new ArrayList<>(Arrays.asList(
+                getResources().getColor(R.color.WorkEventColor),getResources().getColor(R.color.StudyEventColor),getResources().getColor(R.color.EntertainEventColor),getResources().getColor(R.color.OtherEventColor)
         ));
 
         public FunctionView(Context context) {
@@ -583,7 +703,6 @@ public class NewEventView extends ViewGroup{
         private void initView() {
 
             TextSize=mSurface.CheckBoxTextSize;
-            SquareSize = mSurface.SquareSize;
             CheckboxPadding = mSurface.CheckBoxPadding;
             RectPadding = mSurface.CheckRectPadding;
             setWillNotDraw(false);
@@ -591,9 +710,9 @@ public class NewEventView extends ViewGroup{
             RectPaint.setAntiAlias(true);
             RectPaint.setColor(RectColor);
             RectPaint.setStyle(Paint.Style.STROKE);
-            PathEffect ef = new DashPathEffect(new float[]{30,10},1);
+            PathEffect ef = new DashPathEffect(new float[]{15,5},1);
             RectPaint.setPathEffect(ef);
-            RectPaint.setStrokeWidth(5);
+            RectPaint.setStrokeWidth(3);
         }
 
         public void PopoutAnim(int Target){
@@ -634,12 +753,9 @@ public class NewEventView extends ViewGroup{
                         RadioButton radioButton = new RadioButton(mContext);
                         radioButton.setText(TagList.get(i));
                         radioButton.setLayoutParams(lp);
+                        radioButton.setBackgroundColor(TagSelectedList.get(i));
                         radioButton.setTag(i);
                         radioButton.setTextSize(TypedValue.COMPLEX_UNIT_SP, TextSize);
-                        Drawable square = mContext.getResources().getDrawable(TagColor.get(i));
-                        square.setBounds(0,0,SquareSize,SquareSize);
-                        radioButton.setCompoundDrawables(null, null, square, null);
-                        radioButton.setCompoundDrawablePadding(RectPadding);
                         radioGroupTags.addView(radioButton);
                         if(i==TagSelected){
                             radioButton.setChecked(true);
@@ -893,6 +1009,7 @@ public class NewEventView extends ViewGroup{
                     ll.addView(album);
                     final AlertDialog a = new AlertDialog.Builder(mContext).setView(ll).setNegativeButton("不玩了", null).show();
 
+
                     photo.setOnClickListener(new OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -955,13 +1072,15 @@ public class NewEventView extends ViewGroup{
         @Override
         protected void onLayout(boolean changed, int l, int t, int r, int b) {
             int tempheight=0;
+            if(FunctionActivate == REMINED) tempheight=0;
+            else if(FunctionActivate == TAG) tempheight = mSurface.IconSide+mSurface.IconInterval;
             int Padding = CheckboxPadding + RectPadding;
             for(int i =0;i<getChildCount();i++){
                 View temp = getChildAt(i);
 
                 if((int)(temp.getTag())==TAG||(int)(temp.getTag())==REMINED) {
 
-                    temp.layout(Padding, Padding, getMeasuredWidth() - Padding, getMeasuredHeight() - Padding);
+                    temp.layout(Padding, Padding+tempheight, getMeasuredWidth() - Padding, getMeasuredHeight() - Padding+tempheight);
                 }
                 if((int)(temp.getTag()) == TIME){
                     temp.layout(Padding,Padding+tempheight,Padding+temp.getMeasuredWidth(),Padding+tempheight+temp.getMeasuredHeight());
@@ -973,7 +1092,10 @@ public class NewEventView extends ViewGroup{
 
         @Override
         protected void onDraw(Canvas canvas) {
-            RectF drawRect = new RectF(CheckboxPadding,CheckboxPadding,getMeasuredWidth()-CheckboxPadding,getMeasuredHeight()-CheckboxPadding);
+            int tempheight=0;
+            if(FunctionActivate == REMINED) tempheight=0;
+            else if(FunctionActivate == TAG) tempheight = mSurface.IconSide+mSurface.IconInterval;
+            RectF drawRect = new RectF(CheckboxPadding,tempheight+CheckboxPadding,getMeasuredWidth()-CheckboxPadding,tempheight+getMeasuredHeight()-CheckboxPadding);
             canvas.drawRoundRect(drawRect,20,20,RectPaint);
         }
     }
@@ -998,7 +1120,6 @@ public class NewEventView extends ViewGroup{
 
         public FunctionBar(Context context, AttributeSet attrs, int defStyleAttr) {
             super(context, attrs, defStyleAttr);
-            init();
         }
 
         @Override
@@ -1014,7 +1135,7 @@ public class NewEventView extends ViewGroup{
                 @Override
                 public void onClick(View v) {
                     cancelAll();
-                    InviteIcon.setImageResource(R.drawable.invite2);
+                    InviteIcon.setImageResource(R.drawable.invite);
                 }
             });
             PicIcon = new ImageView(mContext);
@@ -1062,7 +1183,7 @@ public class NewEventView extends ViewGroup{
         }
 
         private void cancelAll(){
-            InviteIcon.setImageResource(R.drawable.invite1);
+            InviteIcon.setImageResource(R.drawable.invite);
             ReminedIcon.setImageResource(R.drawable.remined);
             TagIcon.setImageResource(R.drawable.tag1);
             TimeIcon.setImageResource(R.drawable.time1);
@@ -1081,7 +1202,7 @@ public class NewEventView extends ViewGroup{
             if(PicIcon != null) PicIcon.measure(widthSpec,heightSpec);
             if(ReminedIcon != null) ReminedIcon.measure(widthSpec,heightSpec);
             if(TagIcon != null) TagIcon.measure(widthSpec,heightSpec);
-            setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec),MeasureSpec.getSize(heightMeasureSpec));
+            setMeasuredDimension(mSurface.IconSide,MeasureSpec.getSize(heightMeasureSpec));
         }
 
         @Override
@@ -1095,6 +1216,33 @@ public class NewEventView extends ViewGroup{
 
 
 
+        }
+    }
+
+    private class BackGroundPage extends View{
+
+        public BackGroundPage(Context context) {
+            this(context, null);
+        }
+
+        public BackGroundPage(Context context, AttributeSet attrs) {
+            this(context, attrs, 0);
+        }
+
+        public BackGroundPage(Context context, AttributeSet attrs, int defStyleAttr) {
+            super(context, attrs, defStyleAttr);
+        }
+
+        @Override
+        protected void onDraw(Canvas canvas) {
+            int InputSidePadding =(int) (mScreenWidth * mSurface.InputPageSidePadding);
+            int InputUPdownPadding =(int) (mScreenHeight * mSurface.InputPageUpdownPadding);
+            canvas.drawRect(InputSidePadding,InputUPdownPadding,mScreenWidth-InputSidePadding,mScreenHeight-InputUPdownPadding,mSurface.BackGoundPagePaint);
+            canvas.drawLine(InputSidePadding,
+                    mScreenHeight-InputUPdownPadding-2*mSurface.bottonHeightBarPadding-mSurface.bottonBarHeight,
+                    mScreenWidth-InputSidePadding,
+                    mScreenHeight-InputUPdownPadding-2*mSurface.bottonHeightBarPadding-mSurface.bottonBarHeight,
+                    mSurface.DashLinePaint);
         }
     }
 

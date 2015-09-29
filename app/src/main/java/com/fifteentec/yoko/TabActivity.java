@@ -28,8 +28,8 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
     private MyPageFragment myPageFragment;
     private TestFragment tf;
     private CalViewFragment mCalViewFragment;
-  //  private FoundFragment mFoundFragment;
-    private FoundEvent mFoundEvent;
+   // private FoundFragment mFoundFragment;
+   private FoundEvent mFoundEvent;
 
     @SuppressLint("NewApi")
     @Override
@@ -93,7 +93,10 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
 //                else{
 //                    mFmTrans.show(mFoundFragment);
 //                }
-
+//                Toast a = Toast.makeText(this, "Found",
+//                        Toast.LENGTH_SHORT);
+//                a.setDuration(Toast.LENGTH_SHORT);
+//                a.show();
                 if(mFoundEvent == null){
                     mFoundEvent = new FoundEvent();
                     mFmTrans.add(R.id.id_content, mFoundEvent,"found");
@@ -105,7 +108,6 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
                         Toast.LENGTH_SHORT);
                 a.setDuration(Toast.LENGTH_SHORT);
                 a.show();
-
 
                 break;
             case R.integer.SelectorCir:
@@ -121,12 +123,12 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
 //                    mFmTrans.show(tf);
 //                }
 
-                if (friendsFragment == null) {
-                    friendsFragment = new FriendsFragment();
-                     mFmTrans.add(R.id.id_content, friendsFragment, "friend");
-                }else {
-                    mFmTrans.show( friendsFragment);
-                }
+     //           if (friendsFragment == null) {
+       //             friendsFragment = new FriendsFragment();
+         //            mFmTrans.add(R.id.id_content, friendsFragment, "friend");
+           //     }else {
+             //       mFmTrans.show( friendsFragment);
+               // }
 //                    mFmTrans.show(friendsFragment);
 
 
@@ -137,12 +139,12 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
                         Toast.LENGTH_SHORT);
                 c.setDuration(Toast.LENGTH_SHORT);
                 c.show();
-                if (myPageFragment == null) {
+               /* if (myPageFragment == null) {
                     myPageFragment = new MyPageFragment();
                     mFmTrans.add(R.id.id_content, myPageFragment, "home");
                 } else {
                     mFmTrans.show(myPageFragment);
-                }
+                }*/
                 break;
             default:
                 Log.e("Error", "Wrong TabActivity Selector");
@@ -162,7 +164,7 @@ public class TabActivity extends BaseActivity implements TabButtonFragment.Ibutt
         if (mCalViewFragment != null) mFmTrans.hide(mCalViewFragment);
         if (myPageFragment != null) mFmTrans.hide(myPageFragment);
         if (friendsFragment != null) mFmTrans.hide(friendsFragment);
-//        if (mFoundFragment != null){
+        //        if (mFoundFragment != null){
 //            mFmTrans.hide(mFoundFragment);
 //        }
         if (mFoundEvent != null){

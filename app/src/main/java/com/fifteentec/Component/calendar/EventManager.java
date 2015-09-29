@@ -10,6 +10,8 @@ import com.Database.TableEvent;
 import com.fifteentec.Component.User.UserServer;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
@@ -31,9 +33,14 @@ public class EventManager {
 
     private ArrayList<Long> AlldayEvent = new ArrayList<>();
     private ArrayList<Long> NormalEvent = new ArrayList<>();
+    public ArrayList<DrawTag> drawTags = new ArrayList<>();
 
     private ArrayList<EventManager> WeekManager = new ArrayList<>();
 
+
+    public EventRecord getEventRecordByRid(long rid){
+        return mtableEvent.queryEventByRid(rid);
+    }
 
     public static EventManager newInstance(TableEvent tableEvent,int Type,long TimeInMill){
         EventManager eventManager;
@@ -65,9 +72,33 @@ public class EventManager {
                 eventManager = new EventManager(tableEvent);
                 eventManager.mType = Type;
                 eventManager.DayView_Date = TimeInMill;
-                long EndTime = eventManager.DayView_Date +MillsInOneDay;
-                List<EventRecord> eventRecords1 = eventManager.mtableEvent.queryEvent(UserServer.getInstance().getUserid(),eventManager.DayView_Date,EndTime);
-                for(EventRecord eventRecord:eventRecords1){
+                GregorianCalendar temp = new GregorianCalendar();
+                temp.setTimeInMillis(eventManager.DayView_Date);
+                long TimeBegin = eventManager.DayView_Date;
+                for (int i = 0; i < CalUtil.LENTH_OF_MONTH.get(temp.get(Calendar.MONTH)); i++) {
+                    DrawTag drawTag = eventManager.newDrawTag();
+                    long TimeEnd = TimeBegin +MillsInOneDay;
+                    List<EventRecord> eventRecords1 = eventManager.mtableEvent.queryEvent(UserServer.getInstance().getUserid(),TimeBegin,TimeEnd);
+                    for(EventRecord eventRecord:eventRecords1){
+                        if(eventRecord.timebegin == eventRecord.timeend) drawTag.task= true;
+                        else {
+                            if(drawTag.event.size()<4){
+                                drawTag.event.add(eventRecord.type);
+                            }
+                        }
+                    }
+
+
+                }
+
+                return eventManager;
+            case MONTH_VIEW_EVENT_MANAGER:
+                eventManager = new EventManager(tableEvent);
+                eventManager.mType = Type;
+                eventManager.DayView_Date = TimeInMill;
+                long EndTimeMonth = eventManager.DayView_Date +MillsInOneDay;
+                List<EventRecord> eventRecords2 = eventManager.mtableEvent.queryEvent(UserServer.getInstance().getUserid(),eventManager.DayView_Date,EndTimeMonth);
+                for(EventRecord eventRecord:eventRecords2){
                     if(eventRecord.timebegin == eventRecord.timeend) eventManager.AlldayEvent.add(eventRecord.rid);
                     else {
                         eventManager.NormalEvent.add(eventRecord.rid);
@@ -172,11 +203,23 @@ public class EventManager {
         return mtableEvent.queryEventByRid(NormalEvent.get(index)).introduction;
     }
 
+    public String getNormalIntroduction(long rid){
+        return mtableEvent.queryEventByRid(rid).introduction;
+    }
 
-    public float getPositionRatioByTime(long TimeBegin){
+    public int getNormalType(int index){
+        return mtableEvent.queryEventByRid(NormalEvent.get(index)).type;
+    }
+
+    public int getNormalType(long rid){
+        return mtableEvent.queryEventByRid(rid).type;
+    }
+
+
+    public double getPositionRatioByTime(long TimeBegin){
         long offset = TimeBegin - DayView_Date;
 
-        return offset/(float)MillsInOneDay;
+        return offset/(double)MillsInOneDay;
 
     }
 
@@ -196,7 +239,7 @@ public class EventManager {
             }
             for (int i = 0; i < AlldayEvent.size(); i++) {
                 if(AlldayEvent.get(i) == rid){
-                    AlldayEvent.remove(rid);
+                    AlldayEvent.remove(i);
                     return true;
                 }
             }
@@ -209,5 +252,20 @@ public class EventManager {
         eventRecord.timebegin = timebegin;
         eventRecord.timeend = timeend;
         mtableEvent.updateEvent(eventRecord);
+    }
+
+    public DrawTag newDrawTag(){
+        DrawTag drawTag = new DrawTag();
+        drawTags.add(drawTag);
+        return drawTag;
+    }
+
+    public class DrawTag{
+        boolean task = false;
+        boolean festival=false;
+        ArrayList<Integer> event= new ArrayList<>();
+
+        DrawTag(){}
+
     }
 }

@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.Database.DBManager;
 import com.Database.EventRecord;
@@ -39,7 +40,6 @@ import java.util.GregorianCalendar;
 public class CalViewFragment extends Fragment {
 
     //private CalView mCalView;
-    private CalendarView mCalendarView;
 
     private CalendarController mDate;
 
@@ -138,8 +138,7 @@ public class CalViewFragment extends Fragment {
             }
         });
 
-        mCalendarView = (CalendarView) view.findViewById(R.id.id_cal_view);
-        mCalendarView.initView(mDate.getNowArray(),dbManager.getTableEvent());
+
 
 /*
         mCalView =  (CalView) view.findViewById(R.id.id_cal_view);
@@ -169,21 +168,35 @@ public class CalViewFragment extends Fragment {
                 UpdateTime(EVENT_LIST);
             }
         });
+
         mWeekEventFragment = WeekEventFragment.newInstance(mDate.getNowArray());
         mWeekEventFragment.setmWeekViewFragmentLinstener(new WeekEventFragment.WeekViewFragmentLinstener() {
             @Override
             public void CheckExist(long rid) {
-                CreateNewEvent(NewEventView.EXIST_EVENT,dbManager.getTableEvent().queryEventByRid(rid));
+                CreateNewEvent(NewEventView.EXIST_EVENT, dbManager.getTableEvent().queryEventByRid(rid));
             }
 
             @Override
             public void CreateRecord(int TYPE, EventRecord eventRecord) {
-                CreateNewEvent(TYPE,eventRecord);
+                CreateNewEvent(TYPE, eventRecord);
+            }
+
+            @Override
+            public void UpdateTime(ArrayList<Integer> Date) {
+                mDate.UpdateCur(Date);
+            }
+
+            @Override
+            public void ShowDetailView(GregorianCalendar date) {
+                showDayEventView(date);
             }
         });
+
+        mTrans.add(R.id.id_event_content,mListView);
+        mTrans.hide(mListView);
         mTrans.add(R.id.id_event_content,mWeekEventFragment);
         mTrans.hide(mWeekEventFragment);
-        mTrans.add(R.id.id_event_content,mListView).commit();
+        mTrans.show(mWeekEventFragment).commit();
 
 
         return view;
@@ -272,9 +285,22 @@ public class CalViewFragment extends Fragment {
                 mMainView.removeView(mNewEventView);
                 mNewEventView =null;
             }
+
+            @Override
+            public void deleteEvent(long rid) {
+                CancelCreate();
+                dbManager.getTableEvent().deleteEvent(rid);
+                if(mWeekEventFragment != null){
+                    mWeekEventFragment.deleteRecord(rid);
+                }
+                if(mdayEventView !=null){
+                    mdayEventView.deleteView(rid);
+                }
+            }
         });
         mMainView.addView(mNewEventView);
     }
+
 
     private void EventRecordUpdate(long rid,boolean exist) {
         if(mdayEventView != null){
@@ -289,16 +315,6 @@ public class CalViewFragment extends Fragment {
     private void UpdateTime(int Updater) {
         mMonthText.setText(mDate.MONTH_NAME.get(mDate.getCurMonth()));
         mYearText.setText(mDate.getCurYear() + "");
-        switch (Updater){
-            case CAL_VIEW_MONTH_TAP:
-                mListView.UpdateTime(mDate.getCurArray());
-                mWeekEventFragment.UpdateViewTime(mDate.getCurArray());
-                break;
-            case EVENT_LIST:
-                GregorianCalendar temp =mDate.getCurCalendar();
-                //mCalView.UpdateTime(temp);
-                mWeekEventFragment.UpdateViewTime(mDate.getCurArray());
-        }
     }
 
     private void showDayEventView(GregorianCalendar date) {
