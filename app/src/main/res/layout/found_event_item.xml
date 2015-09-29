@@ -2,10 +2,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_height="wrap_content"
+    android:padding="1pt"
     android:layout_marginTop="10dp"
-    android:layout_marginBottom="10dp"
-    android:descendantFocusability="blocksDescendants">
+    android:layout_marginBottom="20dp"
+    android:scrollingCache="false"
+    android:descendantFocusability="blocksDescendants"
+    android:background="@drawable/background_rectangle">
     <ImageView
         android:id="@+id/event_post"
         android:layout_width="fill_parent"
