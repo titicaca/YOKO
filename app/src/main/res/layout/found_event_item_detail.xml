@@ -1,28 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+    android:layout_height="fill_parent"
+    android:background="@color/white">
     <LinearLayout
         android:id="@+id/banner"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp">
         <ImageButton
             android:id="@+id/back_arrow"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="15dp"
+            android:layout_height="25dp"
+            android:scaleType="centerInside"
+            android:layout_marginLeft="15dp"
+            android:layout_gravity="bottom"
             android:background="@drawable/back_arrow"/>
         <TextView
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:textSize="@dimen/activity_vertical_margin"
-            android:gravity="center_vertical"
-            android:layout_marginLeft="10dp"
+            android:layout_height="wrap_content"
+            android:textSize="25dp"
+            android:gravity="bottom"
+            android:layout_marginLeft="20dp"
             android:text="@string/detail"/>
     </LinearLayout>
         <RelativeLayout
             android:id="@+id/relative"
             android:layout_width="fill_parent"
-            android:layout_height="60dp"
+            android:layout_height="100dp"
             android:gravity="top"
             android:layout_marginTop="8dp"
             android:layout_marginLeft="8dp"
@@ -49,7 +54,7 @@
                 android:text="default_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
+                android:layout_marginLeft="10dp"
                 android:layout_toRightOf="@id/group_detail_event_logo"
                 android:textSize="18sp"
                 />
@@ -57,8 +62,8 @@
                 android:id="@+id/from"
                 android:text="@string/from"
                 android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
-                android:gravity="center_vertical"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
                 android:layout_toRightOf="@id/group_detail_event_logo"
                 android:layout_below="@id/event_detail_name"
                 android:textSize="12sp"
@@ -67,13 +72,68 @@
                 android:id="@+id/group_detail_name"
                 android:text="default_name"
                 android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
-                android:gravity="center_vertical"
+                android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"
                 android:layout_toRightOf="@id/from"
                 android:layout_below="@id/event_detail_name"
                 android:textSize="12sp"
                 />
+            <LinearLayout
+                android:id="@+id/layout_time_item"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginLeft="10dp"
+                android:layout_toRightOf="@id/group_detail_event_logo"
+                android:layout_below="@id/from">
+                <TextView
+                    android:id="@+id/time_label_item"
+                    android:text="@string/time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15dp"
+                    android:gravity="bottom"
+                    android:layout_gravity="top"
+                    />
+                <TextView
+                    android:id="@+id/time_item"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15dp"
+                    android:textColor="@color/gray"
+                    android:gravity="bottom"
+                    android:layout_gravity="top"
+                    />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/layout_location_item"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:clickable="true"
+                android:layout_marginLeft="10dp"
+                android:layout_toRightOf="@id/group_detail_event_logo"
+                android:layout_below="@id/layout_time_item"
+                android:layout_weight="0.9">
+                <TextView
+                    android:id="@+id/loc_label_item_item"
+                    android:text="@string/location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15dp"
+                    android:gravity="bottom"
+                    android:layout_gravity="top"
+                    />
+                <TextView
+                    android:id="@+id/location_item"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15dp"
+                    android:textColor="@color/gray"
+                    android:gravity="bottom"
+                    android:layout_gravity="top"
+                    />
+            </LinearLayout>
         </RelativeLayout>
         <ImageView
             android:id="@+id/line"
@@ -86,11 +146,12 @@
         <ScrollView
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_marginRight="20dp"
-            android:layout_marginLeft="20dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp"
             android:layout_below="@id/line">
             <WebView
+                android:id ="@+id/web"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
             </WebView>
@@ -105,8 +166,9 @@
             android:orientation="vertical">
             <ImageButton
                 android:id="@+id/add"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:scaleType="centerInside"
                 android:background="@drawable/takepart"/>
         </LinearLayout>
 </RelativeLayout>

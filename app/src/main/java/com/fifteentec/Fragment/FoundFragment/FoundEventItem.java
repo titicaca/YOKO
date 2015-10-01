@@ -6,9 +6,11 @@ import android.app.FragmentManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -16,10 +18,15 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.Database.DBManager;
+import com.Database.EventRecord;
+import com.fifteentec.Component.FoundItems.EventBrief;
+import com.fifteentec.Component.User.UserServer;
+import com.fifteentec.yoko.BaseActivity;
 import com.fifteentec.yoko.R;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
-;
+;import java.text.SimpleDateFormat;
 
 
 /**
@@ -30,10 +37,16 @@ public class FoundEventItem extends Fragment {
     private TextView name;
     private TextView groupName;
     private int id;
-    private RelativeLayout detail;
+    private WebView detail;
     private ImageButton add;
     private ImageButton back;
+    private TextView time;
+    private TextView location;
     private FragmentManager mFragmentManager;
+    private BaseActivity activity;
+    private DBManager dbManager;
+    private EventBrief item;
+
 
     protected ImageLoader imageLoader = ImageLoader.getInstance();
     long currentTime = 0;
@@ -48,30 +61,67 @@ public class FoundEventItem extends Fragment {
         name = (TextView)view.findViewById(R.id.event_detail_name);
         add = (ImageButton)view.findViewById(R.id.add);
         back = (ImageButton)view.findViewById(R.id.back_arrow);
-        mFragmentManager = FoundEventItem.this.getFragmentManager();
-        final SharedPreferences sharedPreferences;
-        sharedPreferences = getActivity().getSharedPreferences("event_take_part_info", Context.MODE_PRIVATE);
+        detail = (WebView)view.findViewById(R.id.web);
+        time = (TextView)view.findViewById(R.id.time_item);
+        location = (TextView)view.findViewById(R.id.location_item);
 
-        Boolean joined = sharedPreferences.getBoolean("id" + id, false);
-        if(joined)add.setBackgroundResource(R.drawable.takepart_j);
-        else add.setBackgroundResource(R.drawable.takepart);
-        id= getArguments().getInt("id");
+        mFragmentManager = FoundEventItem.this.getFragmentManager();
+        this.activity = (BaseActivity)this.getActivity();
+        this.dbManager = this.activity.getDBManager();
+        editItemContent();
+
+  //      final SharedPreferences sharedPreferences;
+  //      sharedPreferences = getActivity().getSharedPreferences("event_take_part_info", Context.MODE_PRIVATE);
+
+  //      Boolean joined = sharedPreferences.getBoolean("id" + id, false);
+  //      if(joined)add.setBackgroundResource(R.drawable.takepart_j);
+  //      else add.setBackgroundResource(R.drawable.takepart);
+
+        location.setText(getArguments().getString("location"));
+
+        SimpleDateFormat sf = new SimpleDateFormat("yyyy.MM.dd");
         currentTime = (long)System.currentTimeMillis();
-        if((currentTime>getArguments().getLong("timeEnd"))&&(getArguments().getLong("timeEnd")!=0)){
+        if((currentTime>item.getTimeEnd())&&(item.getTimeEnd()!=0)){
+            time.setText(sf.format(item.getTimeBegin())+"-"+sf.format(item.getTimeEnd()));
             add.setImageResource(R.drawable.takepart_n);
             add.setClickable(false);
         }
+        else if(item.getTimeEnd()==0){
+            time.setText(R.string.no_limit);
+
+        }
+        else{
+            if(dbManager.getTableEvent().queryEventById(item.getID())==null){
+                add.setBackgroundResource(R.drawable.takepart);
+                add.setClickable(true);
+            }
+            else{
+                Log.e("id",Long.toString(item.getID()));
+                add.setBackgroundResource(R.drawable.takepart_j);
+                add.setClickable(false);
+            }
+        }
+
+
+
+
 
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Boolean joined = sharedPreferences.getBoolean("id" + id, false);
-                if(!joined){
+                //             Boolean joined = sharedPreferences.getBoolean("id" + id, false);
+                //              if(!joined){
+                //                 add.setBackgroundResource(R.drawable.takepart_j);
+                //                   SharedPreferences.Editor editor = sharedPreferences.edit();
+                //                   editor.putBoolean("id"+id, true);
+                //                  editor.commit();
+                //             }
+                if (dbManager.getTableEvent().queryEventById(item.getID()) == null) {
+                    addNewEvent();
                     add.setBackgroundResource(R.drawable.takepart_j);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putBoolean("id"+id, true);
-                    editor.commit();
+                    add.setClickable(false);
                 }
+                ;
             }
         });
 
@@ -90,14 +140,55 @@ public class FoundEventItem extends Fragment {
 
 
 
-        if(null!=getArguments().getString("intro")&&!"".equals(getArguments().getString("intro"))){
-            imageLoader.displayImage(getArguments().getString("intro"),logo);
+        if(null!=getArguments().getString("uri")&&!"".equals(getArguments().getString("uri"))){
+            imageLoader.displayImage(getArguments().getString("uri"),logo);
+        }
+        else{
+            logo.setImageResource(R.drawable.logo_default);
+        }
+
+        if(null!=getArguments().getString("eventUri")&&!"".equals(getArguments().getString("eventUri"))){
+            detail.loadUrl("http://www.thedayscolor.com/");
         }
         else{
             logo.setImageResource(R.drawable.logo_default);
         }
 
         return view;
+    }
+
+    private void editItemContent(){
+        if(item==null)item = new EventBrief();
+        item.setName(getArguments().getString("name"));
+        item.setEventIntro(getArguments().getString("intro"));
+        item.setTimeBegin(getArguments().getLong("timeBegin"));
+        item.setTimeEnd(getArguments().getLong("timeEnd"));
+        item.setID(getArguments().getLong("id"));
+        Log.e("item id",Long.toString(item.getID()));
+    }
+
+    private void addNewEvent(){
+        EventRecord eventRecord = new EventRecord();
+
+        eventRecord.introduction = item.getEventIntro();
+        eventRecord.id = item.getID();
+        eventRecord.timeend = item.getTimeEnd();
+        eventRecord.timebegin = item.getTimeBegin();
+        if(item.getTimeEnd()==0) {
+            eventRecord.timebegin = currentTime;
+            eventRecord.timeend = currentTime;
+
+        }
+        eventRecord.type = 0;
+        eventRecord.uid = UserServer.getInstance().getUserid();
+
+        if(dbManager.getTableEvent().addEvent(eventRecord)==-1){
+            Log.e("add","error in adding event");
+        }
+        else {
+            Log.e("add",Long.toString(eventRecord.id));
+        }
+
     }
 
 }

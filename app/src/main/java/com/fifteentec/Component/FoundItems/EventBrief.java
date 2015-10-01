@@ -17,7 +17,7 @@ public class EventBrief {
     private String name = "";
     private int peopleEnronroll = 0;
     private int PeopleAll = 0;
-    private int id=0;
+    private long id=0;
 
     public String getGroupName(){
         return groupName;
@@ -25,7 +25,7 @@ public class EventBrief {
     public String getName(){
         return name;
     }
-    public int getID(){
+    public long getID(){
         return id;
     }
     public String getEventIntro(){
@@ -58,7 +58,7 @@ public class EventBrief {
     public void setGroupName(String name){
         this.groupName = name;
     }
-    public void setID(int id){
+    public void setID(long id){
         this.id = id;
     }
     public void setEventIntro(String intro){

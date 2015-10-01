@@ -51,6 +51,7 @@ public class FoundDataParser {
             JSONArray groups = response.getJSONArray("list");
             for (int i = 0; i < groups.length(); ++i) {
                 JSONObject group = (JSONObject)groups.get(i);
+                long id = group.getLong("id");
                 String location = group.getString("location");
                 String time = group.getString("createdtime");
                 String name = group.getString("name");
@@ -65,6 +66,7 @@ public class FoundDataParser {
 
                 EventBrief briefItem = new EventBrief();
                 
+                briefItem.setID(id);
                 briefItem.setEventIntro(groupIntro);
                 briefItem.setEventUri(detailLink);
                 briefItem.setPicUri(PicUrl);

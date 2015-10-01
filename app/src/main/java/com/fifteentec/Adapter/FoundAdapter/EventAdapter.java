@@ -2,6 +2,7 @@ package com.fifteentec.FoundAdapter;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +11,12 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.Database.DBManager;
+import com.Database.EventRecord;
+
 import com.fifteentec.Component.FoundItems.EventBrief;
+import com.fifteentec.Component.User.UserServer;
+import com.fifteentec.yoko.BaseActivity;
 import com.fifteentec.yoko.R;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -29,6 +35,9 @@ public class EventAdapter extends BaseAdapter{
     DisplayImageOptions options;
     List<EventBrief> eventList = new ArrayList<EventBrief>();
     long currentTime = 0;
+    private BaseActivity activity;
+    private DBManager dbManager;
+    private EventBrief eventInfo;
 
 
     static class ListItemView {
@@ -84,57 +93,70 @@ public class EventAdapter extends BaseAdapter{
         } else {
             item = (ListItemView) convertView.getTag();
         }
-        final SharedPreferences sharedPreferences;
-        sharedPreferences = listcontaner.getContext().getSharedPreferences("event_take_part_info", Context.MODE_PRIVATE);
 
-        final int id;
-        id = eventList.get(position).getID();
-        final com.fifteentec.FoundAdapter.EventAdapter.ListItemView finalItem = item;
-        Boolean joined = sharedPreferences.getBoolean("id" + id, false);
-        if(!joined)item.takepart_btn.setBackgroundResource(R.drawable.takepart_s);
-        else item.takepart_btn.setBackgroundResource(R.drawable.takepart_s_j);
-        item.takepart_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Boolean joined = sharedPreferences.getBoolean("id" + id, false);
-                if (!joined) {
-                    finalItem.takepart_btn.setBackgroundResource(R.drawable.takepart_s_j);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putBoolean("id" + id, true);
-                    editor.commit();
-                }
-            }
-        });
-        SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
-        item.name.setText(eventList.get(position).getGroupName());
-        item.location.setText(eventList.get(position).getLocation());
+        this.activity = (BaseActivity)listcontaner.getContext();
+        this.dbManager = this.activity.getDBManager();
+
+        editItemContent(position);
+
+
+        SimpleDateFormat sf = new SimpleDateFormat("yyyy.MM.dd");
+        item.name.setText(eventInfo.getName());
+        item.location.setText(eventInfo.getEventIntro());
         currentTime = (long)System.currentTimeMillis();
-        if((currentTime>eventList.get(position).getTimeEnd())&&(eventList.get(position).getTimeEnd()!=0)){
+
+        if((currentTime>eventInfo.getTimeEnd())&&(eventInfo.getTimeEnd()!=0)){
+            item.time.setText(sf.format(eventInfo.getTimeBegin())+"-"+sf.format(eventInfo.getTimeEnd()));
             item.takepart_btn.setImageResource(R.drawable.takepart_s_n);
             item.takepart_btn.setClickable(false);
         }
-        if(eventList.get(position).getTimeEnd()!=0) item.time.setText(sf.format(eventList.get(position).getTimeBegin())+"-"+sf.format(eventList.get(position).getTimeEnd()));
-        else item.time.setText(R.string.no_limit);
+        else if(eventInfo.getTimeEnd()==0) {
+            item.time.setText(R.string.no_limit);
+        }
+        else{
+            if(dbManager.getTableEvent().queryEventById(eventInfo.getID())==null){
+                Log.e("id", Long.toString(eventInfo.getID()));
+                item.takepart_btn.setBackgroundResource(R.drawable.takepart_s);
+                item.takepart_btn.setClickable(true);
+            }
+            else{
+                item.takepart_btn.setBackgroundResource(R.drawable.takepart_s_j);
+                item.takepart_btn.setClickable(false);
+            }
+
+        }
+
+        final com.fifteentec.FoundAdapter.EventAdapter.ListItemView finalItem = item;
+        item.takepart_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (dbManager.getTableEvent().queryEventById(eventInfo.getID()) == null) {
+                    addNewEvent();
+                    finalItem.takepart_btn.setBackgroundResource(R.drawable.takepart_s_j);
+                    finalItem.takepart_btn.setClickable(false);
+                }
+            }
+        });
 
 
-        if(!"".equals(eventList.get(position).getEventIntro()) && eventList.get(position).getEventIntro().length()>30){
-            String str=eventList.get(position).getEventIntro().trim().substring(0, 30);
+        if(!"".equals(eventInfo.getEventIntro()) && (eventInfo.getEventIntro().length()>30)){
+            String str=eventInfo.getEventIntro().trim().substring(0, 30);
             item.intro.setText(str);
         } else {
-            item.intro.setText(eventList.get(position).getEventIntro());
+            item.intro.setText(eventInfo.getEventIntro());
         }
 
 
-        if (null != eventList.get(position).getLogoUri()
-                && !"".equals(eventList.get(position).getLogoUri())&&!"null".equals(eventList.get(position).getLogoUri())) {
-            imageLoader.displayImage(eventList.get(position).getLogoUri(), item.logo);
+        if (null != eventInfo.getLogoUri()
+                && !"".equals(eventInfo.getLogoUri())&&!"null".equals(eventInfo.getLogoUri())) {
+            imageLoader.displayImage(eventInfo.getLogoUri(), item.logo);
         } else {
             item.logo.setImageResource(R.drawable.logo_default);
         }
 
-        if (null != eventList.get(position).getEventUri()
-                && !"".equals(eventList.get(position).getEventUri())&& !"null".equals(eventList.get(position).getEventUri())) {
-            imageLoader.displayImage(eventList.get(position).getEventUri(),item.event);
+        if (null != eventInfo.getEventUri()
+                && !"".equals(eventInfo.getEventUri())&& !"null".equals(eventInfo.getEventUri())) {
+            imageLoader.displayImage(eventInfo.getEventUri(),item.event);
         } else {
             item.event.setImageResource(R.drawable.event_eg);
         }
@@ -142,4 +164,42 @@ public class EventAdapter extends BaseAdapter{
         return convertView;
 
     }
+
+    private void addNewEvent(){
+        EventRecord eventRecord = new EventRecord();
+
+        eventRecord.introduction = eventInfo.getEventIntro();
+        eventRecord.id = eventInfo.getID();
+        eventRecord.timeend = eventInfo.getTimeEnd();
+        eventRecord.timebegin = eventInfo.getTimeBegin();
+        if(eventInfo.getTimeEnd()==0) {
+            eventRecord.timebegin = currentTime;
+            eventRecord.timeend = currentTime;
+
+        }
+        eventRecord.type = 0;
+        eventRecord.uid = UserServer.getInstance().getUserid();
+
+       if(dbManager.getTableEvent().addEvent(eventRecord)==-1){
+           Log.e("add","error in adding event");
+       }
+        else {
+           Log.e("add",Long.toString(eventRecord.id));
+       }
+
+    }
+
+
+    private void editItemContent(int position){
+        if(eventInfo==null)eventInfo = new EventBrief();
+        eventInfo.setName(eventList.get(position).getName());
+        eventInfo.setEventIntro(eventList.get(position).getEventIntro());
+        eventInfo.setTimeBegin(eventList.get(position).getTimeBegin());
+        eventInfo.setTimeEnd(eventList.get(position).getTimeEnd());
+        eventInfo.setID(eventList.get(position).getID());
+        eventInfo.setPicUri(eventList.get(position).getPicUri());
+        eventInfo.setEventUri(eventList.get(position).getEventUri());
+    }
+
+
 }

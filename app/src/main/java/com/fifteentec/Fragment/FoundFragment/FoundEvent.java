@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.API.APIJsonCallbackResponse;
 import com.API.APIUrl;
 import com.API.APIUserServer;
+import com.Database.DBManager;
 import com.android.volley.RequestQueue;
 import com.fifteentec.Component.FoundItems.PullToRefresh;
 import com.fifteentec.Component.Parser.FoundDataParser;
@@ -50,6 +51,7 @@ public class FoundEvent extends Fragment {
     RequestQueue mRequestQueue;
     BaseActivity baseActivity;
     PullToRefresh refreshableView;
+
 
     private FragmentManager mFragmentManager;
         @Override
@@ -188,19 +190,23 @@ public class FoundEvent extends Fragment {
                         mFmTrans.remove(mFragmentManager.findFragmentByTag("eventItem"));
                     }
 
+
+
                     Bundle args = new Bundle();
                     args.putString("name", eventList.get(position).getGroupName());
                     args.putString("eventUri", eventList.get(position).getEventUri());
                     args.putString("name", eventList.get(position).getName());
-                    args.putInt("id", eventList.get(position).getID());
+                    args.putLong("id", eventList.get(position).getID());
+                    args.putLong("timeBegin", eventList.get(position).getTimeBegin());
                     args.putLong("timeEnd", eventList.get(position).getTimeEnd());
+                    args.putString("location", eventList.get(position).getLocation());
                     args.putString("uri", eventList.get(position).getLogoUri());
+                    args.putString("intro",eventList.get(position).getEventIntro());
                     eventItem.setArguments(args);
 
                    mFmTrans.add(R.id.id_content, eventItem, "eventItem");
-
                     mFmTrans.addToBackStack("eventItem");
-                    mFmTrans.commit();
+                   mFmTrans.commit();
                    mFmTrans.hide(FoundEvent.this);
 
                 }
