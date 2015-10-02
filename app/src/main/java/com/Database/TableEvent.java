@@ -93,7 +93,7 @@ public class TableEvent extends DBTable {
             db.endTransaction();
         }
     }
-
+    
     public void updateEvent(EventRecord eventRecord) {
         updateEvent(eventRecord, 1);
     }

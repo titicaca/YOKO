@@ -135,6 +135,7 @@
             android:layout_alignParentRight="true"
             android:adjustViewBounds="true"
             android:scaleType="centerInside"
+            android:clickable="true"
             android:background="@drawable/takepart_s"/>
     </LinearLayout>
 </LinearLayout>

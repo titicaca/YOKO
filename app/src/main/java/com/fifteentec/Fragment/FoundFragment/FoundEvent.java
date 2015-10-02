@@ -75,8 +75,10 @@ public class FoundEvent extends Fragment {
                             Log.e("object", object.toString());
                             eventList = FoundDataParser.parseEventBriefInfo(object);
                             if (eventList != null) {
+                                eventAdapter.setFragment(FoundEvent.this);
                                 eventAdapter.setList(eventList);
                                 eventAdapter.notifyDataSetChanged();
+
                             }
                         }
                     }, mRequestQueue, null).send();
@@ -99,116 +101,47 @@ public class FoundEvent extends Fragment {
 
                 eventList = FoundDataParser.parseEventBriefInfo(object);
                 if(eventList!=null){
-                    eventAdapter = new EventAdapter(getActivity().getLayoutInflater(),eventList);
+                    eventAdapter = new EventAdapter(getActivity().getLayoutInflater(),eventList,FoundEvent.this);
                     events.setAdapter(eventAdapter);
+                    eventAdapter.notifyDataSetChanged();
                 }
             }
         }, mRequestQueue, null).send();
     }
 
-//    private void initSearchFrame(View parentView){
-//        ivDeleteText = (ImageView) parentView.findViewById(R.id.ivDeleteText3);
-//        etSearch = (EditText) parentView.findViewById(R.id.etSearch3);
-//
-//        ivDeleteText.setOnClickListener(new View.OnClickListener() {
-//
-//            public void onClick(View v) {
-//                etSearch.setText("");
-//            }
-//        });
-//
-//        etSearch.addTextChangedListener(new TextWatcher() {
-//
-//            public void onTextChanged(CharSequence s, int start, int before, int count) {
-//                // TODO Auto-generated method stub
-//
-//            }
-//
-//            public void beforeTextChanged(CharSequence s, int start, int count,
-//                                          int after) {
-//                // TODO Auto-generated method stub
-//
-//            }
-//
-//            public void afterTextChanged(Editable s) {
-//                if (s.length() == 0) {
-//                    ivDeleteText.setVisibility(View.GONE);
-//                } else {
-//                    ivDeleteText.setVisibility(View.VISIBLE);
-//                }
-//            }
-//        });
-//    }
-
-
     private void initListView(View parentView) {
         Log.e("initial listview", "get into function");
-            events.setOnScrollListener(new AbsListView.OnScrollListener() {
-                @Override
-                public void onScrollStateChanged(AbsListView view, int scrollState) {
-                    if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE) {
-                        if (lastItem+1 == eventAdapter.getCount()){
-                            page++;
-                            new APIUserServer.JsonGet(APIUrl.URL_EVENTS_GET + "/page/" + page + "/4", null, null, new APIJsonCallbackResponse() {
-                                @Override
-                                public void run() {
-                                    JSONObject object = this.getResponse();
-                                    Log.e("object", object.toString());
-                                    tempList = FoundDataParser.parseEventBriefInfo(object);
-                                    Log.e("get parsed values", tempList.toString());
-                                    if (tempList == null||tempList.size()== 0) {
-                                        Toast.makeText(getActivity(), "It is the last group", Toast.LENGTH_SHORT);
-                                    } else {
-                                        eventList.addAll(tempList);
-                                        eventAdapter.setList(eventList);
-                                        eventAdapter.notifyDataSetChanged();
-                                    }
+        events.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE) {
+                    if (lastItem == eventAdapter.getCount()) {
+                        page++;
+                        new APIUserServer.JsonGet(APIUrl.URL_EVENTS_GET + "/page/" + page + "/4", null, null, new APIJsonCallbackResponse() {
+                            @Override
+                            public void run() {
+                                JSONObject object = this.getResponse();
+                                Log.e("object", object.toString());
+                                tempList = FoundDataParser.parseEventBriefInfo(object);
+                                Log.e("get parsed values", tempList.toString());
+                                if (tempList == null || tempList.size() == 0) {
+                                    Toast.makeText(getActivity(), "It is the last group", Toast.LENGTH_SHORT);
+                                } else {
+                                    eventList.addAll(tempList);
+                                    eventAdapter.setFragment(FoundEvent.this);
+                                    eventAdapter.setList(eventList);
+                                    eventAdapter.notifyDataSetChanged();
                                 }
-                            }, mRequestQueue, null).send();
-                        }
+                            }
+                        }, mRequestQueue, null).send();
                     }
-
                 }
 
-                @Override
-                public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                    lastItem = events.getLastVisiblePosition();
-                }
-            });
+            }
 
-            events.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @SuppressLint("NewApi")
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    //mFragmentManager = FoundEvent.this.getParentFragment().getFragmentManager();
-                    mFragmentManager = getFragmentManager();
-                    FragmentTransaction mFmTrans = mFragmentManager.beginTransaction();
-
-                    eventItem = new FoundEventItem();
-
-                    if (mFragmentManager.findFragmentByTag("eventItem") != null) {
-                        mFmTrans.remove(mFragmentManager.findFragmentByTag("eventItem"));
-                    }
-
-
-
-                    Bundle args = new Bundle();
-                    args.putString("name", eventList.get(position).getGroupName());
-                    args.putString("eventUri", eventList.get(position).getEventUri());
-                    args.putString("name", eventList.get(position).getName());
-                    args.putLong("id", eventList.get(position).getID());
-                    args.putLong("timeBegin", eventList.get(position).getTimeBegin());
-                    args.putLong("timeEnd", eventList.get(position).getTimeEnd());
-                    args.putString("location", eventList.get(position).getLocation());
-                    args.putString("uri", eventList.get(position).getLogoUri());
-                    args.putString("intro",eventList.get(position).getEventIntro());
-                    eventItem.setArguments(args);
-
-                   mFmTrans.add(R.id.id_content, eventItem, "eventItem");
-                    mFmTrans.addToBackStack("eventItem");
-                   mFmTrans.commit();
-                   mFmTrans.hide(FoundEvent.this);
-
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                lastItem = firstVisibleItem+visibleItemCount;
                 }
             });
 

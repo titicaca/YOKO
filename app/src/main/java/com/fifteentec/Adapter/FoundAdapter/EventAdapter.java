@@ -1,14 +1,20 @@
 package com.fifteentec.FoundAdapter;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.Database.DBManager;
@@ -16,6 +22,8 @@ import com.Database.EventRecord;
 
 import com.fifteentec.Component.FoundItems.EventBrief;
 import com.fifteentec.Component.User.UserServer;
+import com.fifteentec.Fragment.FoundFragment.FoundEvent;
+import com.fifteentec.Fragment.FoundFragment.FoundEventItem;
 import com.fifteentec.yoko.BaseActivity;
 import com.fifteentec.yoko.R;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -28,16 +36,17 @@ import java.util.List;
 /**
  * Created by cj on 2015/8/11.
  */
-public class EventAdapter extends BaseAdapter{
+public class EventAdapter extends BaseAdapter {
     private LayoutInflater listcontaner;
-    private int itemViewResource;
     protected ImageLoader imageLoader = ImageLoader.getInstance();
-    DisplayImageOptions options;
     List<EventBrief> eventList = new ArrayList<EventBrief>();
     long currentTime = 0;
     private BaseActivity activity;
     private DBManager dbManager;
-    private EventBrief eventInfo;
+    ListItemView item = null;
+    private FragmentManager mFragmentManager;
+    private FoundEvent mFoundEvent;
+    private FoundEventItem eventItem;
 
 
     static class ListItemView {
@@ -49,16 +58,20 @@ public class EventAdapter extends BaseAdapter{
         public TextView time;
         public TextView location;
         public ImageButton takepart_btn;
+        public EventBrief eventInfo;
     }
 
-    public EventAdapter(LayoutInflater listcontaner, List<EventBrief> eventData) {
+    public EventAdapter(LayoutInflater listcontaner, List<EventBrief> eventData,FoundEvent mFoundEvent) {
         this.listcontaner = listcontaner;
-        eventList = eventData;
+        this.eventList = eventData;
+        this.mFoundEvent = mFoundEvent;
+        this.activity = (BaseActivity) listcontaner.getContext();
+        this.dbManager = this.activity.getDBManager();
     }
 
     @Override
     public int getCount() {
-        if(eventList==null) return 0;
+        if (eventList == null) return 0;
         return eventList.size();
     }
 
@@ -72,107 +85,131 @@ public class EventAdapter extends BaseAdapter{
         return position;
     }
 
-    public void setList(List<EventBrief> groupData){
+    public void setList(List<EventBrief> groupData) {
         this.eventList = groupData;
         this.notifyDataSetChanged();
     }
+
+    public void setFragment(FoundEvent mFoundEvent){
+        this.mFoundEvent = mFoundEvent;
+        this.notifyDataSetChanged();
+    }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ListItemView item = null;
-        if (null == convertView) {
+       if (null == convertView) {
             item = new ListItemView();
             convertView = listcontaner.inflate(R.layout.found_event_item, null);
-            item.name = (TextView)convertView.findViewById(R.id.event_name);
-            item.intro = (TextView)convertView.findViewById(R.id.event_intro);
-            item.time = (TextView)convertView.findViewById(R.id.time);
-            item.location=(TextView)convertView.findViewById(R.id.location);
-            item.logo = (ImageView)convertView.findViewById(R.id.group_logo3);
-            item.event = (ImageView)convertView.findViewById(R.id.event_post);
-            item.takepart_btn = (ImageButton)convertView.findViewById(R.id.takepartSBtn);
+            item.name = (TextView) convertView.findViewById(R.id.event_name);
+            item.intro = (TextView) convertView.findViewById(R.id.event_intro);
+            item.time = (TextView) convertView.findViewById(R.id.time);
+            item.location = (TextView) convertView.findViewById(R.id.location);
+            item.logo = (ImageView) convertView.findViewById(R.id.group_logo3);
+            item.event = (ImageView) convertView.findViewById(R.id.event_post);
+            item.takepart_btn = (ImageButton) convertView.findViewById(R.id.takepartSBtn);
+            item.eventInfo = new EventBrief();
             convertView.setTag(item);
-        } else {
-            item = (ListItemView) convertView.getTag();
+       } else {
+           item = (ListItemView) convertView.getTag();
+       }
+
+        if(dbManager==null){
+            activity = (BaseActivity) listcontaner.getContext();
+            dbManager = this.activity.getDBManager();
         }
 
-        this.activity = (BaseActivity)listcontaner.getContext();
-        this.dbManager = this.activity.getDBManager();
+        MyListener listener = new MyListener(dbManager);
 
-        editItemContent(position);
-
+        item.eventInfo.setName(eventList.get(position).getName());
+        item.eventInfo.setEventIntro(eventList.get(position).getEventIntro());
+        item.eventInfo.setTimeBegin(eventList.get(position).getTimeBegin());
+        item.eventInfo.setTimeEnd(eventList.get(position).getTimeEnd());
+        item.eventInfo.setID(eventList.get(position).getID());
+        item.eventInfo.setPicUri(eventList.get(position).getPicUri());
+        item.eventInfo.setEventUri(eventList.get(position).getEventUri());
 
         SimpleDateFormat sf = new SimpleDateFormat("yyyy.MM.dd");
-        item.name.setText(eventInfo.getName());
-        item.location.setText(eventInfo.getEventIntro());
-        currentTime = (long)System.currentTimeMillis();
+        item.name.setText(item.eventInfo.getName());
+        item.location.setText(item.eventInfo.getEventIntro());
+        currentTime = (long) System.currentTimeMillis();
 
-        if((currentTime>eventInfo.getTimeEnd())&&(eventInfo.getTimeEnd()!=0)){
-            item.time.setText(sf.format(eventInfo.getTimeBegin())+"-"+sf.format(eventInfo.getTimeEnd()));
-            item.takepart_btn.setImageResource(R.drawable.takepart_s_n);
+        if ((currentTime > item.eventInfo.getTimeEnd()) && (item.eventInfo.getTimeEnd() != 0)) {
+            item.time.setText(sf.format(item.eventInfo.getTimeBegin()) + "-" + sf.format(item.eventInfo.getTimeEnd()));
+            item.takepart_btn.setBackgroundResource(R.drawable.takepart_s_n);
             item.takepart_btn.setClickable(false);
-        }
-        else if(eventInfo.getTimeEnd()==0) {
+        } else if (item.eventInfo.getTimeEnd() == 0) {
             item.time.setText(R.string.no_limit);
-        }
-        else{
-            if(dbManager.getTableEvent().queryEventById(eventInfo.getID())==null){
-                Log.e("id", Long.toString(eventInfo.getID()));
+            if (dbManager.getTableEvent().queryEventById(item.eventInfo.getID()) == null) {
+                Log.e("id", Long.toString(item.eventInfo.getID()));
                 item.takepart_btn.setBackgroundResource(R.drawable.takepart_s);
                 item.takepart_btn.setClickable(true);
+            } else {
+                item.takepart_btn.setBackgroundResource(R.drawable.takepart_s_j);
+                item.takepart_btn.setClickable(false);
             }
-            else{
+        } else {
+            if (dbManager.getTableEvent().queryEventById(item.eventInfo.getID()) == null) {
+                item.takepart_btn.setBackgroundResource(R.drawable.takepart_s);
+                item.takepart_btn.setClickable(true);
+            } else {
                 item.takepart_btn.setBackgroundResource(R.drawable.takepart_s_j);
                 item.takepart_btn.setClickable(false);
             }
 
         }
 
-        final com.fifteentec.FoundAdapter.EventAdapter.ListItemView finalItem = item;
-        item.takepart_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (dbManager.getTableEvent().queryEventById(eventInfo.getID()) == null) {
-                    addNewEvent();
-                    finalItem.takepart_btn.setBackgroundResource(R.drawable.takepart_s_j);
-                    finalItem.takepart_btn.setClickable(false);
-                }
-            }
-        });
+        item.takepart_btn.setTag(-2);
+        item.takepart_btn.setOnClickListener(listener);
 
+        item.name.setTag(-3);
+        item.name.setOnClickListener(listener);
+        item.event.setTag(-3);
+        item.event.setOnClickListener(listener);
+        item.time.setTag(-3);
+        item.time.setOnClickListener(listener);
+        item.intro.setTag(-3);
+        item.intro.setOnClickListener(listener);
+        item.location.setTag(-3);
+        item.location.setOnClickListener(listener);
+        item.logo.setTag(-3);
+        item.logo.setOnClickListener(listener);
 
-        if(!"".equals(eventInfo.getEventIntro()) && (eventInfo.getEventIntro().length()>30)){
-            String str=eventInfo.getEventIntro().trim().substring(0, 30);
+        if (!"".equals(item.eventInfo.getEventIntro()) && (item.eventInfo.getEventIntro().length() > 30)) {
+            String str = item.eventInfo.getEventIntro().trim().substring(0, 30);
             item.intro.setText(str);
         } else {
-            item.intro.setText(eventInfo.getEventIntro());
+            item.intro.setText(item.eventInfo.getEventIntro());
         }
 
 
-        if (null != eventInfo.getLogoUri()
-                && !"".equals(eventInfo.getLogoUri())&&!"null".equals(eventInfo.getLogoUri())) {
-            imageLoader.displayImage(eventInfo.getLogoUri(), item.logo);
+        if (null != item.eventInfo.getLogoUri()
+                && !"".equals(item.eventInfo.getLogoUri()) && !"null".equals(item.eventInfo.getLogoUri())) {
+            imageLoader.displayImage(item.eventInfo.getLogoUri(), item.logo);
         } else {
             item.logo.setImageResource(R.drawable.logo_default);
         }
 
-        if (null != eventInfo.getEventUri()
-                && !"".equals(eventInfo.getEventUri())&& !"null".equals(eventInfo.getEventUri())) {
-            imageLoader.displayImage(eventInfo.getEventUri(),item.event);
+        if (null != item.eventInfo.getEventUri()
+                && !"".equals(item.eventInfo.getEventUri()) && !"null".equals(item.eventInfo.getEventUri())) {
+            imageLoader.displayImage(item.eventInfo.getEventUri(), item.event);
         } else {
             item.event.setImageResource(R.drawable.event_eg);
         }
+
+        this.notifyDataSetChanged();
 
         return convertView;
 
     }
 
-    private void addNewEvent(){
+    private void addNewEvent(ListItemView newItem,DBManager mDbManager) {
         EventRecord eventRecord = new EventRecord();
 
-        eventRecord.introduction = eventInfo.getEventIntro();
-        eventRecord.id = eventInfo.getID();
-        eventRecord.timeend = eventInfo.getTimeEnd();
-        eventRecord.timebegin = eventInfo.getTimeBegin();
-        if(eventInfo.getTimeEnd()==0) {
+        eventRecord.introduction = newItem.eventInfo.getEventIntro();
+        eventRecord.id = newItem.eventInfo.getID();
+        eventRecord.timeend = newItem.eventInfo.getTimeEnd();
+        eventRecord.timebegin = newItem.eventInfo.getTimeBegin();
+        if (item.eventInfo.getTimeEnd() == 0) {
             eventRecord.timebegin = currentTime;
             eventRecord.timeend = currentTime;
 
@@ -180,26 +217,69 @@ public class EventAdapter extends BaseAdapter{
         eventRecord.type = 0;
         eventRecord.uid = UserServer.getInstance().getUserid();
 
-       if(dbManager.getTableEvent().addEvent(eventRecord)==-1){
-           Log.e("add","error in adding event");
-       }
-        else {
-           Log.e("add",Long.toString(eventRecord.id));
-       }
+        if (mDbManager.getTableEvent().addEvent(eventRecord) == -1) {
+            Log.e("add", "error in adding event");
+        } else {
+            Log.e("take part", Long.toString(eventRecord.id));
+        }
 
     }
 
 
-    private void editItemContent(int position){
-        if(eventInfo==null)eventInfo = new EventBrief();
-        eventInfo.setName(eventList.get(position).getName());
-        eventInfo.setEventIntro(eventList.get(position).getEventIntro());
-        eventInfo.setTimeBegin(eventList.get(position).getTimeBegin());
-        eventInfo.setTimeEnd(eventList.get(position).getTimeEnd());
-        eventInfo.setID(eventList.get(position).getID());
-        eventInfo.setPicUri(eventList.get(position).getPicUri());
-        eventInfo.setEventUri(eventList.get(position).getEventUri());
+
+    public class MyListener implements View.OnClickListener {
+        private DBManager localDB;
+
+        public MyListener(DBManager localDB){
+            this.localDB = localDB;
+        }
+
+        @Override
+        public void onClick(View v) {
+            if(((Integer)v.getTag())==-2){
+                View convertView=(View)v.getParent().getParent();
+                Log.e("covertView",convertView.toString());
+                ListItemView newItem =(ListItemView) convertView.getTag();
+                if(localDB.getTableEvent().queryEventById(newItem.eventInfo.getID()) == null) {
+                    addNewEvent(newItem,localDB);
+                    v.setBackgroundResource(R.drawable.takepart_s_j);
+                    v.setClickable(false);
+                }
+            }
+            else if(((Integer)v.getTag())==-3){
+                View convertView=(View)v.getParent();
+                Log.e("covertView",convertView.toString());
+                ListItemView newItem =(ListItemView) convertView.getTag();
+                ListItemView newItem2 =(ListItemView) convertView.getTag();
+                mFragmentManager = mFoundEvent.getFragmentManager();
+                FragmentTransaction mFmTrans = mFragmentManager.beginTransaction();
+
+                eventItem = new FoundEventItem();
+                if (mFragmentManager.findFragmentByTag("eventItem") != null) {
+                    mFmTrans.remove(mFragmentManager.findFragmentByTag("eventItem"));
+                }
+                Bundle args = new Bundle();
+                args.putString("name", newItem2.eventInfo.getGroupName());
+                args.putString("eventUri", newItem2.eventInfo.getEventUri());
+                args.putString("name", newItem2.eventInfo.getName());
+                args.putLong("id", newItem2.eventInfo.getID());
+                args.putLong("timeBegin", newItem2.eventInfo.getTimeBegin());
+                args.putLong("timeEnd", newItem2.eventInfo.getTimeEnd());
+                args.putString("location", newItem2.eventInfo.getLocation());
+                args.putString("uri", newItem2.eventInfo.getLogoUri());
+                args.putString("intro", newItem2.eventInfo.getEventIntro());
+                eventItem.setArguments(args);
+
+                Log.e("open item", Long.toString(newItem2.eventInfo.getID()));
+
+                mFmTrans.add(R.id.id_content, eventItem, "eventItem");
+                mFmTrans.addToBackStack("eventItem");
+                mFmTrans.commit();
+                mFmTrans.hide(mFoundEvent);
+
+            }
+
+
+        }
     }
-
-
 }

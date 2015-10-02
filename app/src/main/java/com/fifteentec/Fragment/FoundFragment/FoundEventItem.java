@@ -70,25 +70,28 @@ public class FoundEventItem extends Fragment {
         this.dbManager = this.activity.getDBManager();
         editItemContent();
 
-  //      final SharedPreferences sharedPreferences;
-  //      sharedPreferences = getActivity().getSharedPreferences("event_take_part_info", Context.MODE_PRIVATE);
-
-  //      Boolean joined = sharedPreferences.getBoolean("id" + id, false);
-  //      if(joined)add.setBackgroundResource(R.drawable.takepart_j);
-  //      else add.setBackgroundResource(R.drawable.takepart);
-
         location.setText(getArguments().getString("location"));
 
         SimpleDateFormat sf = new SimpleDateFormat("yyyy.MM.dd");
         currentTime = (long)System.currentTimeMillis();
         if((currentTime>item.getTimeEnd())&&(item.getTimeEnd()!=0)){
-            time.setText(sf.format(item.getTimeBegin())+"-"+sf.format(item.getTimeEnd()));
-            add.setImageResource(R.drawable.takepart_n);
+            time.setText(sf.format(item.getTimeBegin()) + "-" + sf.format(item.getTimeEnd()));
+            add.setBackgroundResource(R.drawable.takepart_n);
             add.setClickable(false);
         }
         else if(item.getTimeEnd()==0){
             time.setText(R.string.no_limit);
-
+            add.setBackgroundResource(R.drawable.takepart);
+            add.setClickable(true);
+            if(dbManager.getTableEvent().queryEventById(item.getID())==null){
+                add.setBackgroundResource(R.drawable.takepart);
+                add.setClickable(true);
+            }
+            else{
+                Log.e("DB id",Long.toString(dbManager.getTableEvent().queryEventById(item.getID()).id));
+                add.setBackgroundResource(R.drawable.takepart_j);
+                add.setClickable(false);
+            }
         }
         else{
             if(dbManager.getTableEvent().queryEventById(item.getID())==null){
@@ -96,7 +99,7 @@ public class FoundEventItem extends Fragment {
                 add.setClickable(true);
             }
             else{
-                Log.e("id",Long.toString(item.getID()));
+                Log.e("DB id",Long.toString(dbManager.getTableEvent().queryEventById(item.getID()).id));
                 add.setBackgroundResource(R.drawable.takepart_j);
                 add.setClickable(false);
             }
@@ -109,17 +112,10 @@ public class FoundEventItem extends Fragment {
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //             Boolean joined = sharedPreferences.getBoolean("id" + id, false);
-                //              if(!joined){
-                //                 add.setBackgroundResource(R.drawable.takepart_j);
-                //                   SharedPreferences.Editor editor = sharedPreferences.edit();
-                //                   editor.putBoolean("id"+id, true);
-                //                  editor.commit();
-                //             }
                 if (dbManager.getTableEvent().queryEventById(item.getID()) == null) {
                     addNewEvent();
-                    add.setBackgroundResource(R.drawable.takepart_j);
-                    add.setClickable(false);
+                    v.setBackgroundResource(R.drawable.takepart_j);
+                    v.setClickable(false);
                 }
                 ;
             }
@@ -130,6 +126,7 @@ public class FoundEventItem extends Fragment {
             public void onClick(View v) {
                 if(mFragmentManager.getBackStackEntryCount()>0){
                     mFragmentManager.popBackStack();
+
                 }
 
             }
