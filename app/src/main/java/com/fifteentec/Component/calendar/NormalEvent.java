@@ -18,8 +18,11 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.Database.EventRecord;
+import com.fifteentec.yoko.R;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
@@ -33,6 +36,7 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
     public int CellHeight;
     private int EndY;
     private int ScrollEndY;
+    private int ScrollStartY;
     private int ViewWidth;
     private int ViewHeight;
     private boolean firstEntry = true;
@@ -42,6 +46,8 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
 
     private GestureDetector gestureDetector;
     private tempRectView mtempRectView;
+
+    private int pressOffset = 0;
 
 
 
@@ -161,7 +167,6 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
         gestureDetector = new GestureDetector(getContext(),this);
         mSurface =new Surface();
         mEventManager =eventManager;
-        setBackgroundColor(Color.parseColor("#c9c9c9"));
 
 
     }
@@ -174,14 +179,18 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
         int height =MeasureSpec.getSize(heightMeasureSpec);
 
         if(firstEntry){
-            CellHeight = height/mSurface.NormalEventViewDivid;
+            ViewHeight =(int)(height*(1-mSurface.CircleOneRadiusRatio));
             ViewWidth =width;
-            EndY = CellHeight*24;
-            ViewHeight =height;
-            ScrollEndY =EndY-ViewHeight;
-
             mSurface.initSurface();
+
+            CellHeight = ViewHeight/mSurface.NormalEventViewDivid;
+
+            EndY = CellHeight*24;
+            ScrollStartY = -(int)(mSurface.CircleOneRadiusRatio*ViewHeight);
+            ScrollEndY =EndY-ViewHeight;
+            mtempRectView.initView();
             UpdateNormalPosition();
+
         }
 
 
@@ -199,19 +208,41 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
     @Override
     protected void onDraw(Canvas canvas) {
 
-        int tempheight = CellHeight;
+        int tempheight = 0;
 
-        for (int i = 0; i < 24; i++) {
+        for (int i = 0; i < 13; i++) {
             canvas.drawLine(0, tempheight, ViewWidth,tempheight,mSurface.HorizonLinePaint);
-            tempheight+=CellHeight;
+            tempheight+=2*CellHeight;
         }
 
         canvas.drawLine(mSurface.LinePadding, 0, mSurface.LinePadding, EndY, mSurface.LinePaint);
+        drawCircle(canvas, this.getScrollY()+ViewHeight*mSurface.CircleOneRadiusRatio,findTimeByY(getScrollY()+(int)(ViewHeight*mSurface.CircleOneRadiusRatio),true),false,true );
+        drawCircle(canvas, this.getScrollY() + ViewHeight, findTimeByY(getScrollY() + ViewHeight, true), false, true);
         for(int i = 0;i<mEventManager.getNormalDayEventCount();i++){
             EventItem eventItem = NormalEvnetPosition.get(i);
-            canvas.drawRect(eventItem.left, eventItem.top, eventItem.right, eventItem.botton, mSurface.NormalEventPaint);
-            drawCircle(canvas,eventItem.top);
-            canvas.drawText(mEventManager.getNormalIntroduction(i), (eventItem.left+ eventItem.right) / 2, (eventItem.top + eventItem.botton) / 2, mSurface.NormalText);
+            int getEventColor = 3;
+            if( mEventManager.getEventRecordByRid(eventItem.rid).type ==0 ) getEventColor = mSurface.WorkEventPaint;
+            else if( mEventManager.getEventRecordByRid(eventItem.rid).type ==1 ) getEventColor = mSurface.StudyEventPaint;
+            else if( mEventManager.getEventRecordByRid(eventItem.rid).type ==2 ) getEventColor = mSurface.EntertainmentEventPaint;
+            else if( mEventManager.getEventRecordByRid(eventItem.rid).type ==3 ) getEventColor = mSurface.OtherEventPaint;
+            canvas.drawRect(eventItem.left, eventItem.top, eventItem.right - mSurface.EventTextPadding, eventItem.botton-mSurface.EventTextPadding, mSurface.pencase(getEventColor));
+            long timebeigin = mEventManager.getEventRecordByRid(eventItem.rid).timebegin;
+            drawCircle(canvas, eventItem.top,findTimeByY(timebeigin),true,true);
+            long timeend = mEventManager.getEventRecordByRid(eventItem.rid).timeend;
+            drawCircle(canvas, eventItem.botton, findTimeByY(timeend), true, false);
+
+
+            int width = (eventItem.right-eventItem.left)-3*mSurface.EventTextPadding;
+            int height = (eventItem.botton-eventItem.top)-2*mSurface.EventTextPadding;
+            ArrayList<String> text = EventText(mEventManager.getNormalIntroduction(i),width,height);
+            Rect rect = new Rect();
+            mSurface.NormalText.getTextBounds("啊", 0, 1, rect);
+            int allheight = text.size()*rect.height()*3/2;
+            int startheight = (eventItem.top + eventItem.botton)/ 2 + allheight/2;
+            for (int j = 0; j < text.size(); j++) {
+                canvas.drawText(text.get(j), eventItem.left+mSurface.EventTextPadding, startheight, mSurface.NormalText);
+                startheight -=rect.height()*3/2;
+            }
 
         }
 
@@ -222,11 +253,116 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
         if(mtempRectView !=null) mtempRectView.layout(0,0,mtempRectView.getMeasuredWidth(),mtempRectView.getMeasuredHeight());
     }
 
-    private void drawCircle(Canvas canvas,float y){
-        canvas.drawCircle(mSurface.LinePadding,y,mSurface.CircleOneRadiusRatio*ViewWidth,mSurface.pencase(mSurface.CircleOnePaint));
-        canvas.drawCircle(mSurface.LinePadding,y,mSurface.CircleOneRadiusRatio*ViewWidth,mSurface.pencase(mSurface.CircleTwoPaint));
-        canvas.drawCircle(mSurface.LinePadding,y,mSurface.CircleTwoRadiusRatio*ViewWidth,mSurface.pencase(mSurface.CircleThreePaint));
-        canvas.drawLine(mSurface.LinePadding+mSurface.CirclePadding,y,mSurface.LineRighePadding,y,mSurface.LinePaint);
+    private ArrayList<String> EventText(String s,int width,int height){
+
+        /*
+        int lenth = s.length();
+        mSurface.NormalText.getTextBounds("啊",0,1,rect);
+        int hsize = height/(rect.height()*3/2);
+        int wsize =width/rect.width();
+        int TextHeightSize;
+        if(wsize<=0) TextHeightSize = 0;
+        else {
+            if (lenth / wsize > hsize) TextHeightSize = hsize;
+            else {
+                TextHeightSize = lenth / wsize;
+                if (lenth % wsize != 0&&TextHeightSize != hsize)
+                    TextHeightSize++;
+            }
+        }
+*/
+        Rect rect = new Rect();
+
+        boolean isFull;
+        ArrayList<String> result = new ArrayList<>();
+        int start = 0;
+        int end = 0;
+        int Allheight = 0;
+        do{
+            isFull = false;
+            do {
+                if(end == s.length()) break;
+                end ++;
+                mSurface.NormalText.getTextBounds(s.substring(start, end),0,s.substring(start, end).length(),rect);
+            }while(rect.width()<width);
+            if(s.length() !=end || rect.width()>width) end --;
+            result.add(0,s.substring(start, end));
+            Allheight +=(rect.height()*3/2);
+            if(s.length() == end) break;
+            isFull =true;
+            start = end;
+        }while(Allheight<height);
+
+        if(isFull) result.remove(result.size()-1);
+
+        return result;
+
+    }
+    private String findTimeByY(int Y,boolean near){
+        double finalY = Y;
+        String result = new String();
+
+        if(near) {
+            double dividePart = (double)CellHeight /mSurface.CellUnit;
+            double divide = Y % dividePart;
+            if (divide < dividePart / 2d) finalY -= divide;
+            else finalY += (dividePart - divide);
+
+        }
+
+        double offset = (finalY / (double) EndY) * mEventManager.MillsInOneDay;
+        long Time = mEventManager.DayView_Date + Math.round(offset);
+        GregorianCalendar gregorianCalendar = new GregorianCalendar();
+        gregorianCalendar.setTimeInMillis(Time);
+        int Hour = gregorianCalendar.get(Calendar.HOUR);
+        if(gregorianCalendar.get(Calendar.AM_PM)==Calendar.PM) Hour +=12;
+        if(Hour<10){
+            result += "0"+Hour+":";
+        }else{
+            result += ""+Hour+":";
+        }
+        if (gregorianCalendar.get(Calendar.MINUTE)<10) {
+            result += "0"+gregorianCalendar.get(Calendar.MINUTE);
+        }else {
+            result += ""+gregorianCalendar.get(Calendar.MINUTE);
+        }
+        return result;
+    }
+
+    private String findTimeByY(long begin){
+
+        GregorianCalendar tempCalendar = new GregorianCalendar();
+        tempCalendar.setTimeInMillis(begin);
+        String timeText = new String();
+        int Hour = tempCalendar.get(Calendar.HOUR);
+        if(tempCalendar.get(Calendar.AM_PM)==Calendar.PM) Hour +=12;
+        if(Hour<10){
+            timeText += "0"+Hour+":";
+        }else{
+            timeText += ""+Hour+":";
+        }
+        if (tempCalendar.get(Calendar.MINUTE)<10) {
+            timeText += "0"+tempCalendar.get(Calendar.MINUTE);
+        }else {
+            timeText += ""+tempCalendar.get(Calendar.MINUTE);
+        }
+
+        return timeText;
+    }
+
+    private void drawCircle(Canvas canvas,float y,String text,boolean line,boolean circle){
+        if(circle) {
+            canvas.drawCircle(mSurface.LinePadding, y, mSurface.CircleOneRadiusRatio * ViewWidth, mSurface.pencase(mSurface.CircleOnePaint));
+            canvas.drawCircle(mSurface.LinePadding, y, mSurface.CircleOneRadiusRatio * ViewWidth, mSurface.pencase(mSurface.CircleTwoPaint));
+            canvas.drawCircle(mSurface.LinePadding, y, mSurface.CircleTwoRadiusRatio * ViewWidth, mSurface.pencase(mSurface.CircleThreePaint));
+        }
+        Rect rect = new Rect();
+        mSurface.pencase(mSurface.CircleRightText).getTextBounds(text, 0, text.length(), rect);
+        canvas.drawText(text,mSurface.LinePadding+mSurface.CirclePadding,y+rect.height()/2,mSurface.pencase(mSurface.CircleRightText));
+        if(line) {
+
+            canvas.drawLine(mSurface.LinePadding+mSurface.CirclePadding*4/3+rect.width(),y,mSurface.LineRighePadding+mSurface.LinePadding-mSurface.CirclePadding,y,mSurface.LinePaint);
+        }
 
     }
 
@@ -307,6 +443,8 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
                 break;
             }
         }
+
+        mEventManager.deleteByRid(rid);
         if(aim != null) {
             List<Integer> ChangeList = new ArrayList<>();
             boolean isChanged;
@@ -426,7 +564,7 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
     }
 
     private void tempRectUpdate(int start,int end){
-        tempRect.left = mSurface.LinePadding;
+        tempRect.left =  mSurface.LineRighePadding+mSurface.LinePadding;
         tempRect.top = start;
         tempRect.right = ViewWidth;
         tempRect.botton = end;
@@ -470,7 +608,8 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
         int positionY =(int)e.getY()+getScrollY();
 
         if(OPERATIONMODE == TEMPRECT){
-            if((positionY > tempRect.top) && (positionY < tempRect.botton)) return true;
+            gestureDetector.setIsLongpressEnabled(true);
+            return true;
         }else if(OPERATIONMODE == EXIST){
             if(Math.abs(positionY - existRect.top)<StrechMinDistance){
                 OPERATIONMODE = EXIST_TOP;
@@ -478,7 +617,7 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
             }else if(Math.abs(positionY - existRect.botton)<StrechMinDistance){
                 OPERATIONMODE = EXIST_DOWN;
                 return true;
-            }else if((positionY > existRect.top&&(positionY<existRect.botton)))return true;
+            }else if(positionY > existRect.top&&positionY<existRect.botton) return true;
             UpdateTimeByMove();
 
 
@@ -502,13 +641,14 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
         if(OPERATIONMODE ==SCREEN) {
             long i = isExist(positionY, positionX);
             if (i == -1) {
-                tempRectUpdate(positionY);
-                OPERATIONMODE=TEMPRECT;
+                //tempRectUpdate(positionY);
+                //OPERATIONMODE=TEMPRECT;
             } else {
                 normalEventListener.checkExist(i);
             }
             return true;
         }else if(OPERATIONMODE==TEMPRECT){
+            /*
             int positionTop = tempRect.top;
             int positionBotton = tempRect.botton;
             long offsetTop = Math.round((positionTop / (double) (EndY)) * mEventManager.MillsInOneDay);
@@ -518,6 +658,7 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
             eventRecord.timeend = mEventManager.DayView_Date+offsetBotton;
 
             normalEventListener.createRecord(NewEventView.HAVE_TIME,eventRecord);
+            */
             return true;
         }else if(OPERATIONMODE == EXIST|| OPERATIONMODE == EXIST_DOWN || OPERATIONMODE == EXIST_TOP){
             UpdateTimeByMove();
@@ -528,11 +669,10 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
     }
 
     private void UpdateTimeByMove() {
-        int i =deleteEvent(existRect.rid);
-        addNewEvent(existRect,i);
-        long timebegin =(mEventManager.DayView_Date+Math.round((existRect.top / (double) (EndY))*mEventManager.MillsInOneDay));
-        long timeend = (mEventManager.DayView_Date+Math.round((existRect.botton/(double)(EndY))*mEventManager.MillsInOneDay));
-        mEventManager.UpdateEvent(timebegin,timeend,existRect.rid);
+        addNewEvent(existRect);
+        mEventManager.UpdateEvent(existRect.starttime, existRect.endtime,existRect.rid);
+        mEventManager.addEvent(existRect.rid);
+        UpdateView();
         ClearExistRect();
     }
 
@@ -560,10 +700,10 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
                         else scrollBy(0, (int) distanceY);
                     } else scrollTo(0, ScrollEndY);
                 } else {
-                    if (getScrollY() > 0) {
-                        if (getScrollY() < Math.abs(distanceY)) scrollTo(0, 0);
+                    if (getScrollY() > ScrollStartY) {
+                        if (getScrollY()-ScrollStartY < Math.abs(distanceY)) scrollTo(0, ScrollStartY);
                         else scrollBy(0, (int) distanceY);
-                    } else scrollTo(0, 0);
+                    } else scrollTo(0, ScrollStartY);
                 }
                 return true;
             case CONSUME_EXIST:
@@ -571,12 +711,12 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
                 gestureDetector.setIsLongpressEnabled(true);
             case EXIST:
                 int TimeHeight = existRect.botton-existRect.top;
-                if(scrollY-TimeHeight/2<0) ExistRectUpdate(0,TimeHeight);
-                else if(scrollY+TimeHeight/2 >EndY) ExistRectUpdate(EndY-TimeHeight,EndY);
+                if(scrollY+pressOffset-TimeHeight/2<0) ExistRectUpdate(0,TimeHeight);
+                else if(scrollY+pressOffset+TimeHeight/2 >EndY) ExistRectUpdate(EndY-TimeHeight,EndY);
                 else {
-                    ExistRectUpdate(scrollY - TimeHeight / 2, scrollY + TimeHeight / 2);
+                    ExistRectUpdate(scrollY+pressOffset - TimeHeight / 2, scrollY +pressOffset+ TimeHeight / 2);
                     if (distanceY * AutoScrollEnd < 0) AutoScrollEnd = 0;
-                    if ((endy < 100 && getScrollY() > 0) || (endy > ViewHeight - 100 && getScrollY() <ScrollEndY)) {
+                    if ((endy < 100 && getScrollY() > ScrollStartY) || (endy > ViewHeight - 100 && getScrollY() <ScrollEndY)) {
                         if (AutoScrollEnd == 0) {
                             if (endy < 100) AutoScrollEnd = -1;
                             if (endy > ViewHeight - 100) AutoScrollEnd = 1;
@@ -591,7 +731,7 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
                 if((existRect.botton-existRect.top>StrechMinHeight||distanceY>0)&& endy+getScrollY()<existRect.botton-StrechMinHeight) {
                     ExistRectUpdate(existRect.top - (int) distanceY, existRect.botton);
                     if (distanceY * AutoScrollEnd < 0) AutoScrollEnd = 0;
-                    if ((endy < 100 && getScrollY() > 0) || (endy > ViewHeight - 100 && getScrollY() < ScrollEndY)) {
+                    if ((endy < 100 && getScrollY() > ScrollStartY) || (endy > ViewHeight - 100 && getScrollY() < ScrollEndY)) {
                         if (AutoScrollEnd == 0) {
                             if (endy < 100) AutoScrollEnd = -2;
                             if (endy > ViewHeight - 100) AutoScrollEnd = 2;
@@ -605,7 +745,7 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
                 if((existRect.botton-existRect.top>StrechMinHeight||distanceY<0)&&endy+getScrollY()>existRect.top+StrechMinHeight) {
                     ExistRectUpdate(existRect.top, existRect.botton - (int) distanceY);
                     if (distanceY * AutoScrollEnd < 0) AutoScrollEnd = 0;
-                    if ((endy < 100 && getScrollY() > 0) || (endy > ViewHeight - 100 && getScrollY() < ScrollEndY)) {
+                    if ((endy < 100 && getScrollY() > ScrollStartY) || (endy > ViewHeight - 100 && getScrollY() < ScrollEndY)) {
                         if (AutoScrollEnd == 0) {
                             if (endy < 100) AutoScrollEnd = -3;
                             if (endy > ViewHeight - 100) AutoScrollEnd = 3;
@@ -616,8 +756,13 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
                 }
                 return true;
             case TEMPRECT:
-                OPERATIONMODE = SCREEN;
-                CleartempRect();
+                int TimeHeightTemp = tempRect.botton-tempRect.top;
+                if(scrollY-TimeHeightTemp/2<0) tempRectUpdate(0, TimeHeightTemp);
+                else if(scrollY+TimeHeightTemp/2 >EndY) tempRectUpdate(EndY - TimeHeightTemp, EndY);
+                else {
+                    tempRectUpdate(scrollY - TimeHeightTemp / 2, scrollY + TimeHeightTemp / 2);
+                }
+
                 return true;
             default:
                 return false;
@@ -647,18 +792,18 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
                         break;
                     }
                 } else {
-                    if (getScrollY() > 0) {
+                    if (getScrollY() > ScrollStartY) {
                         if (getScrollY() > AutoScrollMove) {
                             scrollBy(0, -AutoScrollMove);
                             if(AutoScrollEnd == -2) handler.sendEmptyMessage(AUTO_SCROLL_TOPUP);
                             else if(AutoScrollEnd == -3) handler.sendEmptyMessage(AUTO_SCROLL_BOTTONUP);
                             else handler.sendEmptyMessage(AUTO_SCROLL_UP);
                         } else {
-                            scrollTo(0, 0);
+                            scrollTo(0, ScrollStartY);
                             break;
                         }
                     } else {
-                        scrollTo(0, 0);
+                        scrollTo(0, ScrollStartY);
                         break;
                     }
                 }
@@ -687,7 +832,28 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
                 }
                 if(temp == null) return;
                 ExistRectUpdate(temp.top, temp.botton, temp.rid);
+                deleteEvent(existRect.rid);
                 OPERATIONMODE = CONSUME_EXIST;
+                pressOffset = (existRect.botton+existRect.top)/2 - positionY;
+                gestureDetector.setIsLongpressEnabled(false);
+                MotionEvent ev = MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), MotionEvent.ACTION_DOWN, e.getX(), e.getY(), 0);
+                dispatchTouchEvent(ev);
+            }else{
+                int startPosition = 0;
+                int endPosition = 0;
+                if(positionY-CellHeight/2<0){
+                    startPosition = 0;
+                    endPosition = CellHeight;
+                }else if(positionY +CellHeight/2>EndY){
+                    startPosition = EndY-CellHeight;
+                    endPosition = EndY;
+                }else{
+                    startPosition = positionY -CellHeight/2;
+                    endPosition = positionY +CellHeight/2;
+                }
+                tempRectUpdate(startPosition, endPosition);
+                OPERATIONMODE=TEMPRECT;
+
                 gestureDetector.setIsLongpressEnabled(false);
                 MotionEvent ev = MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), MotionEvent.ACTION_DOWN, e.getX(), e.getY(), 0);
                 dispatchTouchEvent(ev);
@@ -719,9 +885,77 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
         if(event.getAction() == MotionEvent.ACTION_UP){
             if(OPERATIONMODE == CONSUME_EXIST) {
                 gestureDetector.setIsLongpressEnabled(true);
+                double unit = (double)CellHeight/mSurface.CellUnit;
+                double newTop;
+                if(existRect.top%unit<unit/2){
+                    newTop = existRect.top-existRect.top%unit;
+                }else{
+                    newTop = existRect.top-existRect.top%unit+unit;
+                }
+
+                double newEnd;
+                if(existRect.botton%unit<unit/2){
+                    newEnd = existRect.botton-existRect.botton%unit;
+                }else{
+                    newEnd = existRect.botton-existRect.botton%unit+unit;
+                }
+                existRect.starttime = mEventManager.DayView_Date+Math.round((newTop/(double)EndY)*mEventManager.MillsInOneDay);
+                existRect.endtime =mEventManager.DayView_Date+Math.round((newEnd/(double)EndY)*mEventManager.MillsInOneDay);
+
+                ExistRectUpdate((int) Math.round(newTop), (int) Math.round(newEnd));
+                pressOffset = 0;
+
                 OPERATIONMODE = EXIST;
                 return true;
-            }else if(OPERATIONMODE == EXIST_TOP|| OPERATIONMODE == EXIST_DOWN) OPERATIONMODE = EXIST;
+            }
+            else if(OPERATIONMODE == TEMPRECT){
+
+                double unit = (double)CellHeight/mSurface.CellUnit;
+                double newTop;
+                if(tempRect.top%unit<unit/2){
+                    newTop = tempRect.top-tempRect.top%unit;
+                }else{
+                    newTop = tempRect.top-tempRect.top%unit+unit;
+                }
+
+                double newEnd;
+                if(tempRect.botton%unit<unit/2){
+                    newEnd = tempRect.botton-tempRect.botton%unit;
+                }else{
+                    newEnd = tempRect.botton-tempRect.botton%unit+unit;
+                }
+
+                tempRect.starttime = mEventManager.DayView_Date + Math.round((newTop/(double)EndY)*mEventManager.MillsInOneDay);
+                tempRect.endtime =mEventManager.DayView_Date + Math.round((newEnd/(double)EndY)*mEventManager.MillsInOneDay);
+
+                EventRecord eventRecord = new EventRecord();
+                eventRecord.timebegin = tempRect.starttime;
+                eventRecord.timeend = tempRect.endtime;
+                normalEventListener.createRecord(NewEventView.HAVE_TIME,eventRecord);
+                CleartempRect();
+                OPERATIONMODE= SCREEN;
+            }else if(OPERATIONMODE == EXIST||OPERATIONMODE == EXIST_TOP|| OPERATIONMODE == EXIST_DOWN){
+                double unit = (double)CellHeight/mSurface.CellUnit;
+                double newTop;
+                if(existRect.top%unit<unit/2){
+                    newTop = existRect.top-existRect.top%unit;
+                }else{
+                    newTop = existRect.top-existRect.top%unit+unit;
+                }
+
+                double newEnd;
+                if(existRect.botton%unit<unit/2){
+                    newEnd = existRect.botton-existRect.botton%unit;
+                }else{
+                    newEnd = existRect.botton-existRect.botton%unit+unit;
+                }
+                existRect.starttime = mEventManager.DayView_Date+Math.round((newTop/(double)EndY)*mEventManager.MillsInOneDay);
+                existRect.endtime =mEventManager.DayView_Date+Math.round((newEnd/(double)EndY)*mEventManager.MillsInOneDay);
+
+                ExistRectUpdate((int) Math.round(newTop), (int) Math.round(newEnd));
+                pressOffset = 0;
+                OPERATIONMODE = EXIST;
+            }
             AutoScrollEnd = 0;
         }
         return gestureDetector.onTouchEvent(event);
@@ -743,13 +977,46 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
             super(context, attrs, defStyleAttr);
         }
 
+        void initView(){        this.setAlpha(mSurface.templeAlpha);
+        }
+
         @Override
         protected void onDraw(Canvas canvas) {
             if(tempRect.exist){
                 canvas.drawRect(tempRect.left,tempRect.top,tempRect.right,tempRect.botton,mSurface.tempRectPaint);
+
+                Rect rect = new Rect();
+                mSurface.NormalText.getTextBounds("新建", 0, 1, rect);
+                canvas.drawText("新建", (tempRect.left+tempRect.right)/2 + mSurface.EventTextPadding, (tempRect.top+tempRect.botton)/2, mSurface.NormalText);
+
+                drawCircle(canvas, tempRect.top,findTimeByY(tempRect.top,true),true,true);
+                drawCircle(canvas, tempRect.botton, findTimeByY(tempRect.botton,true), true, false);
             }
             if(existRect.exist){
-                canvas.drawRect(existRect.left,existRect.top,existRect.right,existRect.botton,mSurface.ExistRectPaint);
+
+                int getEventColor = 3;
+                if( mEventManager.getEventRecordByRid(existRect.rid).type ==0 ) getEventColor = mSurface.WorkEventPaint;
+                else if( mEventManager.getEventRecordByRid(existRect.rid).type ==1 ) getEventColor = mSurface.StudyEventPaint;
+                else if( mEventManager.getEventRecordByRid(existRect.rid).type ==2 ) getEventColor = mSurface.EntertainmentEventPaint;
+                else if( mEventManager.getEventRecordByRid(existRect.rid).type ==3 ) getEventColor = mSurface.OtherEventPaint;
+                canvas.drawRect(existRect.left,existRect.top,existRect.right,existRect.botton,mSurface.pencase(getEventColor));
+
+                int width = (existRect.right-existRect.left)-3*mSurface.EventTextPadding;
+                int height = (existRect.botton-existRect.top)-2*mSurface.EventTextPadding;
+                ArrayList<String> text = EventText(mEventManager.getEventRecordByRid(existRect.rid).introduction,width,height);
+                Rect rect = new Rect();
+                mSurface.NormalText.getTextBounds("啊", 0, 1, rect);
+                int allheight = text.size()*rect.height()*3/2;
+                int startheight = (existRect.top + existRect.botton)/ 2 + allheight/2;
+                for (int j = 0; j < text.size(); j++) {
+                    canvas.drawText(text.get(j), existRect.left+mSurface.EventTextPadding, startheight, mSurface.NormalText);
+                    startheight -=rect.height()*3/2;
+                }
+
+                drawCircle(canvas, existRect.top,findTimeByY(existRect.top,true),true,true);
+                drawCircle(canvas, existRect.botton, findTimeByY(existRect.botton,true), true, false);
+
+
             }
         }
     }
@@ -763,37 +1030,49 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
         float LinePaddingRatio = 1/20f;
         int LinePadding;
 
+        float templeAlpha = 6/8f;
+
         int LineRighePadding;
         float LineRighePaddingRatio = 1/4f;
 
         Paint NormalText;
         int NormalEventViewDivid = 12;
-        int NormalEvnetLineLength = 100;
         int NormalEvnetTextColor = Color.BLACK;
-        int NormalEvnetTextSize = 50;
+        int NormalEvnetTextSize ;
+        float NormalEventTextSizeRatio = 1/15f;
+        float EventTextPaddingRatio = 1/100f;
+        int EventTextPadding ;
 
         Paint tempRectPaint;
-        int tempRectColor = Color.BLUE;
-        int tempRectWidth = 10;
+        int tempRectColor = Color.YELLOW;
 
         Paint ExistRectPaint;
         int ExistRectColor = Color.GREEN;
 
-        Paint NormalEventPaint;
-        int NormalEventColor = Color.GRAY;
-
         Paint HorizonLinePaint = new Paint();
-        int HorizonLinePaintColor = Color.parseColor("#d4d4d4");
+        int HorizonLinePaintColor = Color.parseColor("#F3F3F3");
 
         float CirclePadding;
 
         float CircleOneRadiusRatio = 1/50f;
-        float CircleTwoRadiusRatio = 1/80f;
+        float CircleTwoRadiusRatio = 1/100f;
         float CircleWidth  = 1/200f;
+
+        float CircleRightTextSize = 1/20f;
 
         final int CircleOnePaint = 0x00;
         final int CircleTwoPaint = 0x01;
         final int CircleThreePaint = 0x02;
+        final int CircleRightText = 0x03;
+
+        final int WorkEventPaint = 0x04;
+        final int StudyEventPaint = 0x05;
+        final int EntertainmentEventPaint = 0x06;
+        final int OtherEventPaint = 0x07;
+
+        final int DashLinePaint = 0x08;
+
+        double CellUnit = 12d;
 
         void initSurface(){
             LinePaint = new Paint();
@@ -801,13 +1080,12 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
             LineWidth = (int)(ViewWidth*LineWidthRatio);
             LinePaint.setStrokeWidth(LineWidth);
             NormalText = new Paint();
+            NormalText.setAntiAlias(true);
             NormalText.setColor(NormalEvnetTextColor);
             NormalText.setTextSize(NormalEvnetTextSize);
             tempRectPaint = new Paint();
             tempRectPaint.setColor(tempRectColor);
             tempRectPaint.setStyle(Paint.Style.FILL);
-            NormalEventPaint = new Paint();
-            NormalEventPaint.setColor(NormalEventColor);
             ExistRectPaint = new Paint();
             ExistRectPaint.setColor(ExistRectColor);
             LinePadding= (int)(ViewWidth*LinePaddingRatio);
@@ -816,6 +1094,8 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
             HorizonLinePaint.setAntiAlias(true);
             HorizonLinePaint.setStrokeWidth(LineWidth);
             CirclePadding = CircleOneRadiusRatio*ViewWidth*3/2;
+            EventTextPadding = (int)(ViewWidth*EventTextPaddingRatio);
+            NormalText.setTextSize(ViewWidth*NormalEventTextSizeRatio);
 
         }
 
@@ -833,6 +1113,24 @@ public class NormalEvent extends ViewGroup implements GestureDetector.OnGestureL
                     break;
                 case CircleThreePaint:
                     paint.setColor(Color.BLACK);
+                    break;
+                case CircleRightText:
+                    paint.setTextSize(ViewWidth * CircleRightTextSize);
+                    paint.setColor(Color.BLACK);
+                    break;
+                case WorkEventPaint:
+                    paint.setColor(getResources().getColor(R.color.WorkEventColor));
+                    break;
+                case StudyEventPaint:
+                    paint.setColor(getResources().getColor(R.color.StudyEventColor));
+                    break;
+                case EntertainmentEventPaint:
+                    paint.setColor(getResources().getColor(R.color.EntertainEventColor));
+                    break;
+                case OtherEventPaint:
+                    paint.setColor(getResources().getColor(R.color.OtherEventColor));
+                    break;
+                case DashLinePaint:
                     break;
 
             }

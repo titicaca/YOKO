@@ -42,6 +42,33 @@ public class EventManager {
         return mtableEvent.queryEventByRid(rid);
     }
 
+
+    public void UpdateEventManager(){
+        switch (mType){
+            case DAY_VIEW_EVENT_MANAGER:
+                long End = DayView_Date +MillsInOneDay;
+                List<EventRecord> eventRecords=mtableEvent.queryEvent(UserServer.getInstance().getUserid(),DayView_Date,End);
+                AlldayEvent.clear();
+                NormalEvent.clear();
+                for(EventRecord eventRecord:eventRecords){
+                    if(eventRecord.timebegin == eventRecord.timeend&&eventRecord.timebegin==DayView_Date) AlldayEvent.add(eventRecord.rid);
+                    else {
+                        NormalEvent.add(eventRecord.rid);
+                    }
+                }
+                break;
+            case WEEK_VIEW_EVENT_MANAGER:
+                WeekManager.clear();
+                ArrayList<Long> DayStart = CalUtil.GetWeekBeginTimeInMills(DayView_Date);
+                for (int i = 0; i < CalUtil.LENTH_OF_WEEK; i++) {
+                    EventManager temp = EventManager.newInstance(mtableEvent,DAY_VIEW_EVENT_MANAGER,DayStart.get(i));
+                    WeekManager.add(temp);
+                }
+
+                break;
+        }
+    }
+
     public static EventManager newInstance(TableEvent tableEvent,int Type,long TimeInMill){
         EventManager eventManager;
         switch (Type){
@@ -52,7 +79,7 @@ public class EventManager {
                 long End = eventManager.DayView_Date +MillsInOneDay;
                 List<EventRecord> eventRecords= eventManager.mtableEvent.queryEvent(UserServer.getInstance().getUserid(),eventManager.DayView_Date,End);
                 for(EventRecord eventRecord:eventRecords){
-                    if(eventRecord.timebegin == eventRecord.timeend) eventManager.AlldayEvent.add(eventRecord.rid);
+                    if(eventRecord.timebegin == eventRecord.timeend&&eventRecord.timebegin==eventManager.DayView_Date) eventManager.AlldayEvent.add(eventRecord.rid);
                     else {
                         eventManager.NormalEvent.add(eventRecord.rid);
                     }
@@ -126,6 +153,15 @@ public class EventManager {
         return eventRecord.introduction;
     }
 
+    public EventRecord getAllDayEventRecord(int index){
+        return mtableEvent.queryEventByRid(AlldayEvent.get(index));
+    }
+
+    public int getAllDayTag(int index){
+        EventRecord eventRecord=mtableEvent.queryEventByRid(AlldayEvent.get(index));
+        return eventRecord.type;
+    }
+
     public EventRecord getNormalEventByIndex(int index){
         return mtableEvent.queryEventByRid(NormalEvent.get(index));
     }
@@ -165,6 +201,10 @@ public class EventManager {
             long a = mtableEvent.queryEventByRid(AlldayEvent.get(i)).rid;
             if(a == rid) return true;
         }
+        /*
+        EventRecord eventRecord = mtableEvent.queryEventByRid(rid);
+        if(eventRecord.timebegin==eventRecord.timeend&&eventRecord.timebegin==DayView_Date) return true;
+        */
         return false;
     }
     public long getAllDayEventRid(int index){
@@ -174,8 +214,7 @@ public class EventManager {
     public boolean addEvent(long rid){
         EventRecord eventRecord = mtableEvent.queryEventByRid(rid);
         if(mType == DAY_VIEW_EVENT_MANAGER) {
-
-            if (eventRecord.timebegin == eventRecord.timeend) {
+            if (eventRecord.timebegin == eventRecord.timeend && eventRecord.timebegin== DayView_Date) {
                 AlldayEvent.add(rid);
                 return true;
             } else {
@@ -203,6 +242,10 @@ public class EventManager {
         return mtableEvent.queryEventByRid(NormalEvent.get(index)).introduction;
     }
 
+    public EventRecord getNormalEventRecord(int index){
+        return mtableEvent.queryEventByRid(NormalEvent.get(index));
+    }
+
     public String getNormalIntroduction(long rid){
         return mtableEvent.queryEventByRid(rid).introduction;
     }
@@ -216,10 +259,10 @@ public class EventManager {
     }
 
 
-    public double getPositionRatioByTime(long TimeBegin){
+    public float getPositionRatioByTime(long TimeBegin){
         long offset = TimeBegin - DayView_Date;
 
-        return offset/(double)MillsInOneDay;
+        return offset/(float)MillsInOneDay;
 
     }
 
@@ -259,6 +302,7 @@ public class EventManager {
         drawTags.add(drawTag);
         return drawTag;
     }
+
 
     public class DrawTag{
         boolean task = false;
