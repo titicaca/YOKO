@@ -366,9 +366,11 @@ public class CalViewFragment extends Fragment {
         }
     }
 
-
-
-
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if(!hidden) EventRecordUpdate();
+    }
 
     private void showDayEventView(GregorianCalendar date) {
         if (mdayEventView == null) {
