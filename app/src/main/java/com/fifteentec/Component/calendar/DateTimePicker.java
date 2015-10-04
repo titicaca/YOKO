@@ -77,6 +77,7 @@ public class DateTimePicker {
         }
     }
 
+
     private void resizePikcer(FrameLayout tp){
         List<NumberPicker> npList = findNumberPicker(tp);
         for(NumberPicker np:npList) {

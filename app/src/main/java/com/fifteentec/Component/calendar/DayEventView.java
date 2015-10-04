@@ -519,8 +519,8 @@ public class DayEventView extends ViewGroup {
         @Override
         public void onLongPress(MotionEvent e) {
             if (mEventManager.removeEvent(DownChildId)) {
-                dayEventViewListener.deleteRecord(DownChildId);
-                UpdateView();
+                //dayEventViewListener.deleteRecord(DownChildId);
+                //UpdateView();
             } else {
                 EventRecord eventRecord = new EventRecord();
                 eventRecord.timebegin = mEventManager.DayView_Date;

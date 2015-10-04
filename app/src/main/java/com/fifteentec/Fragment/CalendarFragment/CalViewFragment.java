@@ -142,6 +142,7 @@ public class CalViewFragment extends Fragment {
                     }
                     month =true;
                 }
+                mListView.UpdateView();
             }
         });
 

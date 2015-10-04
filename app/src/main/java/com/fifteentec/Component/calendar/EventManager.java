@@ -153,6 +153,10 @@ public class EventManager {
         return eventRecord.introduction;
     }
 
+    public EventRecord getAllDayEventRecord(int index){
+        return mtableEvent.queryEventByRid(AlldayEvent.get(index));
+    }
+
     public int getAllDayTag(int index){
         EventRecord eventRecord=mtableEvent.queryEventByRid(AlldayEvent.get(index));
         return eventRecord.type;
@@ -238,6 +242,10 @@ public class EventManager {
         return mtableEvent.queryEventByRid(NormalEvent.get(index)).introduction;
     }
 
+    public EventRecord getNormalEventRecord(int index){
+        return mtableEvent.queryEventByRid(NormalEvent.get(index));
+    }
+
     public String getNormalIntroduction(long rid){
         return mtableEvent.queryEventByRid(rid).introduction;
     }
@@ -251,10 +259,10 @@ public class EventManager {
     }
 
 
-    public double getPositionRatioByTime(long TimeBegin){
+    public float getPositionRatioByTime(long TimeBegin){
         long offset = TimeBegin - DayView_Date;
 
-        return offset/(double)MillsInOneDay;
+        return offset/(float)MillsInOneDay;
 
     }
 

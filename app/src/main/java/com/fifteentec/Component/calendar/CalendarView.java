@@ -6,7 +6,9 @@ import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -22,6 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AnimationSet;
+import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -110,16 +113,13 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
 
         OPERATION = WEEK;
         firstEnter=true;
-        OPERATION= WEEK;
         removeAllViews();
         mAnimatorController=new AnimatorController();
         gestureDetector = new GestureDetector(mContext,this);
         gestureDetector.setIsLongpressEnabled(false);
         today = new ArrayList<>(Arrays.asList(date.get(0), date.get(1), date.get(2), date.get(3)));
-        CurrentWeekBegin = new GregorianCalendar(today.get(0),today.get(1),today.get(2),0,0);
+        CurrentWeekBegin = new GregorianCalendar(today.get(0), today.get(1), today.get(2), 0, 0);
         CurrentWeekBegin.add(Calendar.DAY_OF_MONTH, 1 - today.get(3));
-
-
         mSurface = new Surface();
         backGound = new ShadowView(mContext);
 
@@ -1556,7 +1556,7 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
 
     }
 
-    private class MonthIco extends View{
+    private class MonthIco extends View implements OnClickListener{
 
         GregorianCalendar month;
         int Month;
@@ -1580,6 +1580,7 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
             this.Month=month.get(Calendar.MONTH)+1;
             this.Year =month.get(Calendar.YEAR);
             this.index=index;
+            setOnClickListener(this);
         }
 
         @Override
@@ -1596,9 +1597,27 @@ public class CalendarView extends ViewGroup implements GestureDetector.OnGesture
             String yearText = Year+"";
             Rect rect = new Rect();
             mSurface.MonthIconMonthTextPaint.getTextBounds(monthText, 0, monthText.length(), rect);
-            canvas.drawText(monthText, getMeasuredWidth() / 2 - rect.width() / 2, getMeasuredHeight()/2, mSurface.MonthIconMonthTextPaint);
+            canvas.drawText(monthText, getMeasuredWidth() / 2 - rect.width() / 2, getMeasuredHeight() / 2, mSurface.MonthIconMonthTextPaint);
             mSurface.MonthIconYearTextPaint.getTextBounds(yearText, 0, yearText.length(), rect);
             canvas.drawText(yearText, getMeasuredWidth() / 2 - rect.width() / 2, getMeasuredHeight() * 5 / 6, mSurface.MonthIconYearTextPaint);
+        }
+
+        @Override
+        public void onClick(View v) {
+            final DatePicker datePicker = new DatePicker(mContext);
+            datePicker.updateDate(CurrentWeekBegin.get(Calendar.YEAR),CurrentWeekBegin.get(Calendar.MONTH),CurrentWeekBegin.get(Calendar.DAY_OF_MONTH));
+            datePicker.setCalendarViewShown(false);
+            new AlertDialog.Builder(mContext).setView(datePicker).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    CurrentWeekBegin.set(datePicker.getYear(),datePicker.getMonth(),datePicker.getDayOfMonth(),0,0);
+                    CurrentWeekBegin.add(Calendar.DAY_OF_MONTH,CurrentWeekBegin.get(Calendar.DAY_OF_WEEK)-1);
+                    mViewController.UpdateDrawCurrent();
+                    mViewController.GoToCurrent(CurrentWeekBegin.get(Calendar.YEAR) * 12 + CurrentWeekBegin.get(Calendar.MONTH) - (today.get(0) * 12 + today.get(1)));
+                    mCalendarListener.UpdateTime(CurrentWeekBegin);
+
+                }
+            }).setNegativeButton("取消",null).show();
         }
     }
 

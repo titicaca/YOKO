@@ -103,7 +103,7 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
         if (firstEntry) {
             ScreenHeight =height;
             ScreenWidth =width;
-            CellHeight = (int)(height*mSurface.ViewHeightRatio)/mSurface.dividePart;
+            CellHeight = (int)((height*mSurface.ViewHeightRatio)/mSurface.dividePart);
             mSurface.initSurface();
 
             StrechMinHeight =   CellHeight;
@@ -330,13 +330,13 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
                     eventItem.top = 0;
                     eventItem.longEvent = true;
                 }
-                else eventItem.top = (int)((24/mSurface.dividePart)*mSurface.ViewHeight*mEventManager.getEventMangerInDayOfWeek(i).getPositionRatioByTime(timebegin));
+                else eventItem.top = (int)(mSurface.EndHeight*mEventManager.getEventMangerInDayOfWeek(i).getPositionRatioByTime(timebegin));
 
                 if(timeend>mEventManager.getEventMangerInDayOfWeek(i).DayView_Date+EventManager.MillsInOneDay){
                     eventItem.botton = mSurface.EndHeight;
                     eventItem.longEvent = true;
                 }
-                else eventItem.botton= (int)((24/mSurface.dividePart)*mSurface.ViewHeight*mEventManager.getEventMangerInDayOfWeek(i).getPositionRatioByTime(timeend));
+                else eventItem.botton= (int)(mSurface.EndHeight*mEventManager.getEventMangerInDayOfWeek(i).getPositionRatioByTime(timeend));
                 eventItem.colum = i;
                 addNewEvent(eventItem);
             }
@@ -661,8 +661,6 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
         if(event.getAction() == MotionEvent.ACTION_UP){
             switch (OPERATIONMODE){
                 case TEMPRECT:
-                    int positionTop = tempRect.top;
-                    int positionBotton = tempRect.botton;
 
                     double unitTemp = (double)CellHeight/mSurface.CellUnit;
                     double newTopTemp;
@@ -717,9 +715,8 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
                     existRect.timeBegin = mEventManager.getEventMangerInDayOfWeek(existRect.colum).DayView_Date+Math.round((newTop/(double)mSurface.EndHeight)*mEventManager.MillsInOneDay);
                     existRect.timeEnd =mEventManager.getEventMangerInDayOfWeek(existRect.colum).DayView_Date+Math.round((newEnd/(double)mSurface.EndHeight)*mEventManager.MillsInOneDay);
 
+                    ExistRectUpdate((int) Math.round(newTop), (int) Math.round(newEnd));
 
-
-                    ExistRectUpdate((int)Math.round(newTop),(int)Math.round(newEnd));
                     pressOffset = 0;
                     break;
 
@@ -739,7 +736,7 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
         else if(OPERATIONMODE ==TEMPRECT){
             return true;
         }else if(OPERATIONMODE == EXIST){
-            if((positionX<existRect.right+existRect.colum*CellWidth)) {
+            if((positionX<existRect.right+existRect.colum*CellWidth)&&(positionX>existRect.left+existRect.colum*CellWidth)) {
                 if (Math.abs(positionY - existRect.top) < StrechMinDistance) {
                     OPERATIONMODE = EXIST_TOP;
                     return true;
@@ -755,6 +752,7 @@ public class WeekEventView extends ViewGroup implements GestureDetector.OnGestur
             mEventManager.UpdateEvent(existRect.timeBegin, existRect.timeEnd, existRect.rid);
             addNewEvent(existRect);
             mEventManager.addEvent(existRect.rid);
+            UpdateView();
         }
 
         mWeekViewListener.CalEnable(true);

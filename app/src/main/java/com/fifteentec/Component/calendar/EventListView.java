@@ -3,9 +3,14 @@ package com.fifteentec.Component.calendar;
 
 import android.content.Context;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.DashPathEffect;
 import android.graphics.Paint;
+import android.graphics.PathDashPathEffect;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
@@ -18,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.Database.EventRecord;
 import com.fifteentec.yoko.BaseActivity;
 import com.fifteentec.yoko.R;
 
@@ -30,12 +36,11 @@ import java.util.Random;
 public class EventListView extends ViewGroup implements GestureDetector.OnGestureListener{
     private Context mcontext ;
     private EventController mEvent;
-    private float mRatio =1/4f;
+    private float mRatio =1/3f;
     private int ScreenWidth;
     private int ScreenHeight;
     private LayoutInflater mInflater;
     private GestureDetector mGesture;
-    private EventListListener mEventListListener;
     private Surface mSurface;
 
 
@@ -43,13 +48,8 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
     /**
      * 通过滚动EventList来改变当前事件,通知CalViewFragment改变时间.
      */
-    public interface EventListListener{
-        void DateChange(ArrayList<Integer> list);
-    }
 
-    public void setEvnetListDateChangeListener(EventListListener listener){
-        this.mEventListListener = listener;
-    }
+
 
     public EventListView(Context context) {
         super(context, null);
@@ -181,19 +181,25 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
      */
     private class EventList extends View{
 
-        private ArrayList<String> mEvent;
+        private ArrayList<EventRecord> mNormalEvent;
+        private ArrayList<EventRecord> mAllDayEvent;
         private GregorianCalendar mDate;
-        private int ItemHeight = 130;
+        private float ItemHeightRatio = 1/8f;
+        private int ItemHeight;
         private int ItemWidth;
-        private int mInterval = 30;
-        private int mPaddingTop = 10;
-        private int mPaddingLeft =60;
-        private int mRoundness = 8;
+        private int mInterval;
+        private float PaddingLeftRatio = 1/4f;
+        private int mPaddingLeft;
         private int mPaddingRectRight = 40;
         private Paint mRectPaint;
         private Paint mTextPaint;
         public int ViewHeight; // View高度
         private EventManager mEventManager;
+        private Paint DashPaint= new Paint();
+
+        private Paint mSmallTextPaint= new Paint();
+
+
         public EventList(Context context) {
             this(context, null);
         }
@@ -206,30 +212,43 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
             super(context, attrs, defStyleAttr);
         }
 
-        public void initView(GregorianCalendar date,int ParentWidth){
+        public boolean initView(GregorianCalendar date,int ParentWidth){
+
+            ItemHeight = (int)(ParentWidth*ItemHeightRatio);
+            mInterval = (int)(ParentWidth*ItemHeightRatio/2);
 
             this.mDate = date;
+            float TextRatio = 1/13f;
+            mPaddingLeft = (int)(ParentWidth*PaddingLeftRatio);
             this.ItemWidth = ParentWidth;
             mRectPaint = new Paint();
             mRectPaint.setColor(Color.parseColor("#920510"));
             mRectPaint.setAntiAlias(true);
             mTextPaint = new Paint();
-            mTextPaint.setColor(Color.WHITE);
+            mTextPaint.setColor(Color.BLACK);
             mTextPaint.setAntiAlias(true);
-            mTextPaint.setTextSize(50);
-            mEvent = new ArrayList<>();
+            mTextPaint.setTextSize(ParentWidth * TextRatio);
+            mNormalEvent = new ArrayList<>();
+            mAllDayEvent = new ArrayList<>();
+            mSmallTextPaint.setAntiAlias(true);
+            mSmallTextPaint.setTextSize(ParentWidth * TextRatio / 2);
+            mSmallTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
+            DashPaint.setAntiAlias(true);
+            DashPaint.setPathEffect(new DashPathEffect(new float[]{10, 2}, 1));
+            DashPaint.setStrokeWidth(2);
+
             mEventManager = EventManager.newInstance(((BaseActivity)mcontext).getDBManager().getTableEvent(),EventManager.DAY_VIEW_EVENT_MANAGER,mDate.getTimeInMillis());
             for (int i = 0; i < mEventManager.getAllDayEventCount(); i++) {
-                mEvent.add(mEventManager.getAllDayIntroduciton(i));
+                mAllDayEvent.add(mEventManager.getAllDayEventRecord(i));
             }
             for (int i = 0; i < mEventManager.getNormalDayEventCount(); i++) {
-                mEvent.add(mEventManager.getNormalIntroduction(i));
+                mNormalEvent.add(mEventManager.getNormalEventByIndex(i));
             }
-            if(mEvent.size()==0){
-                mEvent.add("无");
-            }
-            ViewHeight = (ItemHeight+mInterval)*mEvent.size()+mInterval;
+            ViewHeight = (ItemHeight+mInterval)*mNormalEvent.size()+(ItemHeight+mInterval)*mAllDayEvent.size()+mInterval;
+
+            return mNormalEvent.size()==0&&mAllDayEvent.size()==0;
         }
+
 
         @Override
         protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -250,7 +269,7 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
                 height = heightSize;
 
             }else{
-                height = (ItemHeight+mInterval)*mEvent.size()+mInterval;
+                height = (ItemHeight+mInterval)*mNormalEvent.size()+(ItemHeight+mInterval)*mAllDayEvent.size()+mInterval;
             }
             setMeasuredDimension(width,height);
 
@@ -258,16 +277,51 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
 
         @Override
         protected void onDraw(Canvas canvas) {
-            int topItem = mInterval;
-            for(int i = 0; i <mEvent.size();i++) {
-                RectF mRect = new RectF(0,topItem,ItemWidth-mPaddingRectRight,topItem+ItemHeight);
-                canvas.drawRoundRect(mRect, mRoundness, mRoundness, mRectPaint);
+            int topItem = 0;
+            for(int i = 0; i <mNormalEvent.size();i++) {
+                Rect mRect = new Rect(0,topItem,ItemWidth-mPaddingRectRight,topItem+ItemHeight);
+                //canvas.drawRect(mRect, mRectPaint);
                 Paint.FontMetricsInt font = mTextPaint.getFontMetricsInt();
                 int baseline = (int)(mRect.top + (mRect.bottom - mRect.top - font.bottom + font.top) / 2 - font.top);
-                canvas.drawText(mEvent.get(i),mPaddingLeft,baseline,mTextPaint);
+                canvas.drawText(mNormalEvent.get(i).introduction, mPaddingLeft, baseline, mTextPaint);
+                canvas.drawRect(0, topItem, mPaddingLeft / 10, topItem+mPaddingLeft / 6, mRectPaint);
+                String startTime = TimeInMillsToString(mNormalEvent.get(i).timebegin);
+                Rect bound = new Rect();
+                mSmallTextPaint.getTextBounds(startTime,0,startTime.length(),bound);
+                canvas.drawText(TimeInMillsToString(mNormalEvent.get(i).timebegin), mPaddingLeft / 4, topItem+bound.height(), mSmallTextPaint);
+                canvas.drawText(TimeInMillsToString(mNormalEvent.get(i).timeend),mPaddingLeft/4,topItem+bound.height()*3,mSmallTextPaint);
                 topItem += (ItemHeight+mInterval);
-
             }
+
+            Bitmap gou = BitmapFactory.decodeResource(getResources(),R.drawable.ok);
+            Rect rect;
+
+            for(int i = 0; i <mAllDayEvent.size();i++) {
+                Rect mRect = new Rect(0,topItem,ItemWidth-mPaddingRectRight,topItem+ItemHeight);
+                //canvas.drawRect(mRect, mRectPaint);
+                Paint.FontMetricsInt font = mTextPaint.getFontMetricsInt();
+                int baseline = (int)(mRect.top + (mRect.bottom - mRect.top - font.bottom + font.top) / 2 - font.top);
+                String introduction = mAllDayEvent.get(i).introduction;
+                Rect TextBound =  new Rect();
+                mTextPaint.getTextBounds(introduction,0,introduction.length(),TextBound);
+                canvas.drawText(introduction,mPaddingLeft,baseline,mTextPaint);
+                rect= new Rect(mPaddingLeft/4,topItem,mPaddingLeft/3*2,topItem+mPaddingLeft/3);
+                canvas.drawBitmap(gou, null, rect, null);
+                canvas.drawLine(mPaddingLeft,topItem+mRect.height(),mPaddingLeft+TextBound.width(),topItem+mRect.height(),DashPaint);
+                topItem += (ItemHeight+mInterval);
+            }
+        }
+
+        private String TimeInMillsToString(long mills){
+            GregorianCalendar time = new GregorianCalendar();
+            time.setTimeInMillis(mills);
+            String resule = new String();
+            if( time.get(Calendar.HOUR_OF_DAY)<10) resule = "0"+time.get(Calendar.HOUR_OF_DAY)+":";
+            else resule = time.get(Calendar.HOUR_OF_DAY)+":";
+
+            if(time.get(Calendar.MINUTE)<10) resule += "0"+time.get(Calendar.MINUTE);
+            else resule += time.get(Calendar.MINUTE)+"";
+            return resule;
         }
     }
 
@@ -289,6 +343,7 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
         public int mBottonIndex;
 
         public int initEventList(){
+
             int count = 0;
             int result = 0;
             mBottonIndex = 0;
@@ -316,9 +371,13 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
             mBottonIndex--;
             GregorianCalendar tempDate = new GregorianCalendar(mCurDate.get(0),mCurDate.get(1),mCurDate.get(2),0,0,0);
             tempDate.add(Calendar.DAY_OF_MONTH, mBottonIndex);
-            addView(addViewText(tempDate), 0);
+
             EventList mEL = new EventList(mcontext);
-            mEL.initView(tempDate, (int) (ScreenWidth * (1 - mRatio)));
+            if(mEL.initView(tempDate, (int) (ScreenWidth * (1 - mRatio)))){
+                addView(addViewText(tempDate,true), 0);
+            }else{
+                addView(addViewText(tempDate,false), 0);
+            }
             addView(mEL, 1);
             return mEL.ViewHeight;
 
@@ -334,15 +393,18 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
             mTopIndex++;
             GregorianCalendar tempDate = new GregorianCalendar(mCurDate.get(0),mCurDate.get(1),mCurDate.get(2));
             tempDate.add(Calendar.DAY_OF_MONTH, mTopIndex);
-            addView(addViewText(tempDate));
             EventList mEL = new EventList(mcontext);
-            mEL.initView(tempDate, (int) (ScreenWidth * (1 - mRatio)));
+            if(mEL.initView(tempDate, (int) (ScreenWidth * (1 - mRatio)))){
+                addView(addViewText(tempDate,true));
+            }else{
+                addView(addViewText(tempDate,false));
+            }
             addView(mEL);
             return mEL.ViewHeight;
         }
 
 
-        private View addViewText(GregorianCalendar tempDate){
+        private View addViewText(GregorianCalendar tempDate,boolean isEmpty){
             View temp = mInflater.inflate(R.layout.view_event_list_text_layout,null);
             TextView day = (TextView) temp.findViewById(R.id.id_event_list_day_text);
             int dayDate =tempDate.get(Calendar.DAY_OF_MONTH);
@@ -352,15 +414,42 @@ public class EventListView extends ViewGroup implements GestureDetector.OnGestur
                 day.setText("" + tempDate.get(Calendar.DAY_OF_MONTH));
             }
             day.setTypeface(Typeface.DEFAULT_BOLD);
-            day.setTextSize(TypedValue.COMPLEX_UNIT_PX,ScreenWidth*mSurface.DayTextSize);
+
+            if(isEmpty){
+                day.setTextSize(TypedValue.COMPLEX_UNIT_PX,ScreenWidth*mSurface.MonthTextSize);
+                day.setTextColor(getResources().getColor(R.color.InvaildGrayColor));
+            }
+            else {
+                day.setTextSize(TypedValue.COMPLEX_UNIT_PX,ScreenWidth*mSurface.DayTextSize);
+                day.setTextColor(Color.BLACK);
+            }
+
             TextView Week = (TextView) temp.findViewById(R.id.id_event_list_week_text);
-            Week.setText(CalUtil.WEEK_NAME.get(tempDate.get(Calendar.DAY_OF_WEEK)));
-            Week.setTextSize(TypedValue.COMPLEX_UNIT_PX, ScreenWidth * mSurface.WeekTextSize);
+            if(isEmpty) {
+                Week.setText("");
+                Week.setTextSize(0);
+            }
+            else {
+                Week.setText(CalUtil.WEEK_NAME.get(tempDate.get(Calendar.DAY_OF_WEEK)));
+                Week.setTextSize(TypedValue.COMPLEX_UNIT_PX, ScreenWidth * mSurface.WeekTextSize);
+
+            }
 
             TextView Month = (TextView) temp.findViewById(R.id.id_event_list_month_text);
             int NowMonth = tempDate.get(Calendar.MONTH) +1;
-            Month.setText(tempDate.get(Calendar.YEAR)+"."+NowMonth);
+            String month=new String();
+            if(NowMonth<10){
+                month = "0"+NowMonth;
+            }else{
+                month = ""+NowMonth;
+            }
+            Month.setText(tempDate.get(Calendar.YEAR)+"."+month);
             Month.setTextSize(TypedValue.COMPLEX_UNIT_PX, ScreenWidth * mSurface.MonthTextSize);
+            if(isEmpty){
+                Month.setTextColor(getResources().getColor(R.color.InvaildGrayColor));
+            }else {
+                Month.setTextColor(Color.BLACK);
+            }
 
             return temp;
         }

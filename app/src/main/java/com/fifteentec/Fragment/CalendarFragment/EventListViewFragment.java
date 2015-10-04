@@ -57,20 +57,13 @@ public class EventListViewFragment extends Fragment{
         mContext = getActivity();
         mEvnetView =  new EventListView(mContext);
         mEvnetView.init(new ArrayList<>(mCurDate));
-        mEvnetView.setEvnetListDateChangeListener(new EventListView.EventListListener() {
-            @Override
-            public void DateChange(ArrayList<Integer> list) {
-                mCurDate.clear();
-                mCurDate.add(list.get(0));
-                mCurDate.add(list.get(1));
-                mCurDate.add(list.get(2));
-                mCurDate.add(list.get(3));
-                mEvnetFragmentListener.ListDateChange(list);
-            }
-        });
 
 
         return mEvnetView;
+    }
+
+    public void UpdateView(){
+        mEvnetView.init(mCurDate);
     }
 
 

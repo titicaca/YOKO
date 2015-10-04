@@ -2,6 +2,7 @@ package com.fifteentec.Component.calendar;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -98,7 +99,8 @@ public class NewEventView extends ViewGroup{
     private GregorianCalendar StartDate;
     private GregorianCalendar EndDate;
     private GregorianCalendar AllDayDate = new GregorianCalendar();
-    private String introduction = "null";
+    final private String DefaultText = " ";
+    private String introduction = DefaultText;
     private long rid = 0;
     private String PicPath = null;
 
@@ -253,14 +255,14 @@ public class NewEventView extends ViewGroup{
             public void ButtonSwitch(SwitchButton switchButton, boolean isOn) {
                 AllDaySwitch = isOn;
                 if (AllDaySwitch) {
-                    if(EndDate.getTimeInMillis()==StartDate.getTimeInMillis()){
+                    if (EndDate.getTimeInMillis() == StartDate.getTimeInMillis()) {
                         GregorianCalendar gregorianCalendar = new GregorianCalendar();
                         gregorianCalendar.setTimeInMillis(StartDate.getTimeInMillis());
-                        gregorianCalendar.add(Calendar.HOUR,1);
+                        gregorianCalendar.add(Calendar.HOUR, 1);
                         EndDate.setTimeInMillis(gregorianCalendar.getTimeInMillis());
                     }
-                }else{
-                    AllDayDate = new GregorianCalendar(StartDate.get(Calendar.YEAR), StartDate.get(Calendar.MONTH), StartDate.get(Calendar.DAY_OF_MONTH),0,0,0);
+                } else {
+                    AllDayDate = new GregorianCalendar(StartDate.get(Calendar.YEAR), StartDate.get(Calendar.MONTH), StartDate.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
                 }
                 mEventTime.initEventTime();
             }
@@ -295,7 +297,17 @@ public class NewEventView extends ViewGroup{
         mDeleteButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                mEventListener.deleteEvent(rid);
+                TextView delete = new TextView(mContext);
+                delete.setText("是否删除该事件?");
+                delete.setPadding(100, 100, 100, 100);
+                delete.setGravity(Gravity.CENTER_HORIZONTAL);
+                delete.setTextSize(TypedValue.COMPLEX_UNIT_PX, mSurface.EventTimeBigTextSize * mScreenHeight/2);
+                new AlertDialog.Builder(mContext).setView(delete).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mEventListener.deleteEvent(rid);
+                    }
+                }).setNegativeButton("取消",null).show();
             }
         });
         addView(mDeleteButton);
@@ -304,15 +316,16 @@ public class NewEventView extends ViewGroup{
         mEventTime.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                DateTimePicker dateTimePicker = new DateTimePicker(mContext,mScreenWidth);
-                dateTimePicker.initalDialog(StartDate,EndDate,AllDaySwitch);
+                DateTimePicker dateTimePicker = new DateTimePicker(mContext, mScreenWidth);
+                dateTimePicker.initalDialog(StartDate, EndDate, AllDaySwitch);
                 dateTimePicker.setDateTimePickerListener(new DateTimePicker.DateTimePickerListener() {
                     @Override
                     public void DateChange(GregorianCalendar start, GregorianCalendar end) {
                         StartDate = CalUtil.CopyDate(start);
-                        if(end.getTimeInMillis()>start.getTimeInMillis()+5*60*1000) EndDate = CalUtil.CopyDate(end);
-                        else EndDate.setTimeInMillis(StartDate.getTimeInMillis()+(5*60*1000));
-                        if(!AllDaySwitch) AllDayDate = CalUtil.CopyDate(start);
+                        if (end.getTimeInMillis() > start.getTimeInMillis() + 5 * 60 * 1000)
+                            EndDate = CalUtil.CopyDate(end);
+                        else EndDate.setTimeInMillis(StartDate.getTimeInMillis() + (5 * 60 * 1000));
+                        if (!AllDaySwitch) AllDayDate = CalUtil.CopyDate(start);
                         mEventTime.initEventTime();
                     }
                 });
@@ -334,11 +347,11 @@ public class NewEventView extends ViewGroup{
                     bundle.putLong("StartTime", AllDayDate.getTimeInMillis());
                     bundle.putLong("EndTime", AllDayDate.getTimeInMillis());
                 }
-                bundle.putString("LocalPicLink",PicPath);
+                bundle.putString("LocalPicLink", PicPath);
                 bundle.putLong("Reminder", RemindSelected);
                 bundle.putInt("Type", TagSelected);
-                bundle.putLong("Rid",rid);
-                mEventListener.CreateFinish(bundle,isNewEvent);
+                bundle.putLong("Rid", rid);
+                mEventListener.CreateFinish(bundle, isNewEvent);
             }
         });
         addView(mOKButton);
@@ -352,8 +365,8 @@ public class NewEventView extends ViewGroup{
         mSavedPic.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(PicPath != null)
-                mEventListener.ShowPic(PicPath);
+                if (PicPath != null)
+                    mEventListener.ShowPic(PicPath);
             }
         });
         addView(mSavedPic);
@@ -731,7 +744,7 @@ public class NewEventView extends ViewGroup{
             setTextSize(TypedValue.COMPLEX_UNIT_PX,mSurface.InputPageTextSize);
             setGravity(Gravity.TOP);
             setHint(HintString);
-            if(introduction != "null") setText(introduction);
+            if(introduction != DefaultText) setText(introduction);
             int effectWidth = (int)(mScreenWidth*(1-2*mSurface.InputPageSidePadding))-2*mSurface.InputPageTextPadding;
             setMaxEms(effectWidth/(int)(this.getTextSize()*(7/6f)));
             addTextChangedListener(mtextWatcher);
@@ -749,6 +762,7 @@ public class NewEventView extends ViewGroup{
         private int itemHeight;
 
         private Paint RectPaint;
+        private Paint RectFillPaint;
 
 
         private int RectColor= Color.parseColor("#666666");
@@ -789,8 +803,12 @@ public class NewEventView extends ViewGroup{
             RectPaint.setColor(RectColor);
             RectPaint.setStyle(Paint.Style.STROKE);
             PathEffect ef = new DashPathEffect(new float[]{15,5},1);
-            RectPaint.setPathEffect(ef);
+            //RectPaint.setPathEffect(ef);
             RectPaint.setStrokeWidth(3);
+            RectFillPaint = new Paint();
+            RectFillPaint.setAntiAlias(true);
+            RectFillPaint.setColor(Color.WHITE);
+            RectFillPaint.setStyle(Paint.Style.FILL);
             for (int i = 0; i < TagSelectedList.size(); i++) {
                 Drawable temp = TagSelectedList.get(i);
                 temp.setBounds(0,0,(int)TextSize,(int)TextSize);
@@ -970,7 +988,8 @@ public class NewEventView extends ViewGroup{
             if(FunctionActivate == REMINED) tempheight=0;
             else if(FunctionActivate == TAG) tempheight = mSurface.IconSide+mSurface.IconInterval;
             RectF drawRect = new RectF(CheckboxPadding,tempheight+CheckboxPadding,getMeasuredWidth()-CheckboxPadding,tempheight+getMeasuredHeight() - CheckboxPadding);
-            canvas.drawRoundRect(drawRect,20,20,RectPaint);
+            canvas.drawRoundRect(drawRect, 20, 20, RectPaint);
+            canvas.drawRoundRect(drawRect,20,20,RectFillPaint);
         }
     }
 

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name = "appMainColor">#43b96d</color>
-    <color name = "WorkEventColor">#a2c9e3</color>
-    <color name = "StudyEventColor">#f8b551</color>
-    <color name = "EntertainEventColor">#f29b76</color>
-    <color name = "OtherEventColor">#acd598</color>
+    <color name = "WorkEventColor">#cde2f0</color>
+    <color name = "StudyEventColor">#fbd7a1</color>
+    <color name = "EntertainEventColor">#f8c9b5</color>
+    <color name = "OtherEventColor">#d1e9c5</color>
     <color name = "ShadowColor">#b5b5b5</color>
     <color name = "DashlineColor">#898989</color>
     <color name = "AllDayEvent">#F0F0F0</color>
-
+    <color name = "InvaildGrayColor">#ffe2dee2</color>
 </resources>
