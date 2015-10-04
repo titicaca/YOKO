@@ -50,6 +50,7 @@ public class PullToRefresh extends LinearLayout implements OnTouchListener {
 	private boolean loadOnce;
 	private boolean ableToPull;
 
+
 	public PullToRefresh(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		
@@ -78,6 +79,7 @@ public class PullToRefresh extends LinearLayout implements OnTouchListener {
 		}
 	}
 
+
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		setIsAbleToPull(event);
@@ -89,7 +91,6 @@ public class PullToRefresh extends LinearLayout implements OnTouchListener {
 			case MotionEvent.ACTION_MOVE:
 				float yMove = event.getRawY();
 				int distance = (int) (yMove - yDown);
-				// 濡傛灉鎵嬫寚鏄笅婊戠姸鎬侊紝骞朵笖涓嬫媺澶存槸瀹屽叏闅愯棌鐨勶紝灏卞睆钄戒笅鎷変簨浠�
 				if (distance <= 0 && headerLayoutParams.topMargin <= hideHeaderHeight) {
 					return false;
 				}
@@ -102,7 +103,6 @@ public class PullToRefresh extends LinearLayout implements OnTouchListener {
 					} else {
 						currentStatus = STATUS_PULL_TO_REFRESH;
 					}
-					// 閫氳繃鍋忕Щ涓嬫媺澶寸殑topMargin鍊硷紝鏉ュ疄鐜颁笅鎷夋晥鏋�
 					headerLayoutParams.topMargin = (distance / 2) + hideHeaderHeight;
 					header.setLayoutParams(headerLayoutParams);
 				}
@@ -110,24 +110,19 @@ public class PullToRefresh extends LinearLayout implements OnTouchListener {
 			case MotionEvent.ACTION_UP:
 			default:
 				if (currentStatus == STATUS_RELEASE_TO_REFRESH) {
-					// 鏉炬墜鏃跺鏋滄槸閲婃斁绔嬪嵆鍒锋柊鐘舵�侊紝灏卞幓璋冪敤姝ｅ湪鍒锋柊鐨勪换鍔�
 					new RefreshingTask().execute();
 				} else if (currentStatus == STATUS_PULL_TO_REFRESH) {
-					// 鏉炬墜鏃跺鏋滄槸涓嬫媺鐘舵�侊紝灏卞幓璋冪敤闅愯棌涓嬫媺澶寸殑浠诲姟
 					new HideHeaderTask().execute();
 				}
 				break;
 			}
-			// 鏃跺埢璁板緱鏇存柊涓嬫媺澶翠腑鐨勪俊鎭�
 			if (currentStatus == STATUS_PULL_TO_REFRESH
 					|| currentStatus == STATUS_RELEASE_TO_REFRESH) {
 				updateHeaderView();
-				// 褰撳墠姝ｅ浜庝笅鎷夋垨閲婃斁鐘舵�侊紝瑕佽ListView澶卞幓鐒︾偣锛屽惁鍒欒鐐瑰嚮鐨勯偅涓�椤逛細涓�鐩村浜庨�変腑鐘舵��
 				listView.setPressed(false);
 				listView.setFocusable(false);
 				listView.setFocusableInTouchMode(false);
 				lastStatus = currentStatus;
-				// 褰撳墠姝ｅ浜庝笅鎷夋垨閲婃斁鐘舵�侊紝閫氳繃杩斿洖true灞忚斀鎺塋istView鐨勬粴鍔ㄤ簨浠�
 				return true;
 			}
 		}

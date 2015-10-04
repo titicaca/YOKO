@@ -6,6 +6,7 @@ public class EventRecord extends DBRecord{
     public long rid;
     public long uid;
     public long serverid;
+    public long id;
     public String introduction;
     public String localpicturelink;
     public String remotepitcurelink;
@@ -26,6 +27,7 @@ public class EventRecord extends DBRecord{
     public EventRecord(EventRecord eventRecord) {
         this.rid = eventRecord.rid;
         this.uid = eventRecord.uid;
+        this.id = eventRecord.id;
         this.serverid = eventRecord.serverid;
         this.introduction = eventRecord.introduction;
         this.localpicturelink = eventRecord.localpicturelink;
@@ -41,13 +43,14 @@ public class EventRecord extends DBRecord{
         this.updatetime = eventRecord.updatetime;
     }
 
-    public EventRecord(long uid, long serverid, String introduction,
+    public EventRecord(long uid, long serverid,long id, String introduction,
                        String localpicturelink, String remotepitcurelink,
                        long remind, long timebegin, long timeend, int type,
                        int property, String detaillink, int status, int modified,
                        long updatetime) {
         this.uid = uid;
         this.serverid = serverid;
+        this.id = id;
         this.introduction = introduction;
         this.localpicturelink = localpicturelink;
         this.remotepitcurelink = remotepitcurelink;

@@ -3,110 +3,139 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:layout_marginTop="10dp"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
     android:descendantFocusability="blocksDescendants">
-
     <ImageView
         android:id="@+id/event_post"
         android:layout_width="fill_parent"
-        android:layout_height="120dp"
+        android:layout_height="260dp"
         android:scaleType="fitXY"
         />
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="150dp"
+        android:background="@drawable/background_rectangle">
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.2">
         <ImageView
             android:id="@+id/group_logo3"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_marginTop="8dp"
-            android:layout_marginLeft="8dp"
             />
         <com.fifteentec.Component.FoundItems.CircularImage
             android:id="@+id/cover_group_logo3"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_marginTop="8dp"
             android:layout_marginLeft="8dp"
             />
-        <TextView
-            android:id="@+id/group_event_name"
-            android:text="default_name"
+        </RelativeLayout>
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="60sp"
-            android:layout_toRightOf="@id/group_logo3"
-            android:gravity="bottom"
-            android:textSize="18sp"
-            />
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="0.8">
+            <TextView
+                android:id="@+id/event_name"
+                android:text="default_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/group_logo3"
+                android:textSize="23sp"
+                />
+            <LinearLayout
+                android:id="@+id/layout_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_toRightOf="@id/group_logo3"
+                android:layout_below="@id/event_name">
+                <TextView
+                    android:id="@+id/time_label"
+                    android:text="@string/time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15dp"
+                    android:gravity="bottom"
+                    android:layout_gravity="top"
+                    />
+                <TextView
+                    android:id="@+id/time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15dp"
+                    android:textColor="@color/gray"
+                    android:gravity="bottom"
+                    android:layout_gravity="top"
+                    />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/layout_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:clickable="true"
+                android:layout_toRightOf="@id/group_logo3"
+                android:layout_below="@id/layout_time"
+                android:layout_weight="0.9">
+                <TextView
+                    android:id="@+id/loc_label"
+                    android:text="@string/location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15dp"
+                    android:gravity="bottom"
+                    android:layout_gravity="top"
+                    />
+                <TextView
+                    android:id="@+id/location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15dp"
+                    android:textColor="@color/gray"
+                    android:gravity="bottom"
+                    android:layout_gravity="top"
+                    />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_toRightOf="@id/group_logo3"
+                android:layout_below="@id/layout_location">
+                <TextView
+                    android:id="@+id/event_intro_label"
+                    android:text="@string/intro"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:layout_gravity="center_vertical"
+                    />
+                <TextView
+                    android:id="@+id/event_intro"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/gray"
+                    android:textSize="15sp"
+                    android:layout_gravity="center_vertical"
+                    />
+            </LinearLayout>
+        </LinearLayout>
 
-    </RelativeLayout>
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-        <TextView
-            android:id="@+id/event_intro_label"
-            android:text="@string/intro"
-            android:layout_width="wrap_content"
+        <ImageButton
+            android:id="@+id/takepartSBtn"
+            android:layout_width="90dp"
             android:layout_height="30dp"
-            android:textSize="18sp"
-            android:layout_gravity="center_vertical"
-            />
-        <TextView
-            android:id="@+id/event_intro"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:textColor="@color/gray"
-            android:textSize="15sp"
-            android:layout_gravity="center_vertical"
-            />
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="10dp"
+            android:layout_alignParentRight="true"
+            android:adjustViewBounds="true"
+            android:scaleType="centerInside"
+            android:clickable="true"
+            android:background="@drawable/takepart_s"/>
     </LinearLayout>
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <TextView
-            android:id="@+id/time_label"
-            android:text="@string/time"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:textSize="18dp"
-            android:gravity="bottom"
-            android:layout_gravity="top"
-            />
-        <TextView
-            android:id="@+id/time"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:textSize="15dp"
-            android:textColor="@color/gray"
-            android:gravity="bottom"
-            android:layout_gravity="top"
-            />
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:clickable="true">
-        <TextView
-            android:id="@+id/loc_label"
-            android:text="@string/location"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:textSize="18dp"
-            android:gravity="bottom"
-            android:layout_gravity="top"
-            />
-        <TextView
-            android:id="@+id/location"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:textSize="15dp"
-            android:textColor="@color/gray"
-            android:gravity="bottom"
-            android:layout_gravity="top"
-            />
-    </LinearLayout>
-
 </LinearLayout>

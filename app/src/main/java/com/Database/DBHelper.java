@@ -129,6 +129,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 "(" + DBConstants.COLUMN_EVENT_RID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 DBConstants.COLUMN_EVENT_UID + " INT8 NOT NULL, " +
                 DBConstants.COLUMN_EVENT_SEVERID + " INT8, " +
+                DBConstants.COLUMN_EVENT_ID + " INT8, " +
                 DBConstants.COLUMN_EVENT_INTRODUCTION + " TEXT, " +
                 DBConstants.COLUMN_EVENT_LOCALPICTURELINK + " CHAR(255), " +
                 DBConstants.COLUMN_EVENT_REMOTEPICTURELINK + " CHAR(255), " +
