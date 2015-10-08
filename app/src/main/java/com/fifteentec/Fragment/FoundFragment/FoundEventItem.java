@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import com.Database.DBManager;
 import com.Database.EventRecord;
+import com.fifteentec.Component.FoundItems.CircularImage;
 import com.fifteentec.Component.FoundItems.EventBrief;
 import com.fifteentec.Component.User.UserServer;
 import com.fifteentec.yoko.BaseActivity;
@@ -37,10 +38,11 @@ public class FoundEventItem extends Fragment {
     private TextView name;
     private TextView groupName;
     private int id;
-    private WebView detail;
+    private TextView detail;
     private ImageButton add;
     private ImageButton back;
     private TextView time;
+    private CircularImage head;
     private TextView location;
     private FragmentManager mFragmentManager;
     private BaseActivity activity;
@@ -61,9 +63,11 @@ public class FoundEventItem extends Fragment {
         name = (TextView)view.findViewById(R.id.event_detail_name);
         add = (ImageButton)view.findViewById(R.id.add);
         back = (ImageButton)view.findViewById(R.id.back_arrow);
-        detail = (WebView)view.findViewById(R.id.web);
+        detail = (TextView)view.findViewById(R.id.web);
         time = (TextView)view.findViewById(R.id.time_item);
         location = (TextView)view.findViewById(R.id.location_item);
+        head = (CircularImage)view.findViewById(R.id.cover_group_detail_event_logo);
+        head.setBackgroundResource(R.color.gray);
 
         mFragmentManager = FoundEventItem.this.getFragmentManager();
         this.activity = (BaseActivity)this.getActivity();
@@ -73,9 +77,15 @@ public class FoundEventItem extends Fragment {
         location.setText(getArguments().getString("location"));
 
         SimpleDateFormat sf = new SimpleDateFormat("yyyy.MM.dd");
+        SimpleDateFormat sft = new SimpleDateFormat("HH:mm");
         currentTime = (long)System.currentTimeMillis();
         if((currentTime>item.getTimeEnd())&&(item.getTimeEnd()!=0)){
-            time.setText(sf.format(item.getTimeBegin()) + "-" + sf.format(item.getTimeEnd()));
+            if(sf.format(item.getTimeBegin()).contains(sf.format(item.getTimeEnd()))){
+                time.setText(sf.format(item.getTimeBegin())+" "+sft.format(item.getTimeBegin())+"-"+ sft.format(item.getTimeEnd()));
+
+            }else{
+                time.setText(sf.format(item.getTimeBegin()) + "-" + sf.format(item.getTimeEnd())+ " "+sft.format(item.getTimeBegin()) + "-" + sft.format(item.getTimeEnd()));
+            }
             add.setBackgroundResource(R.drawable.takepart_n);
             add.setClickable(false);
         }
@@ -94,6 +104,12 @@ public class FoundEventItem extends Fragment {
             }
         }
         else{
+            if(sf.format(item.getTimeBegin()).contains(sf.format(item.getTimeEnd()))){
+                time.setText(sf.format(item.getTimeBegin())+" "+sft.format(item.getTimeBegin())+"-"+ sft.format(item.getTimeEnd()));
+
+            }else{
+                time.setText(sf.format(item.getTimeBegin()) + "-" + sf.format(item.getTimeEnd())+ " "+sft.format(item.getTimeBegin()) + "-" + sft.format(item.getTimeEnd()));
+            }
             if(dbManager.getTableEvent().queryEventById(item.getID())==null){
                 add.setBackgroundResource(R.drawable.takepart);
                 add.setClickable(true);
@@ -132,6 +148,7 @@ public class FoundEventItem extends Fragment {
             }
         });
 
+        location.setText(getArguments().getString("location"));
         name.setText(getArguments().getString("name"));
         groupName.setText(getArguments().getString("groupName"));
 
@@ -140,16 +157,17 @@ public class FoundEventItem extends Fragment {
         if(null!=getArguments().getString("uri")&&!"".equals(getArguments().getString("uri"))){
             imageLoader.displayImage(getArguments().getString("uri"),logo);
         }
+//        else{
+//            logo.setImageResource(R.drawable.logo_default);
+//        }
+
+        if(null!=getArguments().getString("intro")&&!"".equals(getArguments().getString("intro"))){
+            detail.setText(getArguments().getString("intro"));
+        }
         else{
-            logo.setImageResource(R.drawable.logo_default);
+            detail.setText("");
         }
 
-        if(null!=getArguments().getString("eventUri")&&!"".equals(getArguments().getString("eventUri"))){
-            detail.loadUrl("http://www.thedayscolor.com/");
-        }
-        else{
-            logo.setImageResource(R.drawable.logo_default);
-        }
 
         return view;
     }
@@ -167,7 +185,7 @@ public class FoundEventItem extends Fragment {
     private void addNewEvent(){
         EventRecord eventRecord = new EventRecord();
 
-        eventRecord.introduction = item.getEventIntro();
+        eventRecord.introduction = item.getName();
         eventRecord.id = item.getID();
         eventRecord.timeend = item.getTimeEnd();
         eventRecord.timebegin = item.getTimeBegin();

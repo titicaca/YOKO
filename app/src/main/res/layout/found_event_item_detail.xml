@@ -35,18 +35,19 @@
 
             <ImageView
                 android:id="@+id/group_detail_event_logo"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:src="@drawable/me_head_bg"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginLeft="8dp"
+                android:layout_marginRight="5dp"
                 />
             <com.fifteentec.Component.FoundItems.CircularImage
                 android:id="@+id/cover_group_detail_event_logo"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginLeft="8dp"
+                android:layout_marginRight="5dp"
                 />
 
             <TextView
@@ -67,6 +68,7 @@
                 android:layout_toRightOf="@id/group_detail_event_logo"
                 android:layout_below="@id/event_detail_name"
                 android:textSize="12sp"
+                android:visibility="invisible"
                 />
             <TextView
                 android:id="@+id/group_detail_name"
@@ -77,6 +79,7 @@
                 android:layout_toRightOf="@id/from"
                 android:layout_below="@id/event_detail_name"
                 android:textSize="12sp"
+                android:visibility="invisible"
                 />
             <LinearLayout
                 android:id="@+id/layout_time_item"
@@ -150,11 +153,17 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp"
             android:layout_below="@id/line">
-            <WebView
+     <!--       <WebView
                 android:id ="@+id/web"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-            </WebView>
+            </WebView>-->
+
+            <TextView
+                android:id ="@+id/web"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textSize="15sp"/>
         </ScrollView>
         <LinearLayout
             android:layout_width="wrap_content"
