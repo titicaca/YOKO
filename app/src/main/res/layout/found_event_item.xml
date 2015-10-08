@@ -18,13 +18,13 @@
         android:background="@drawable/background_rectangle">
         <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.2">
+            android:layout_height="wrap_content">
         <ImageView
             android:id="@+id/group_logo3"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginTop="8dp"
+            android:visibility="invisible"
             />
         <com.fifteentec.Component.FoundItems.CircularImage
             android:id="@+id/cover_group_logo3"
@@ -32,27 +32,29 @@
             android:layout_height="40dp"
             android:layout_marginTop="8dp"
             android:layout_marginLeft="8dp"
+            android:background="@color/gray"
             />
         </RelativeLayout>
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:layout_marginLeft="5dp"
             android:layout_weight="0.8">
             <TextView
                 android:id="@+id/event_name"
                 android:text="default_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/group_logo3"
-                android:textSize="23sp"
+                android:layout_toRightOf="@id/cover_group_logo3"
+                android:textSize="15sp"
                 />
             <LinearLayout
                 android:id="@+id/layout_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_toRightOf="@id/group_logo3"
+                android:layout_toRightOf="@id/cover_group_logo3"
                 android:layout_below="@id/event_name">
                 <TextView
                     android:id="@+id/time_label"
@@ -67,7 +69,7 @@
                     android:id="@+id/time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="15dp"
+                    android:textSize="12dp"
                     android:textColor="@color/gray"
                     android:gravity="bottom"
                     android:layout_gravity="top"
@@ -79,7 +81,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:clickable="true"
-                android:layout_toRightOf="@id/group_logo3"
+                android:layout_toRightOf="@id/cover_group_logo3"
                 android:layout_below="@id/layout_time"
                 android:layout_weight="0.9">
                 <TextView
@@ -95,7 +97,7 @@
                     android:id="@+id/location"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="15dp"
+                    android:textSize="12dp"
                     android:textColor="@color/gray"
                     android:gravity="bottom"
                     android:layout_gravity="top"
@@ -105,7 +107,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_toRightOf="@id/group_logo3"
+                android:layout_toRightOf="@id/cover_group_logo3"
                 android:layout_below="@id/layout_location">
                 <TextView
                     android:id="@+id/event_intro_label"
@@ -120,7 +122,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/gray"
-                    android:textSize="15sp"
+                    android:textSize="12sp"
                     android:layout_gravity="center_vertical"
                     />
             </LinearLayout>

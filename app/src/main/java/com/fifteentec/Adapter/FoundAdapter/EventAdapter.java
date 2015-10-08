@@ -127,14 +127,21 @@ public class EventAdapter extends BaseAdapter {
         item.eventInfo.setID(eventList.get(position).getID());
         item.eventInfo.setPicUri(eventList.get(position).getPicUri());
         item.eventInfo.setEventUri(eventList.get(position).getEventUri());
+        item.eventInfo.setLocation(eventList.get(position).getLocation());
 
         SimpleDateFormat sf = new SimpleDateFormat("yyyy.MM.dd");
+        SimpleDateFormat sft = new SimpleDateFormat("HH:mm");
         item.name.setText(item.eventInfo.getName());
-        item.location.setText(item.eventInfo.getEventIntro());
+        item.location.setText(item.eventInfo.getLocation());
         currentTime = (long) System.currentTimeMillis();
 
         if ((currentTime > item.eventInfo.getTimeEnd()) && (item.eventInfo.getTimeEnd() != 0)) {
-            item.time.setText(sf.format(item.eventInfo.getTimeBegin()) + "-" + sf.format(item.eventInfo.getTimeEnd()));
+            if(sf.format(item.eventInfo.getTimeBegin()).contains(sf.format(item.eventInfo.getTimeEnd()))){
+                item.time.setText(sf.format(item.eventInfo.getTimeBegin())+" "+sft.format(item.eventInfo.getTimeBegin())+"-"+ sft.format(item.eventInfo.getTimeEnd()));
+
+            }else{
+                item.time.setText(sf.format(item.eventInfo.getTimeBegin()) + "-" + sf.format(item.eventInfo.getTimeEnd())+ " "+sft.format(item.eventInfo.getTimeBegin()) + "-" + sft.format(item.eventInfo.getTimeEnd()));
+            }
             item.takepart_btn.setBackgroundResource(R.drawable.takepart_s_n);
             item.takepart_btn.setClickable(false);
         } else if (item.eventInfo.getTimeEnd() == 0) {
@@ -148,6 +155,12 @@ public class EventAdapter extends BaseAdapter {
                 item.takepart_btn.setClickable(false);
             }
         } else {
+            if(sf.format(item.eventInfo.getTimeBegin()).contains(sf.format(item.eventInfo.getTimeEnd()))){
+                item.time.setText(sf.format(item.eventInfo.getTimeBegin())+" "+sft.format(item.eventInfo.getTimeBegin())+"-"+ sft.format(item.eventInfo.getTimeEnd()));
+
+            }else{
+                item.time.setText(sf.format(item.eventInfo.getTimeBegin()) + "-" + sf.format(item.eventInfo.getTimeEnd())+ " "+sft.format(item.eventInfo.getTimeBegin()) + "-" + sft.format(item.eventInfo.getTimeEnd()));
+            }
             if (dbManager.getTableEvent().queryEventById(item.eventInfo.getID()) == null) {
                 item.takepart_btn.setBackgroundResource(R.drawable.takepart_s);
                 item.takepart_btn.setClickable(true);
@@ -175,7 +188,7 @@ public class EventAdapter extends BaseAdapter {
         item.logo.setOnClickListener(listener);
 
         if (!"".equals(item.eventInfo.getEventIntro()) && (item.eventInfo.getEventIntro().length() > 30)) {
-            String str = item.eventInfo.getEventIntro().trim().substring(0, 30);
+            String str = item.eventInfo.getEventIntro().trim().substring(0, 34);
             item.intro.setText(str);
         } else {
             item.intro.setText(item.eventInfo.getEventIntro());
@@ -205,7 +218,7 @@ public class EventAdapter extends BaseAdapter {
     private void addNewEvent(ListItemView newItem,DBManager mDbManager) {
         EventRecord eventRecord = new EventRecord();
 
-        eventRecord.introduction = newItem.eventInfo.getEventIntro();
+        eventRecord.introduction = newItem.eventInfo.getName();
         eventRecord.id = newItem.eventInfo.getID();
         eventRecord.timeend = newItem.eventInfo.getTimeEnd();
         eventRecord.timebegin = newItem.eventInfo.getTimeBegin();
