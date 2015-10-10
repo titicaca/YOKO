@@ -86,6 +86,7 @@ public class EventAdapter extends BaseAdapter {
     }
 
     public void setList(List<EventBrief> groupData) {
+        imageLoader.clearMemoryCache();
         this.eventList = groupData;
         this.notifyDataSetChanged();
     }
@@ -112,6 +113,7 @@ public class EventAdapter extends BaseAdapter {
        } else {
            item = (ListItemView) convertView.getTag();
        }
+        imageLoader.clearMemoryCache();
 
         if(dbManager==null){
             activity = (BaseActivity) listcontaner.getContext();
@@ -147,7 +149,6 @@ public class EventAdapter extends BaseAdapter {
         } else if (item.eventInfo.getTimeEnd() == 0) {
             item.time.setText(R.string.no_limit);
             if (dbManager.getTableEvent().queryEventById(item.eventInfo.getID()) == null) {
-                Log.e("id", Long.toString(item.eventInfo.getID()));
                 item.takepart_btn.setBackgroundResource(R.drawable.takepart_s);
                 item.takepart_btn.setClickable(true);
             } else {
@@ -202,9 +203,10 @@ public class EventAdapter extends BaseAdapter {
             item.logo.setImageResource(R.drawable.logo_default);
         }
 
-        if (null != item.eventInfo.getEventUri()
-                && !"".equals(item.eventInfo.getEventUri()) && !"null".equals(item.eventInfo.getEventUri())) {
-            imageLoader.displayImage(item.eventInfo.getEventUri(), item.event);
+        if (null != item.eventInfo.getPicUri()
+                && !"".equals(item.eventInfo.getPicUri()) && !"null".equals(item.eventInfo.getPicUri())) {
+            imageLoader.displayImage(item.eventInfo.getPicUri(), item.event);
+    //        Log.e("url",item.eventInfo.getEventUri());
         } else {
             item.event.setImageResource(R.drawable.event_eg);
         }
@@ -230,11 +232,11 @@ public class EventAdapter extends BaseAdapter {
         eventRecord.type = 0;
         eventRecord.uid = UserServer.getInstance().getUserid();
 
-        if (mDbManager.getTableEvent().addEvent(eventRecord) == -1) {
-            Log.e("add", "error in adding event");
-        } else {
-            Log.e("take part", Long.toString(eventRecord.id));
-        }
+//        if (mDbManager.getTableEvent().addEvent(eventRecord) == -1) {
+//           Log.e("add", "error in adding event");
+//        } else {
+//            Log.e("take part", Long.toString(eventRecord.id));
+//        }
 
     }
 
@@ -283,7 +285,7 @@ public class EventAdapter extends BaseAdapter {
                 args.putString("intro", newItem2.eventInfo.getEventIntro());
                 eventItem.setArguments(args);
 
-                Log.e("open item", Long.toString(newItem2.eventInfo.getID()));
+ //               Log.e("open item", Long.toString(newItem2.eventInfo.getID()));
 
                 mFmTrans.add(R.id.id_content, eventItem, "eventItem");
                 mFmTrans.addToBackStack("eventItem");

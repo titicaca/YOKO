@@ -68,16 +68,17 @@ public class FoundEvent extends Fragment {
             refreshableView.setOnRefreshListener(new PullToRefresh.PullToRefreshListener() {
                 @Override
                 public void onRefresh() {
-                    new APIUserServer.JsonGet(APIUrl.URL_EVENTS_GET+"/page/0/4", null, null, new APIJsonCallbackResponse() {
+                    new APIUserServer.JsonGet(APIUrl.URL_EVENTS_GET+"/page/0/10", null, null, new APIJsonCallbackResponse() {
                         @Override
                         public void run() {
                             JSONObject object = this.getResponse();
-                            Log.e("object", object.toString());
+                //            Log.e("object", object.toString());
                             eventList = FoundDataParser.parseEventBriefInfo(object);
                             if (eventList != null) {
                                 eventAdapter.setFragment(FoundEvent.this);
                                 eventAdapter.setList(eventList);
                                 eventAdapter.notifyDataSetChanged();
+                                page = 0;
 
                             }
                         }
@@ -93,11 +94,11 @@ public class FoundEvent extends Fragment {
     private void initDBfunctions() {
         baseActivity = (BaseActivity) this.getActivity();
         mRequestQueue = baseActivity.getRequestQueue();
-        new APIUserServer.JsonGet(APIUrl.URL_EVENTS_GET+ "/page/0/4", null, null, new APIJsonCallbackResponse() {
+        new APIUserServer.JsonGet(APIUrl.URL_EVENTS_GET+ "/page/0/10", null, null, new APIJsonCallbackResponse() {
             @Override
             public void run() {
                 JSONObject object = this.getResponse();
-                Log.e("Event object", object.toString());
+          //      Log.e("Event object", object.toString());
 
                 eventList = FoundDataParser.parseEventBriefInfo(object);
                 if(eventList!=null){
@@ -110,20 +111,18 @@ public class FoundEvent extends Fragment {
     }
 
     private void initListView(View parentView) {
-        Log.e("initial listview", "get into function");
         events.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
                 if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE) {
                     if (lastItem == eventAdapter.getCount()) {
                         page++;
-                        new APIUserServer.JsonGet(APIUrl.URL_EVENTS_GET + "/page/" + page + "/4", null, null, new APIJsonCallbackResponse() {
+                        new APIUserServer.JsonGet(APIUrl.URL_EVENTS_GET + "/page/" + page + "/10", null, null, new APIJsonCallbackResponse() {
                             @Override
                             public void run() {
                                 JSONObject object = this.getResponse();
-                                Log.e("object", object.toString());
+                              //  Log.e("object", object.toString());
                                 tempList = FoundDataParser.parseEventBriefInfo(object);
-                                Log.e("get parsed values", tempList.toString());
                                 if (tempList == null || tempList.size() == 0) {
                                     Toast.makeText(getActivity(), "It is the last group", Toast.LENGTH_SHORT);
                                 } else {
