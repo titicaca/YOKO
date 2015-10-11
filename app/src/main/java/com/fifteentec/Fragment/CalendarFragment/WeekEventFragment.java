@@ -1,16 +1,16 @@
-package com.fifteentec.Fragment;
+package com.fifteentec.Fragment.CalendarFragment;
 
 import android.app.Fragment;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.Database.EventRecord;
 import com.fifteentec.Component.calendar.CalendarView;
+import com.fifteentec.Component.calendar.EventManager;
 import com.fifteentec.Component.calendar.WeekEventView;
+import com.fifteentec.yoko.BaseActivity;
 import com.fifteentec.yoko.R;
 
 import java.util.ArrayList;
@@ -35,6 +35,10 @@ public class WeekEventFragment extends Fragment {
         void ShowDetailView(GregorianCalendar date);
     }
 
+    public void UpdateWeekView(){
+        weekEventView.UpdateEventArray();
+    }
+
     public void setmWeekViewFragmentLinstener(WeekViewFragmentLinstener mWeekViewFragmentLinstener) {
         this.mWeekViewFragmentLinstener = mWeekViewFragmentLinstener;
     }
@@ -57,8 +61,9 @@ public class WeekEventFragment extends Fragment {
     }
 
 
-    public void EventRecordUpdate(long rid,boolean exist){
-        weekEventView.UpdateView(rid, exist);
+    public void EventRecordUpdate(){
+
+        weekEventView.UpdateView();
 
     }
 
@@ -79,6 +84,12 @@ public class WeekEventFragment extends Fragment {
         }
     }
 
+    public void UpdateToView(GregorianCalendar time){
+        if(weekEventView!=null&&calendarView !=null) {
+            UpdateFragmentTime(time);
+            calendarView.initView(mCurDate);
+        }
+    }
     public void UpdateScale(){
         weekEventView.UpdateScale();
     }

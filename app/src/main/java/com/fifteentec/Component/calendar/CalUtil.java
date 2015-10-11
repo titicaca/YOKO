@@ -38,6 +38,10 @@ public class CalUtil {
         return token;
     }
 
+    public static long findDateBegin(long time){
+        long offset = time%TimeOfDayInMills;
+        return time-offset;
+    }
 
     public static ArrayList<Integer> GetDayInMonth(GregorianCalendar date)
     {
@@ -126,7 +130,7 @@ public class CalUtil {
 
     public static GregorianCalendar CopyDate(GregorianCalendar date)
     {
-        return new GregorianCalendar(date.get(Calendar.YEAR),date.get(Calendar.MONTH),date.get(Calendar.DAY_OF_MONTH));
+        return new GregorianCalendar(date.get(Calendar.YEAR),date.get(Calendar.MONTH),date.get(Calendar.DAY_OF_MONTH),date.get(Calendar.HOUR_OF_DAY),date.get(Calendar.MINUTE),date.get(Calendar.SECOND));
     }
 
 
