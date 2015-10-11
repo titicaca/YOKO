@@ -179,7 +179,7 @@ public class FoundEventItem extends Fragment {
         item.setTimeBegin(getArguments().getLong("timeBegin"));
         item.setTimeEnd(getArguments().getLong("timeEnd"));
         item.setID(getArguments().getLong("id"));
-        Log.e("item id",Long.toString(item.getID()));
+    //    Log.e("item id",Long.toString(item.getID()));
     }
 
     private void addNewEvent(){
@@ -197,12 +197,12 @@ public class FoundEventItem extends Fragment {
         eventRecord.type = 0;
         eventRecord.uid = UserServer.getInstance().getUserid();
 
-        if(dbManager.getTableEvent().addEvent(eventRecord)==-1){
-            Log.e("add","error in adding event");
-        }
-        else {
-            Log.e("add",Long.toString(eventRecord.id));
-        }
+//        if(dbManager.getTableEvent().addEvent(eventRecord)==-1){
+//            Log.e("add","error in adding event");
+//        }
+//        else {
+//            Log.e("add",Long.toString(eventRecord.id));
+//        }
 
     }
 

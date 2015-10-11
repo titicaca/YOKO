@@ -5,6 +5,7 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,6 +29,7 @@ import com.fifteentec.yoko.BaseActivity;
 import com.fifteentec.yoko.R;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -172,20 +174,20 @@ public class EventAdapter extends BaseAdapter {
 
         }
 
-        item.takepart_btn.setTag(-2);
+        item.takepart_btn.setTag(R.integer.FoundTouchEvent,-2);
         item.takepart_btn.setOnClickListener(listener);
 
-        item.name.setTag(-3);
+        item.name.setTag(R.integer.FoundTouchEvent,-3);
         item.name.setOnClickListener(listener);
-        item.event.setTag(-3);
+        item.event.setTag(R.integer.FoundTouchEvent,-3);
         item.event.setOnClickListener(listener);
-        item.time.setTag(-3);
+        item.time.setTag(R.integer.FoundTouchEvent,-3);
         item.time.setOnClickListener(listener);
-        item.intro.setTag(-3);
+        item.intro.setTag(R.integer.FoundTouchEvent,-3);
         item.intro.setOnClickListener(listener);
-        item.location.setTag(-3);
+        item.location.setTag(R.integer.FoundTouchEvent,-3);
         item.location.setOnClickListener(listener);
-        item.logo.setTag(-3);
+        item.logo.setTag(R.integer.FoundTouchEvent,-3);
         item.logo.setOnClickListener(listener);
 
         if (!"".equals(item.eventInfo.getEventIntro()) && (item.eventInfo.getEventIntro().length() > 30)) {
@@ -206,6 +208,18 @@ public class EventAdapter extends BaseAdapter {
         if (null != item.eventInfo.getPicUri()
                 && !"".equals(item.eventInfo.getPicUri()) && !"null".equals(item.eventInfo.getPicUri())) {
             imageLoader.displayImage(item.eventInfo.getPicUri(), item.event);
+//            item.event.setTag(R.integer.FoundLoadEvent,item.eventInfo.getPicUri());
+//            ImageLoader.getInstance().loadImage(item.eventInfo.getPicUri(), new SimpleImageLoadingListener() {
+//
+//                @Override
+//                public void onLoadingComplete(String imageUrl, View view,
+//                                              Bitmap loadedImage) {
+//                    super.onLoadingComplete(imageUrl, view, loadedImage);
+//                    if (imageUrl.equals(item.event.getTag(R.integer.FoundLoadEvent))) {
+//                        item.event.setImageBitmap(loadedImage);
+//                    }
+//                }
+//            });
     //        Log.e("url",item.eventInfo.getEventUri());
         } else {
             item.event.setImageResource(R.drawable.event_eg);
@@ -251,7 +265,7 @@ public class EventAdapter extends BaseAdapter {
 
         @Override
         public void onClick(View v) {
-            if(((Integer)v.getTag())==-2){
+            if(((Integer)v.getTag(R.integer.FoundTouchEvent))==-2){
                 View convertView=(View)v.getParent().getParent();
                 Log.e("covertView",convertView.toString());
                 ListItemView newItem =(ListItemView) convertView.getTag();
@@ -261,7 +275,7 @@ public class EventAdapter extends BaseAdapter {
                     v.setClickable(false);
                 }
             }
-            else if(((Integer)v.getTag())==-3){
+            else if(((Integer)v.getTag(R.integer.FoundTouchEvent))==-3){
                 View convertView=(View)v.getParent();
                 Log.e("covertView",convertView.toString());
                 ListItemView newItem =(ListItemView) convertView.getTag();

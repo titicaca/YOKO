@@ -5,4 +5,6 @@
     <integer name="SelectorFrd"> 0x01</integer>
     <integer name="SelectorCir"> 0x02</integer>
     <integer name="SelectorMe"> 0x03</integer>
+    <integer name="FoundTouchEvent">0x04</integer>
+    <integer name="FoundLoadEvent">0x05</integer>
 </resources>
