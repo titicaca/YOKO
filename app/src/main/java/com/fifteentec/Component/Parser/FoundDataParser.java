@@ -46,7 +46,7 @@ public class FoundDataParser {
 
     public static List<EventBrief> parseEventBriefInfo(final JSONObject response) {
         List<EventBrief> eventBriefs = new ArrayList<EventBrief>();
-        Log.e("parser","start parsing" );
+   //     Log.e("parser","start parsing" );
         try {
             JSONArray groups = response.getJSONArray("list");
             for (int i = 0; i < groups.length(); ++i) {
